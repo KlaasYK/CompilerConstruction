@@ -36,14 +36,10 @@ void subInteger(Integer *a, Integer b);
 void mulInteger(Integer *a, Integer b);
 
 /* a := a div b */
-<<<<<<< HEAD
 void divInteger();
 
 /* make integer form a string */
 void makeIntegerFromString(Integer *a, char digits[]);
-
-/* prints integer to stdout */
-void printInteger(Integer a);
 
 /* a := a + b */
 void addInteger(Integer *a, Integer b);
@@ -56,12 +52,3 @@ void mulInteger(Integer *a, Integer b);
 
 /* a := a div b */
 void divInteger();
-=======
-void divInteger(Integer *a, Integer b);
-
-
-
-void subInteger(Integer *a, Integer b) {
-	
-}
->>>>>>> origin/master
