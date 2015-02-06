@@ -33,3 +33,21 @@ void mulInteger(Integer *a, Integer b);
 
 /* a := a div b */
 void divInteger();
+
+/* make integer form a string */
+void makeIntegerFromString(Integer *a, char digits[]);
+
+/* prints integer to stdout */
+void printInteger(Integer a);
+
+/* a := a + b */
+void addInteger(Integer *a, Integer b);
+
+/* a := a - b */
+void subInteger(Integer *a, Integer b);
+
+/* a := a * b */
+void mulInteger(Integer *a, Integer b);
+
+/* a := a div b */
+void divInteger();
