@@ -36,19 +36,30 @@ void subInteger(Integer *a, Integer b);
 void mulInteger(Integer *a, Integer b);
 
 /* a := a div b */
-void divInteger();
+void divInteger(Integer *a, Integer b);
+
+
+/* Implementations */
 
 /* make integer form a string */
 void makeIntegerFromString(Integer *a, char digits[]);
 
 /* a := a + b */
-void addInteger(Integer *a, Integer b);
+void addInteger(Integer *a, Integer b) {
+	unsigned long alen = a->length;
+	unsigned long blen = b.length;
+}
 
 /* a := a - b */
-void subInteger(Integer *a, Integer b);
+void subInteger(Integer *a, Integer b) {
+	unsigned long alen = a->length;
+	unsigned long blen = b.length;
+	
+	
+}
 
 /* a := a * b */
 void mulInteger(Integer *a, Integer b);
 
 /* a := a div b */
-void divInteger();
+void divInteger(Intger *a, Integer b);
