@@ -117,7 +117,7 @@ void addInteger(Integer *a, Integer b) {
 	/* blen > alen */
 	if (blen > alen) {
 		/* allocate more memory */
-		int* digitsnew;
+		int *digitsnew;
 		digitsnew = safeMalloc(blen);
 		/* copy digits over */
 		for (i = 0; i < alen; ++i) {
@@ -126,15 +126,30 @@ void addInteger(Integer *a, Integer b) {
 		/* old digits can be removed */
 		free(a->digits);
 		/* copy carry over */
-		for (; carry != 0; ++i) {
+		for (; carry != 0 && i < blen; ++i) {
 			digitsnew[i] = b.digits[i] + carry;
 			carry = digitsnew[i] / 10;
 			digitsnew[i] %= 10;
 		}
-
-		/* copy rest of digits over */
-		for (; i < blen; ++i) {
-			digitsnew[i] = b.digits[i];
+		if (i == blen && carry != 0) {
+			/* if there is carry for the last digit create a new array of the right length*/
+			int *temp = safeMalloc(blen + 1);
+			blen++;
+			/* copy values to the new array*/
+			for (int j = 0; j < blen-1; ++j) {
+				temp[j] = a->digits[j];
+			}
+			/* copy the carry */
+			temp[j] = carry;
+			/* free the old array*/
+			free(digitsnew);
+			/* put the new array in digitsnew*/
+			digitsnew =  temp;
+		}else{
+			/* copy rest of digits over */
+			for (; i < blen; ++i) {
+				digitsnew[i] = b.digits[i];
+			}
 		}
 		/* finally replace digits */
 		a->digits = digitsnew;
@@ -142,7 +157,7 @@ void addInteger(Integer *a, Integer b) {
 
 	} else if (alen == blen && carry > 0) {
 		/* more space is needed */
-		int* digitsnew;
+		int *digitsnew;
 		digitsnew = safeMalloc(alen + 1);
 		for (i = 0; i < alen; ++i) {
 			digitsnew[i] = a->digits[i];
@@ -183,7 +198,7 @@ void subInteger(Integer *a, Integer b) {
 	/* blen > alen */
 	if (blen > alen) {
 		/* allocate more memory */
-		int* digitsnew;
+		int *digitsnew;
 		digitsnew = safeMalloc(blen);
 		/* copy digits over */
 		for (i = 0; i < alen; ++i) {
@@ -192,15 +207,30 @@ void subInteger(Integer *a, Integer b) {
 		/* old digits can be removed */
 		free(a->digits);
 		/* copy carry over */
-		for (; carry != 0; ++i) {
+		for (; carry != 0 && i < blen; ++i) {
 			digitsnew[i] = b.digits[i] + carry;
 			carry = digitsnew[i] / 10;
 			digitsnew[i] %= 10;
 		}
-
-		/* copy rest of digits over */
-		for (; i < blen; ++i) {
-			digitsnew[i] = b.digits[i];
+		if (i == blen && carry != 0) {
+			/* if there is carry for the last digit create a new array of the right length*/
+			int *temp = safeMalloc(blen + 1);
+			blen++;
+			/* copy values to the new array*/
+			for (int j = 0; j < blen-1; ++j) {
+				temp[j] = a->digits[j];
+			}
+			/* copy the carry */
+			temp[j] = carry;
+			/* free the old array*/
+			free(digitsnew);
+			/* put the new array in digitsnew*/
+			digitsnew =  temp;
+		}else{
+			/* copy rest of digits over */
+			for (; i < blen; ++i) {
+				digitsnew[i] = b.digits[i];
+			}
 		}
 		/* finally replace digits */
 		a->digits = digitsnew;
@@ -208,7 +238,7 @@ void subInteger(Integer *a, Integer b) {
 
 	} else if (alen == blen && carry > 0) {
 		/* more space is needed */
-		int* digitsnew;
+		int *digitsnew;
 		digitsnew = safeMalloc(alen + 1);
 		for (i = 0; i < alen; ++i) {
 			digitsnew[i] = a->digits[i];
