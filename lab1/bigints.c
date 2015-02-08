@@ -168,7 +168,7 @@ void addInteger(Integer *a, Integer b) {
 		(a->length)++;
 	} else if (carry > 0) {
 		/* alen > blen */
-		printf("%d", i);
+		/*printf("%d", i);*/
 		a->digits[i] = carry;
 	}
 }
