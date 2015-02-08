@@ -252,7 +252,7 @@ void subInteger(Integer *a, Integer b) {
 	/* if the number is prepended by zeros */
 	if (i > 0) {
 		/* check for 0 or -0 and make it always positive */
-		if(i == alen){
+		if (i == alen) {
 			i--;
 			a->sign = 1;
 		}
@@ -347,6 +347,7 @@ Integer karatsuba(Integer a, Integer b) {
 	Integer z0, z1, z2;
 	
 	/* base state of recursion */
+
 	/* a < 10 */
 	if (alen < 2) {
 		simpleMul(&b, a.digits[0]);
@@ -400,7 +401,36 @@ Integer karatsuba(Integer a, Integer b) {
 
 /* a := a * b */
 void mulInteger(Integer *a, Integer b) {
-	unsigned long alen = a->length, blen = b.length;
+	int newsign = a->sign * b.sign;
+	unsigned long i, alen = a->length;
+
+	/* calculate multiplication, possibly with the wrong sign */
+	a* = karatsuba(a*, b);
+	/* check how many zero's are at the end of a number*/
+	for (i = 0; i < alen && a->digits[alen - i - 1] == 0; ++i);
+
+	/* if the number is zero */
+	if (i == alen) {
+		unsigned long j;
+		i--;
+		a->sign = 1;
+		/* more space is needed */
+		int *digitsnew;
+		/* allocate more memory */
+		digitsnew = safeMalloc(alen - i);
+		/* copy digits over */
+		for (j = 0; j < alen - i; ++j) {
+			digitsnew[j] = a->digits[j];
+		}
+		/* free the old array */
+		free(a->digits);
+		/* put the new array in digits */
+		a->digits = digitsnew;
+		/* Make a length 1 larger*/
+		(a->length) -= i;
+	} else {
+		a->sign = newsign;
+	}
 
 }
 
