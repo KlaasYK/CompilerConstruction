@@ -50,17 +50,17 @@ void shallowCopyInteger(Integer a, Integer *aCopy) {
 }
 
 /* utility function to compare numbers */
-int compareTo(Integer a, Integer b){
-	if(a.length > b.length){
+int compareTo(Integer a, Integer b) {
+	if (a.length > b.length) {
 		return 1;
-	}else if(b.length > a.length){
+	} else if (b.length > a.length) {
 		return -1;
-	}else{
+	} else {
 		unsigned long i;
-		for (i = a.length-1; i >= 0; i--) {
-			if(a.digits[i] > b.digits[i]){
+		for (i = a.length - 1; i >= 0; i--) {
+			if (a.digits[i] > b.digits[i]) {
 				return 1;
-			}else if(b.digits[i] > a.digits[i]){
+			} else if (b.digits[i] > a.digits[i]) {
 				return -1;
 			}
 		}
@@ -151,7 +151,7 @@ void addInteger(Integer *a, Integer b) {
 		return;
 	}
 
-	/* check if blen > alen*/
+	/* check if b > a */
 	if (compareTo(b, *a) > 0) {
 		/* deep copy b */
 		Integer bCopy;
@@ -162,7 +162,7 @@ void addInteger(Integer *a, Integer b) {
 		return;
 	}
 
-	/* for equal signs and alen >= blen */
+	/* for equal signs and a >= b */
 	int carry = 0, temp;
 	unsigned long i;
 
@@ -214,21 +214,21 @@ void subInteger(Integer *a, Integer b) {
 		return;
 	}
 
-	/* check if blen > alen*/
+	/* check if b > a */
 	if (compareTo(b, *a) > 0) {
 		/* deep copy b */
 		Integer bCopy;
 		deepCopyInteger(b, &bCopy);
 		a->sign = -(a->sign);
 		bCopy.sign = -(bCopy.sign);
-		addInteger(&bCopy, *a);
+		subInteger(&bCopy, *a);
 		freeInteger(a);
 		shallowCopyInteger(bCopy, a);
 		a->sign = -(a->sign);
 		return;
 	}
 
-	/* for equal signs and alen >= blen */
+	/* for equal signs and a >= b */
 	int carry = 0, temp;
 	unsigned long i;
 
@@ -245,31 +245,32 @@ void subInteger(Integer *a, Integer b) {
 		a->digits[i] = (temp + 10) % 10;
 		carry = (temp + 10) / 10 - 1;
 	}
-	
+
 	/* check how many zero's are at the end of a number*/
-	for (int i = 0; i < size; i++) {
-		Object elem = array[i];
+	for (i = 0; i < alen && a->digits[alen - i - 1] == 0; ++i);
 
-	}
-
-	/* f */
-	if (carry > 0) {
+	/* if the number is prepended by zeros */
+	if (i > 0) {
+		/* check for 0 or -0 and make it always positive */
+		if(i == alen){
+			i--;
+			a->sign = 1;
+		}
+		unsigned long j;
 		/* more space is needed */
 		int *digitsnew;
 		/* allocate more memory */
-		digitsnew = safeMalloc(alen + 1);
+		digitsnew = safeMalloc(alen - i);
 		/* copy digits over */
-		for (i = 0; i < alen; i++) {
-			digitsnew[i] = a->digits[i];
+		for (j = 0; j < alen - i; ++j) {
+			digitsnew[j] = a->digits[j];
 		}
-		/* copy the carry */
-		digitsnew[i] = carry;
 		/* free the old array */
 		free(a->digits);
 		/* put the new array in digits */
 		a->digits = digitsnew;
 		/* Make a length 1 larger*/
-		(a->length)++;
+		(a->length) -= i;
 	}
 
 }
@@ -379,14 +380,14 @@ void powInteger(Integer *a, Integer b) {
 
 int main() {
 	Integer a, b;
-	makeIntegerFromString(&a, "-1");
-	makeIntegerFromString(&b, "-9999999999999999999999999999999999999999999999999999999");
+	makeIntegerFromString(&a, "-98");
+	makeIntegerFromString(&b, "-998");
 	printInteger(a);
 	printf("\n");
 	printInteger(b);
 	printf("\n");
 
-	addInteger(&a, b);
+	subInteger(&a, b);
 	printInteger(a);
 	printf("\n");
 
