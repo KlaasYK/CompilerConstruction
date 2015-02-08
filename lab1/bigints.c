@@ -91,12 +91,12 @@ void addInteger(Integer *a, Integer b) {
 	/* check sign */	
 	if (a->sign == 1 && b.sign == -1) {
 		/* execute subFunction */
-                subIneger(a, b);
+                subInteger(a, b);
 		return;
 	}
 	if (a->sign == -1 && b.sign == 1) {
 		/* execute subFunction swap a and b */
-                subIneger(b, a);
+                subInteger(b, a);
 		return;
 	}
 	/* for equal signs, use below */
