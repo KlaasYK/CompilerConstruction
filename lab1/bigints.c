@@ -210,7 +210,7 @@ void subInteger(Integer *a, Integer b) {
 	if (a->sign + b.sign == 0) {
 		/* execute subtract function */
 		b.sign = a->sign;
-		subInteger(a, b);
+		addInteger(a, b);
 		return;
 	}
 
