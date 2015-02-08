@@ -330,6 +330,8 @@ void splitAt(Integer *high, Integer *low, Integer largeInteger, unsigned long sp
 Integer karatsuba(Integer a, Integer b) {
 	unsigned long alen = a.length, blen = b.length, m, m2;
 
+	Integer z0, z1, z2;
+	
 	/* base state */
 	/* a < 10 */
 	if (alen < 2) {
@@ -346,8 +348,8 @@ Integer karatsuba(Integer a, Integer b) {
 
 	/* declare all the integers! */
 	Integer high1, low1, high2, low2;
-
-
+	splitAt(&high1, &low1, a, m2);
+	splitAt(&high2, &low2, b, m2);
 
 	/* free the temp integers */
 	freeInteger(&high1);
@@ -396,7 +398,7 @@ int main() {
 
 
 	Integer high, low;
-	makeIntegerFromString(&a, "2542");
+	makeIntegerFromString(&a, "25425");
 	makeIntegerFromString(&b, "4");
 	printInteger(a);
 	printf("\n");
