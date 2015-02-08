@@ -267,13 +267,8 @@ Integer karatsuba(Integer a, Integer b) {
 
 /* a := a * b */
 void mulInteger(Integer *a, Integer b) {
-<<<<<<< HEAD
 	unsigned long alen = a->length, blen = b.length;
-	
-	
-=======
 
->>>>>>> 20c473b8497e8e20203e93c29eda2ae468ed1afd
 }
 
 /* a := a div b */
@@ -291,17 +286,11 @@ void powInteger(Integer *a, Integer b) {
 
 }
 
-<<<<<<< HEAD
-int main () {
-	Integer a,b;
-	makeIntegerFromString(&a, "1");
-	makeIntegerFromString(&b, "999");
-=======
+
 int main() {
 	Integer a, b;
 	makeIntegerFromString(&a, "555");
 	makeIntegerFromString(&b, "2");
->>>>>>> 20c473b8497e8e20203e93c29eda2ae468ed1afd
 	printInteger(a);
 	printf("\n");
 	printInteger(b);
