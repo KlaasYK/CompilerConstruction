@@ -390,6 +390,9 @@ int main() {
 	printInteger(low);
 	printf("\n");
 
+	
+	freeInteger(&high);
+	freeInteger(&low);
 	freeInteger(&a);
 	freeInteger(&b);
 	return 0;
