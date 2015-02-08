@@ -67,7 +67,7 @@ void printInteger(Integer a) {
 	}
 	for (i = a.length; i > 0; --i) {
 		val = a.digits[i - 1];
-		if (val > BASE) {
+		if (val >= BASE) {
 			/* print error */
 			printf("!(%d)!", a.digits[i - 1]);
 		} else {
