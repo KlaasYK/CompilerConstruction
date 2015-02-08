@@ -169,15 +169,15 @@ void addInteger(Integer *a, Integer b) {
 	/* calculate sum */
 	for (i = 0; i < blen; ++i) {
 		temp = a->digits[i] + b.digits[i] + carry;
-		a->digits[i] = temp % 10;
-		carry = temp / 10;
+		a->digits[i] = temp % BASE;
+		carry = temp / BASE;
 	}
 
 	/* copy the last carry */
 	for (; carry != 0 && i < alen; ++i) {
 		temp = a->digits[i] + carry;
-		a->digits[i] = temp % 10;
-		carry = temp / 10;
+		a->digits[i] = temp % BASE;
+		carry = temp / BASE;
 	}
 
 	/* if last carry is overflowing a */
@@ -235,15 +235,15 @@ void subInteger(Integer *a, Integer b) {
 	/* calculate sum */
 	for (i = 0; i < blen; ++i) {
 		temp = a->digits[i] - b.digits[i] + carry;
-		a->digits[i] = (temp + 10) % 10;
-		carry = (temp + 10) / 10 - 1;
+		a->digits[i] = (temp + BASE) % BASE;
+		carry = (temp + BASE) / BASE - 1;
 	}
 
 	/* copy the last carry */
 	for (; carry != 0 && i < alen; ++i) {
 		temp = a->digits[i] + carry;
-		a->digits[i] = (temp + 10) % 10;
-		carry = (temp + 10) / 10 - 1;
+		a->digits[i] = (temp + BASE) % BASE;
+		carry = (temp + BASE) / BASE - 1;
 	}
 
 	/* check how many zero's are at the end of a number*/
