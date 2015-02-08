@@ -412,19 +412,15 @@ Integer karatsuba(Integer a, Integer b) {
 /* a := a * b */
 void mulInteger(Integer *a, Integer b) {
 	int newsign = a->sign * b.sign;
-	unsigned long i, alen = a->length;
 	Integer c;
 	/* calculate multiplication, possibly with the wrong sign */
 	c = karatsuba(*a, b);
 	freeInteger(a);
 	shallowCopyInteger(c, a);
 	/* check how many zero's are at the end of a number*/
+	unsigned long i, alen = a->length;
 	for (i = 0; i < alen && a->digits[alen - i - 1] == 0; ++i);
 
-	printf("Test\n"); 
-	printInteger(*a);
-	printf("\n");
-	
 	/* if the number is zero */
 	if (i == alen) {
 		unsigned long j;
@@ -482,8 +478,8 @@ int main() {
 	freeInteger(&b);
 
 
-	makeIntegerFromString(&a, "4");
-	makeIntegerFromString(&b, "5");
+	makeIntegerFromString(&a, "23663");
+	makeIntegerFromString(&b, "2356");
 	printInteger(a);
 	printf("\n");
 	printInteger(b);
