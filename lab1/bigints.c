@@ -32,11 +32,17 @@ void freeInteger(Integer *a) {
 }
 
 /* utility function to deep copy Integers*/
-void deepcopyInteger(Integer a, Integer *aCopy) {
+void deepCopyInteger(Integer a, Integer *aCopy) {
 	aCopy->digits = safeMalloc(a.length);
 	for (int i = 0; i < size; i++) {
 		aCopy->digits[i] = a.digits[i];
 	}
+	aCopy->length = a.length;
+	aCopy->sign = a.sign;
+}
+
+void shallowCopyInteger(Integer a, Integer *aCopy) {
+	aCopy->digits = a.digits;
 	aCopy->length = a.length;
 	aCopy->sign = a.sign;
 }
@@ -127,7 +133,7 @@ void addInteger(Integer *a, Integer b) {
 	if (blen > alen) {
 		/* deep copy b */
 		Integer bCopy;
-		deepcopyInteger(b, bCopy);
+		deepCopyInteger(b, bCopy);
 		addInteger(&bCopy, *a);
 		freeInteger(a);
 		a->digits = bCopy.digits;
