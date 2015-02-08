@@ -327,17 +327,17 @@ void powInteger(Integer *a, Integer b) {
 
 int main() {
 	Integer a, b;
-	makeIntegerFromString(&a, "555");
-	makeIntegerFromString(&b, "2");
+	makeIntegerFromString(&a, "25");
+	makeIntegerFromString(&b, "1");
 	printInteger(a);
 	printf("\n");
 	printInteger(b);
 	printf("\n");
-
-	addInteger(&a, b);
+	
+	simpleMul(&a, 4);
 	printInteger(a);
 	printf("\n");
-
+	
 	freeInteger(&a);
 	freeInteger(&b);
 	return 0;
