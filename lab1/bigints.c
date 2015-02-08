@@ -115,8 +115,6 @@ void addInteger(Integer *a, Integer b) {
 	unsigned long alen = a->length;
 	unsigned long blen = b.length;
 
-	/* deep copy b */
-	Integer bCopy;
 			
 	/* check sign */
 	if (a->sign + b.sign == 0) {
@@ -127,8 +125,14 @@ void addInteger(Integer *a, Integer b) {
 	}
 	/* check if blen > alen*/
 	if (blen > alen) {
-		addInteger(&b, *a);
-		a = &b;
+		/* deep copy b */
+		Integer bCopy;
+		deepcopyInteger(b, bCopy);
+		addInteger(&bCopy, *a);
+		freeInteger(a);
+		a->digits = bCopy.digits;
+		a->length = bCopy.length;
+		a->sign = bCopy.sign;
 	}
 	/* for equal signs, use below */
 	int carry = 0, temp;
