@@ -34,7 +34,7 @@ void freeInteger(Integer *a) {
 /* utility function to deep copy Integers*/
 void deepCopyInteger(Integer a, Integer *aCopy) {
 	aCopy->digits = safeMalloc(a.length);
-	for (int i = 0; i < size; i++) {
+	for (int i = 0; i < a.length; i++) {
 		aCopy->digits[i] = a.digits[i];
 	}
 	aCopy->length = a.length;
@@ -121,7 +121,6 @@ void addInteger(Integer *a, Integer b) {
 	unsigned long alen = a->length;
 	unsigned long blen = b.length;
 
-			
 	/* check sign */
 	if (a->sign + b.sign == 0) {
 		/* execute subtract function */
@@ -129,17 +128,18 @@ void addInteger(Integer *a, Integer b) {
 		subInteger(a, b);
 		return;
 	}
+
 	/* check if blen > alen*/
 	if (blen > alen) {
 		/* deep copy b */
 		Integer bCopy;
-		deepCopyInteger(b, bCopy);
+		deepCopyInteger(b, &bCopy);
 		addInteger(&bCopy, *a);
 		freeInteger(a);
-		a->digits = bCopy.digits;
-		a->length = bCopy.length;
-		a->sign = bCopy.sign;
+		shallowCopyInteger(bCopy, a);
+		return;
 	}
+
 	/* for equal signs, use below */
 	int carry = 0, temp;
 	unsigned long i, min = MIN(alen, blen);
@@ -149,60 +149,23 @@ void addInteger(Integer *a, Integer b) {
 		carry = temp / 10;
 	}
 
-	/* blen > alen */
-	if (blen > alen) {
-		/* allocate more memory */
+	if (alen == blen && carry > 0) {
+		/* more space is needed */
 		int *digitsnew;
-		digitsnew = safeMalloc(blen);
+		/* allocate more memory */
+		digitsnew = safeMalloc(alen + 1);
 		/* copy digits over */
 		for (i = 0; i < alen; ++i) {
 			digitsnew[i] = a->digits[i];
 		}
-		/* old digits can be removed */
-		free(a->digits);
-		/* copy carry over */
-		for (; carry != 0 && i < blen; ++i) {
-			digitsnew[i] = b.digits[i] + carry;
-			carry = digitsnew[i] / 10;
-			digitsnew[i] %= 10;
-		}
-		if (i == blen && carry != 0) {
-			/* if there is carry for the last digit create a new array of the right length*/
-			int *temp = safeMalloc(blen + 1);
-			blen++;
-			int j;
-			/* copy values to the new array*/
-			for (j = 0; j < blen - 1; ++j) {
-				temp[j] = a->digits[j];
-			}
-			/* copy the carry */
-			temp[j] = carry;
-			/* free the old array*/
-			free(digitsnew);
-			/* put the new array in digitsnew*/
-			digitsnew = temp;
-		} else {
-			/* copy rest of digits over */
-			for (; i < blen; ++i) {
-				digitsnew[i] = b.digits[i];
-			}
-		}
-		/* finally replace digits */
-		a->digits = digitsnew;
-		a->length = blen;
-
-	} else if (alen == blen && carry > 0) {
-		/* more space is needed */
-		int *digitsnew;
-		digitsnew = safeMalloc(alen + 1);
-		for (i = 0; i < alen; ++i) {
-			digitsnew[i] = a->digits[i];
-		}
+		/* copy the carry */
 		digitsnew[i] = carry;
+		/* free the old array */
 		free(a->digits);
+		/* put the new array in digits */
 		a->digits = digitsnew;
+		/* Make a length 1 larger*/
 		(a->length)++;
-
 	} else if (carry > 0) {
 		/* alen > blen */
 		a->digits[i] = carry;
