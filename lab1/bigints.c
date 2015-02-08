@@ -153,9 +153,9 @@ void addInteger(Integer *a, Integer b) {
 
 	/* copy the last carry */
 	for (; carry != 0 && i < alen; ++i) {
-		a->digits[i] = a->digits[i] + carry;
-		carry = a->digits[i] / 10;
-		a->digits[i] %= 10;
+		temp = a->digits[i] + carry;
+		a->digits[i] = temp % 10;
+		carry = temp / 10;
 	}
 
 	/* if last carry is overflowing a */
@@ -197,9 +197,12 @@ void subInteger(Integer *a, Integer b) {
 		/* deep copy b */
 		Integer bCopy;
 		deepCopyInteger(b, &bCopy);
+		a->sign = -(a->sign);
+		bCopy.sign = -(bCopy.sign);
 		addInteger(&bCopy, *a);
 		freeInteger(a);
 		shallowCopyInteger(bCopy, a);
+		a->sign = -(a->sign);
 		return;
 	}
 
@@ -209,16 +212,16 @@ void subInteger(Integer *a, Integer b) {
 
 	/* calculate sum */
 	for (i = 0; i < blen; ++i) {
-		temp = a->digits[i] + b.digits[i] + carry;
-		a->digits[i] = temp % 10;
-		carry = temp / 10;
+		temp = a->digits[i] - b.digits[i] + carry;
+		a->digits[i] = (temp + 10) % 10;
+		carry = (temp + 10) / 10 - 1;
 	}
 
 	/* copy the last carry */
 	for (; carry != 0 && i < alen; ++i) {
-		a->digits[i] = a->digits[i] + carry;
-		carry = a->digits[i] / 10;
-		a->digits[i] %= 10;
+		temp = a->digits[i] + carry;
+		a->digits[i] = (temp + 10) % 10;
+		carry = (temp + 10) / 10 - 1;
 	}
 
 	/* if last carry is overflowing a */
