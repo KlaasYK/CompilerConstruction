@@ -403,9 +403,11 @@ Integer karatsuba(Integer a, Integer b) {
 void mulInteger(Integer *a, Integer b) {
 	int newsign = a->sign * b.sign;
 	unsigned long i, alen = a->length;
-
+	Integer c;
 	/* calculate multiplication, possibly with the wrong sign */
-	*a = karatsuba(*a, b);
+	c = karatsuba(*a, b);
+	freeInteger(a);
+	shallowCopyInteger(c, a);
 	/* check how many zero's are at the end of a number*/
 	for (i = 0; i < alen && a->digits[alen - i - 1] == 0; ++i);
 
