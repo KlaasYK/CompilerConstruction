@@ -140,7 +140,7 @@ void addInteger(Integer *a, Integer b) {
 		return;
 	}
 
-	/* for equal signs, use below */
+	/* for equal signs and alen >= blen */
 	int carry = 0, temp;
 	unsigned long i, min = MIN(alen, blen);
 	for (i = 0; i < min; ++i) {
@@ -155,7 +155,7 @@ void addInteger(Integer *a, Integer b) {
 		/* allocate more memory */
 		digitsnew = safeMalloc(alen + 1);
 		/* copy digits over */
-		for (i = 0; i < alen; ++i) {
+		for (i = 0; i < alen; i++) {
 			digitsnew[i] = a->digits[i];
 		}
 		/* copy the carry */
@@ -168,6 +168,7 @@ void addInteger(Integer *a, Integer b) {
 		(a->length)++;
 	} else if (carry > 0) {
 		/* alen > blen */
+		printf("%d", i);
 		a->digits[i] = carry;
 	}
 }
@@ -327,8 +328,8 @@ void powInteger(Integer *a, Integer b) {
 
 int main() {
 	Integer a, b;
-	makeIntegerFromString(&a, "1");
-	makeIntegerFromString(&b, "999");
+	makeIntegerFromString(&a, "999");
+	makeIntegerFromString(&b, "1");
 	printInteger(a);
 	printf("\n");
 	printInteger(b);
