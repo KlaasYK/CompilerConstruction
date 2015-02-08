@@ -351,13 +351,13 @@ Integer karatsuba(Integer a, Integer b) {
 	/* a < 10 */
 	if (alen < 2) {
 		/* TODO: remove depency on b */
-		simpleMul(&b, a.digits[0]);
 		deepCopyInteger(b, &returnInt);
+		simpleMul(&returnInt, a.digits[0]);
 		return returnInt;
 	}
 	if (blen < 2) {
-		simpleMul(&a, b.digits[0]);
 		deepCopyInteger(a, &returnInt);
+		simpleMul(&returnInt, b.digits[0]);
 		return returnInt;
 	}
 
@@ -421,6 +421,10 @@ void mulInteger(Integer *a, Integer b) {
 	/* check how many zero's are at the end of a number*/
 	for (i = 0; i < alen && a->digits[alen - i - 1] == 0; ++i);
 
+	printf("Test\n"); 
+	printInteger(*a);
+	printf("\n");
+	
 	/* if the number is zero */
 	if (i == alen) {
 		unsigned long j;
@@ -478,8 +482,8 @@ int main() {
 	freeInteger(&b);
 
 
-	makeIntegerFromString(&a, "250");
-	makeIntegerFromString(&b, "4");
+	makeIntegerFromString(&a, "4");
+	makeIntegerFromString(&b, "5");
 	printInteger(a);
 	printf("\n");
 	printInteger(b);
