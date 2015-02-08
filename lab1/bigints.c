@@ -3,6 +3,8 @@
 
 #define MIN(a,b) a<b?a:b
 
+#define BASE 10
+
 /* datastructure for infinite intgers */
 struct EGCLint {
     int* digits; /* the value for each of the digits, big endian */
@@ -101,7 +103,7 @@ void addInteger(Integer *a, Integer b) {
 	}
 	if (a->sign == -1 && b.sign == 1) {
 		/* execute subFunction swap a and b */
-                subInteger(b, a);
+                /* subInteger(b, a); */
 		return;
 	}
 	/* for equal signs, use below */
@@ -163,8 +165,50 @@ void subInteger(Integer *a, Integer b) {
 	
 }
 
+
+/* a := a * b where b < 10 */
+void simpleMul(Integer *a, int b ) {
+	int carry = 0, val;
+	unsigned long i, alen = a->length;
+	/* multiply the whole "string" with the single digit */
+	for (i = 0; i < alen; ++i) {
+		val = a->digits[i] * b + carry;
+		carry = val / BASE;
+		a->digits[i] = val % BASE;
+	}
+	
+	/* allocate an extra digit, add carry */
+	if (carry > 0) {
+		int* newdigits = safeMalloc(alen + 1);
+		for (i = 0; i < alen; ++i) {
+			newdigits[i] = a->digits[i];
+		}
+		newdigits[i] = carry;
+		a->length = alen + 1;
+		free(a->digits);
+		a->digits = newdigits;
+	}
+	
+}
+
+/* recursive karatsuba */
+Integer karatsuba(Integer a, Integer b) {
+	unsigned long alen = a.length, blen = b.length;
+	Integer c;
+	
+	/* a < 10 */
+	if (alen < 2) {
+		
+	}
+	
+}
+
+
+
 /* a := a * b */
 void mulInteger(Integer *a, Integer b) {
+	unsigned long alen = a->length, blen = b.length;
+	
 	
 }
 
@@ -186,8 +230,8 @@ void powInteger(Integer *a, Integer b) {
 
 int main () {
 	Integer a,b;
-	makeIntegerFromString(&a, "555");
-	makeIntegerFromString(&b, "2");
+	makeIntegerFromString(&a, "1");
+	makeIntegerFromString(&b, "999");
 	printInteger(a);
 	printf("\n");
 	printInteger(b);
