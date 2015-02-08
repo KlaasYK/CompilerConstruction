@@ -261,6 +261,10 @@ Integer karatsuba(Integer a, Integer b) {
 		simpleMul(&b,a);
 		return b;
 	}
+	if (blen < 2) {
+		simpleMul(&a, b);
+		return a;
+	}
 	
 	
 }
