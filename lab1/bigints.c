@@ -31,6 +31,16 @@ void freeInteger(Integer *a) {
 	free(a->digits);
 }
 
+/* utility function to deep copy Integers*/
+void deepcopyInteger(Integer a, Integer *aCopy) {
+	aCopy->digits = safeMalloc(a.length);
+	for (int i = 0; i < size; i++) {
+		aCopy->digits[i] = a.digits[i];
+	}
+	aCopy->length = a.length;
+	aCopy->sign = a.sign;
+}
+
 /* make integer form a string */
 void makeIntegerFromString(Integer *a, char digits[]) {
 	unsigned long i = 0;
@@ -105,6 +115,9 @@ void addInteger(Integer *a, Integer b) {
 	unsigned long alen = a->length;
 	unsigned long blen = b.length;
 
+	/* deep copy b */
+	Integer bCopy;
+			
 	/* check sign */
 	if (a->sign + b.sign == 0) {
 		/* execute subtract function */
@@ -112,7 +125,11 @@ void addInteger(Integer *a, Integer b) {
 		subInteger(a, b);
 		return;
 	}
-
+	/* check if blen > alen*/
+	if (blen > alen) {
+		addInteger(&b, *a);
+		a = &b;
+	}
 	/* for equal signs, use below */
 	int carry = 0, temp;
 	unsigned long i, min = MIN(alen, blen);
@@ -145,7 +162,7 @@ void addInteger(Integer *a, Integer b) {
 			blen++;
 			int j;
 			/* copy values to the new array*/
-			for (j = 0; j < blen-1; ++j) {
+			for (j = 0; j < blen - 1; ++j) {
 				temp[j] = a->digits[j];
 			}
 			/* copy the carry */
@@ -153,8 +170,8 @@ void addInteger(Integer *a, Integer b) {
 			/* free the old array*/
 			free(digitsnew);
 			/* put the new array in digitsnew*/
-			digitsnew =  temp;
-		}else{
+			digitsnew = temp;
+		} else {
 			/* copy rest of digits over */
 			for (; i < blen; ++i) {
 				digitsnew[i] = b.digits[i];
@@ -227,7 +244,7 @@ void subInteger(Integer *a, Integer b) {
 			blen++;
 			int j;
 			/* copy values to the new array*/
-			for (j = 0; j < blen-1; ++j) {
+			for (j = 0; j < blen - 1; ++j) {
 				temp[j] = a->digits[j];
 			}
 			/* copy the carry */
@@ -235,8 +252,8 @@ void subInteger(Integer *a, Integer b) {
 			/* free the old array*/
 			free(digitsnew);
 			/* put the new array in digitsnew*/
-			digitsnew =  temp;
-		}else{
+			digitsnew = temp;
+		} else {
 			/* copy rest of digits over */
 			for (; i < blen; ++i) {
 				digitsnew[i] = b.digits[i];
@@ -265,9 +282,8 @@ void subInteger(Integer *a, Integer b) {
 
 }
 
-
 /* a := a * b where b < 10 */
-void simpleMul(Integer *a, int b ) {
+void simpleMul(Integer *a, int b) {
 	int carry = 0, val;
 	unsigned long i, alen = a->length;
 	/* multiply the whole "string" with the single digit */
@@ -276,7 +292,7 @@ void simpleMul(Integer *a, int b ) {
 		carry = val / BASE;
 		a->digits[i] = val % BASE;
 	}
-	
+
 	/* allocate an extra digit, add carry */
 	if (carry > 0) {
 		int *newdigits = safeMalloc(alen + 1);
@@ -288,34 +304,32 @@ void simpleMul(Integer *a, int b ) {
 		free(a->digits);
 		a->digits = newdigits;
 	}
-	
+
 }
 
 /* recursive karatsuba */
 Integer karatsuba(Integer a, Integer b) {
-	unsigned long alen = a.length, blen = b.length,m,m2;
+	unsigned long alen = a.length, blen = b.length, m, m2;
 	Integer c;
-	
-	
+
+
 	/* base state */
 	/* a < 10 */
 	if (alen < 2) {
-		simpleMul(&b,a.digits[0]);
+		simpleMul(&b, a.digits[0]);
 		return b;
 	}
 	if (blen < 2) {
 		simpleMul(&a, b.digits[0]);
 		return a;
 	}
-	
-	m = MAX(alen,blen);
-	m2 = m/2;
-	
-	
-	
+
+	m = MAX(alen, blen);
+	m2 = m / 2;
+
+
+
 }
-
-
 
 /* a := a * b */
 void mulInteger(Integer *a, Integer b) {
@@ -338,7 +352,6 @@ void powInteger(Integer *a, Integer b) {
 
 }
 
-
 int main() {
 	Integer a, b;
 	makeIntegerFromString(&a, "1");
@@ -347,25 +360,25 @@ int main() {
 	printf("\n");
 	printInteger(b);
 	printf("\n");
-	
+
 	addInteger(&a, b);
 	printInteger(a);
 	printf("\n");
-	
+
 	freeInteger(&a);
 	freeInteger(&b);
-	
+
 	makeIntegerFromString(&a, "25");
 	makeIntegerFromString(&b, "1");
 	printInteger(a);
 	printf("\n");
 	printInteger(b);
 	printf("\n");
-	
+
 	simpleMul(&a, 4);
 	printInteger(a);
 	printf("\n");
-	
+
 	freeInteger(&a);
 	freeInteger(&b);
 	return 0;
