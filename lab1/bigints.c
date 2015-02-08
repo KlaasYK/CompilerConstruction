@@ -289,11 +289,11 @@ Integer karatsuba(Integer a, Integer b) {
 	
 	/* a < 10 */
 	if (alen < 2) {
-		simpleMul(&b,a);
+		simpleMul(&b,a.digits[0]);
 		return b;
 	}
 	if (blen < 2) {
-		simpleMul(&a, b);
+		simpleMul(&a, b.digits[0]);
 		return a;
 	}
 	
