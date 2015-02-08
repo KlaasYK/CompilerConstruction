@@ -331,7 +331,7 @@ Integer karatsuba(Integer a, Integer b) {
 	unsigned long alen = a.length, blen = b.length, m, m2;
 
 	Integer z0, z1, z2;
-	
+
 	/* base state */
 	/* a < 10 */
 	if (alen < 2) {
@@ -366,7 +366,6 @@ void mulInteger(Integer *a, Integer b) {
 
 	/* calculate multiplication, possibly with the wrong sign */
 	a* = karatsuba(a*, b);
-	
 	/* check how many zero's are at the end of a number*/
 	for (i = 0; i < alen && a->digits[alen - i - 1] == 0; ++i);
 
@@ -389,6 +388,8 @@ void mulInteger(Integer *a, Integer b) {
 		a->digits = digitsnew;
 		/* Make a length 1 larger*/
 		(a->length) -= i;
+	} else {
+		a->sign = newsign;
 	}
 
 }
