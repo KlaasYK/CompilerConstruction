@@ -159,15 +159,20 @@ void addInteger(Integer *a, Integer b) {
 			digitsnew[i] = a->digits[i];
 		}
 		/* copy the carry */
-		digitsnew[i] = carry;
+		for (; carry != 0 && i < blen; ++i) {
+			digitsnew[i] = b.digits[i] + carry;
+			carry = digitsnew[i] / 10;
+			digitsnew[i] %= 10;
+		}
 		/* free the old array */
 		free(a->digits);
 		/* put the new array in digits */
 		a->digits = digitsnew;
 		/* Make a length 1 larger*/
 		(a->length)++;
-	} else if (carry > 0) {
-		/* alen > blen */
+	}
+	if (carry > 0) {
+		/* fix carry */
 		printf("%d", i);
 		a->digits[i] = carry;
 	}
