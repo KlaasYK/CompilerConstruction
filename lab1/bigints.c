@@ -341,6 +341,20 @@ void powInteger(Integer *a, Integer b) {
 
 int main() {
 	Integer a, b;
+	makeIntegerFromString(&a, "1");
+	makeIntegerFromString(&b, "999");
+	printInteger(a);
+	printf("\n");
+	printInteger(b);
+	printf("\n");
+	
+	addInteger(&a, b);
+	printInteger(a);
+	printf("\n");
+	
+	freeInteger(&a);
+	freeInteger(&b);
+	
 	makeIntegerFromString(&a, "25");
 	makeIntegerFromString(&b, "1");
 	printInteger(a);
