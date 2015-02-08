@@ -286,11 +286,35 @@ void simpleMul(Integer *a, int b) {
 
 }
 
+/* splits at split moving it to 2 other integers, deep copies */
+void splitAt(Integer *high, Integer *low, Integer largeInteger, unsigned long split) {
+	unsigned long i;
+	
+	/* make sure the right amount of low digits is passed */
+	low->length = MIN(split,largeInteger.length);
+	low->digits = safeMalloc(low->length);
+	for (i=0; i < low->length; ++i) {
+		low->digits[i] = largeInteger.digits[i];
+	}
+	
+	/* high digits */
+	if (largeInteger.length < split) {
+		high->length = 1l;
+		high->digits = safeMalloc(high->length);
+		high->digits[0] = 0;
+	} else {
+		high->length = largeInteger.length - split;
+		high->digits = safeMalloc(high->length);
+		for(i=0; i < high->length; ++i) {
+			high->digits[i] = largeInteger.digits[i+split];
+		}
+	}
+	
+}
+
 /* recursive karatsuba */
 Integer karatsuba(Integer a, Integer b) {
-	unsigned long alen = a.length, blen = b.length, m, m2;
-	Integer c;
-
+	unsigned long alen = a.length, blen = b.length,m,m2;
 
 	/* base state */
 	/* a < 10 */
@@ -302,11 +326,20 @@ Integer karatsuba(Integer a, Integer b) {
 		simpleMul(&a, b.digits[0]);
 		return a;
 	}
-
-	m = MAX(alen, blen);
-	m2 = m / 2;
-
-
+	
+	m = MAX(alen,blen);
+	m2 = m/2;
+	
+	/* declare all the integers! */ 
+	Integer high1, low1, high2, low2;
+	
+	
+	
+	/* free the temp integers */
+	freeInteger(&high1);
+	freeInteger(&low1);
+	freeInteger(&high2);
+	freeInteger(&low2);
 
 }
 
@@ -346,16 +379,20 @@ int main() {
 
 	freeInteger(&a);
 	freeInteger(&b);
-
-	makeIntegerFromString(&a, "25");
-	makeIntegerFromString(&b, "1");
+	
+	
+	Integer high, low;
+	makeIntegerFromString(&a, "2542");
+	makeIntegerFromString(&b, "4");
 	printInteger(a);
 	printf("\n");
 	printInteger(b);
 	printf("\n");
-
-	simpleMul(&a, 4);
-	printInteger(a);
+	
+	splitAt(&high, &low, a, 5l);
+	printInteger(high);
+	printf("\n");
+	printInteger(low);
 	printf("\n");
 
 	freeInteger(&a);
