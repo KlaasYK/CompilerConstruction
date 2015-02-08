@@ -89,14 +89,10 @@ void addInteger(Integer *a, Integer b) {
 	unsigned long blen = b.length;
 	
 	/* check sign */	
-	if (a->sign == 1 && b.sign == -1) {
+	if (a->sign + b.sign == 0) {
 		/* execute subFunction */
-                subInteger(a, b);
-		return;
-	}
-	if (a->sign == -1 && b.sign == 1) {
-		/* execute subFunction swap a and b */
-                subInteger(b, a);
+		b.sign = a->sign;
+		subInteger(a, b);
 		return;
 	}
 	/* for equal signs, use below */
@@ -155,6 +151,17 @@ void subInteger(Integer *a, Integer b) {
 	unsigned long alen = a->length;
 	unsigned long blen = b.length;
 	
+	/* check sign */	
+	if (a->sign == 1 && b.sign == -1) {
+		/* execute subFunction */
+		addInteger(a, b);
+		return;
+	}
+	if (a->sign == -1 && b.sign == 1) {
+		/* execute subFunction swap a and b */
+                subInteger(b, a);
+		return;
+	}
 	
 }
 
