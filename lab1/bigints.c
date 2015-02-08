@@ -61,11 +61,18 @@ void makeIntegerFromString(Integer *a, char digits[]) {
 /* prints integer to stdout */
 void printInteger(Integer a) {
 	unsigned long i;
+	int val;
 	if (a.sign == -1) {
 		printf("-");
 	}
 	for (i = a.length; i > 0; --i) {
-		printf("%d", a.digits[i - 1]);
+		val = a.digits[i - 1];
+		if (val > BASE) {
+			/* print error */
+			printf("!(%d)!", a.digits[i - 1]);
+		} else {
+			printf("%d", a.digits[i - 1]);
+		}
 	}
 }
 
@@ -288,6 +295,8 @@ Integer karatsuba(Integer a, Integer b) {
 	unsigned long alen = a.length, blen = b.length;
 	Integer c;
 	
+	
+	/* base state */
 	/* a < 10 */
 	if (alen < 2) {
 		simpleMul(&b,a.digits[0]);
