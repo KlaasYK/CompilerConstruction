@@ -33,8 +33,9 @@ void freeInteger(Integer *a) {
 
 /* utility function to deep copy Integers*/
 void deepCopyInteger(Integer a, Integer *aCopy) {
+	unsigned long i;
 	aCopy->digits = safeMalloc(a.length);
-	for (int i = 0; i < a.length; i++) {
+	for (i = 0; i < a.length; i++) {
 		aCopy->digits[i] = a.digits[i];
 	}
 	aCopy->length = a.length;
@@ -55,7 +56,8 @@ int compareTo(Integer a, Integer b){
 	}else if(b.length > a.length){
 		return -1;
 	}else{
-		for (int i = a.length-1; i >= 0; i--) {
+		unsigned long i;
+		for (i = a.length-1; i >= 0; i--) {
 			if(a.digits[i] > b.digits[i]){
 				return 1;
 			}else if(b.digits[i] > a.digits[i]){
@@ -150,7 +152,7 @@ void addInteger(Integer *a, Integer b) {
 	}
 
 	/* check if blen > alen*/
-	if (blen > alen) {
+	if (compareTo(b, *a) > 0) {
 		/* deep copy b */
 		Integer bCopy;
 		deepCopyInteger(b, &bCopy);
@@ -213,7 +215,7 @@ void subInteger(Integer *a, Integer b) {
 	}
 
 	/* check if blen > alen*/
-	if (blen > alen || compareTo(b, *a) > 0) {
+	if (compareTo(b, *a) > 0) {
 		/* deep copy b */
 		Integer bCopy;
 		deepCopyInteger(b, &bCopy);
@@ -243,8 +245,14 @@ void subInteger(Integer *a, Integer b) {
 		a->digits[i] = (temp + 10) % 10;
 		carry = (temp + 10) / 10 - 1;
 	}
+	
+	/* check how many zero's are at the end of a number*/
+	for (int i = 0; i < size; i++) {
+		Object elem = array[i];
 
-	/* if last carry is overflowing a */
+	}
+
+	/* f */
 	if (carry > 0) {
 		/* more space is needed */
 		int *digitsnew;
