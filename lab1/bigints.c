@@ -405,7 +405,7 @@ void mulInteger(Integer *a, Integer b) {
 	unsigned long i, alen = a->length;
 
 	/* calculate multiplication, possibly with the wrong sign */
-	a* = karatsuba(a*, b);
+	*a = karatsuba(*a, b);
 	/* check how many zero's are at the end of a number*/
 	for (i = 0; i < alen && a->digits[alen - i - 1] == 0; ++i);
 
@@ -466,19 +466,16 @@ int main() {
 	freeInteger(&b);
 
 
-	makeIntegerFromString(&a, "25");
+	makeIntegerFromString(&a, "2");
 	makeIntegerFromString(&b, "4");
 	printInteger(a);
 	printf("\n");
 	printInteger(b);
 	printf("\n");
-
-	printInteger(high);
+	mulInteger(&a, b);
+	printInteger(a);
 	printf("\n");
 
-
-	freeInteger(&high);
-	freeInteger(&low);
 	freeInteger(&a);
 	freeInteger(&b);
 	return 0;
