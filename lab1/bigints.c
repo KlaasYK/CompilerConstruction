@@ -41,10 +41,30 @@ void deepCopyInteger(Integer a, Integer *aCopy) {
 	aCopy->sign = a.sign;
 }
 
+/* utility function to shallow copy Integers */
 void shallowCopyInteger(Integer a, Integer *aCopy) {
 	aCopy->digits = a.digits;
 	aCopy->length = a.length;
 	aCopy->sign = a.sign;
+}
+
+/* utility function to compare numbers */
+int compareTo(Integer a, Integer b){
+	if(a.length > b.length){
+		return 1;
+	}else if(b.length > a.length){
+		return -1;
+	}else{
+		for (int i = a.length-1; i >= 0; i--) {
+			if(a.digits[i] > b.digits[i]){
+				return 1;
+			}else if(b.digits[i] > a.digits[i]){
+				return -1;
+			}
+		}
+		return 0;
+	}
+
 }
 
 /* make integer form a string */
@@ -193,7 +213,7 @@ void subInteger(Integer *a, Integer b) {
 	}
 
 	/* check if blen > alen*/
-	if (blen > alen) {
+	if (blen > alen || compareTo(b, *a) > 0) {
 		/* deep copy b */
 		Integer bCopy;
 		deepCopyInteger(b, &bCopy);
