@@ -135,8 +135,9 @@ void addInteger(Integer *a, Integer b) {
 			/* if there is carry for the last digit create a new array of the right length*/
 			int *temp = safeMalloc(blen + 1);
 			blen++;
+			int j;
 			/* copy values to the new array*/
-			for (int j = 0; j < blen-1; ++j) {
+			for (j = 0; j < blen-1; ++j) {
 				temp[j] = a->digits[j];
 			}
 			/* copy the carry */
