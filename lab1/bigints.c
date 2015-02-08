@@ -326,13 +326,27 @@ void splitAt(Integer *high, Integer *low, Integer largeInteger, unsigned long sp
 
 }
 
+/* a := a * BASE^k shift */
+void shiftRight(Integer *a, unsigned long k) {
+	unsigned long i;
+	int *newdigits = safeMalloc(a->length + k);
+	for (i = 0; i < k; ++i) {
+		newdigits[i] = 0;
+	}
+	for (i = k; i < a->length; ++i) {
+		newdigits[i] = a->digits[i];
+	}
+	free(a->digits);
+	a->digits = newdigits;
+}
+
 /* recursive karatsuba */
 Integer karatsuba(Integer a, Integer b) {
 	unsigned long alen = a.length, blen = b.length, m, m2;
 
 	Integer z0, z1, z2;
 	
-	/* base state */
+	/* base state of recursion */
 	/* a < 10 */
 	if (alen < 2) {
 		simpleMul(&b, a.digits[0]);
@@ -350,13 +364,38 @@ Integer karatsuba(Integer a, Integer b) {
 	Integer high1, low1, high2, low2;
 	splitAt(&high1, &low1, a, m2);
 	splitAt(&high2, &low2, b, m2);
-
+	
+	/* divide */
+	z0 = karatsuba(low1, low2);
+	z2 = karatsuba(high1, high2);
+	
+	addInteger(&low1,high1);
+	addInteger(&low2,high2);
+	/* the low Integers now contain the sums */
+	z1 = karatsuba(low1, low2);
+	
+	/* now follows the z2 * 10^(2*m2) + ((z1-z2-z0)*10^(m2) + z0
+	
+	/* the z1 - z2 -z0 stored in the z1 */
+	subInteger(&z1, z2);
+	subInteger(&z1, z0);
+	
+	/* shift right for z1 and z2 */
+	shiftRight(&z1, m2);
+	shiftRight(&z2, m2 * 2);
+	
+	/* and conquer */
+	addInteger(&z2, z1);
+	addInteger(&z2, z0);
+	
 	/* free the temp integers */
 	freeInteger(&high1);
 	freeInteger(&low1);
 	freeInteger(&high2);
 	freeInteger(&low2);
-
+	
+	/* done */
+	return z2;
 }
 
 /* a := a * b */
@@ -397,18 +436,14 @@ int main() {
 	freeInteger(&b);
 
 
-	Integer high, low;
-	makeIntegerFromString(&a, "25425");
+	makeIntegerFromString(&a, "25");
 	makeIntegerFromString(&b, "4");
 	printInteger(a);
 	printf("\n");
 	printInteger(b);
 	printf("\n");
 
-	splitAt(&high, &low, a, 5l);
 	printInteger(high);
-	printf("\n");
-	printInteger(low);
 	printf("\n");
 
 
