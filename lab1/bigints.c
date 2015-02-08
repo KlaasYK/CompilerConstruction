@@ -3,6 +3,7 @@
 #include <math.h>
 
 #define MIN(a,b) a<b?a:b
+#define MAX(a,b) a<b?b:a
 
 #define BASE 10
 
@@ -67,11 +68,11 @@ void printInteger(Integer a) {
 	}
 	for (i = a.length; i > 0; --i) {
 		val = a.digits[i - 1];
-		if (val >= BASE) {
+		if (val >= BASE || val < 0) {
 			/* print error */
-			printf("!(%d)!", a.digits[i - 1]);
+			printf("!(%d)!", val);
 		} else {
-			printf("%d", a.digits[i - 1]);
+			printf("%d", val);
 		}
 	}
 }
@@ -292,7 +293,7 @@ void simpleMul(Integer *a, int b ) {
 
 /* recursive karatsuba */
 Integer karatsuba(Integer a, Integer b) {
-	unsigned long alen = a.length, blen = b.length;
+	unsigned long alen = a.length, blen = b.length,m,m2;
 	Integer c;
 	
 	
@@ -306,6 +307,10 @@ Integer karatsuba(Integer a, Integer b) {
 		simpleMul(&a, b.digits[0]);
 		return a;
 	}
+	
+	m = MAX(alen,blen);
+	m2 = m/2;
+	
 	
 	
 }
