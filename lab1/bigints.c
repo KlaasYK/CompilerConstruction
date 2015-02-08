@@ -142,14 +142,24 @@ void addInteger(Integer *a, Integer b) {
 
 	/* for equal signs and alen >= blen */
 	int carry = 0, temp;
-	unsigned long i, min = MIN(alen, blen);
-	for (i = 0; i < min; ++i) {
+	unsigned long i;
+
+	/* calculate sum */
+	for (i = 0; i < blen; ++i) {
 		temp = a->digits[i] + b.digits[i] + carry;
 		a->digits[i] = temp % 10;
 		carry = temp / 10;
 	}
 
-	if (alen == blen && carry > 0) {
+	/* copy the last carry */
+	for (; carry != 0 && i < alen; ++i) {
+		a->digits[i] = a->digits[i] + carry;
+		carry = a->digits[i] / 10;
+		a->digits[i] %= 10;
+	}
+
+	/* if last carry is overflowing a */
+	if (carry > 0) {
 		/* more space is needed */
 		int *digitsnew;
 		/* allocate more memory */
@@ -166,10 +176,6 @@ void addInteger(Integer *a, Integer b) {
 		a->digits = digitsnew;
 		/* Make a length 1 larger*/
 		(a->length)++;
-	} else if (carry > 0) {
-		/* alen > blen */
-		/*printf("%d", i);*/
-		a->digits[i] = carry;
 	}
 }
 
@@ -180,78 +186,59 @@ void subInteger(Integer *a, Integer b) {
 
 	/* check sign */
 	if (a->sign + b.sign == 0) {
-		/* execute add function */
+		/* execute subtract function */
 		b.sign = a->sign;
-		addInteger(a, b);
+		subInteger(a, b);
 		return;
 	}
 
-	/* for equal signs, use below */
-	int carry = 0, temp;
-	unsigned long i, min = MIN(alen, blen);
-	for (i = 0; i < min; ++i) {
-		temp = a->digits[i] - b.digits[i] + carry;
-		a->digits[i] = (temp + 10) % 10;
-		carry = (temp + 10) / 10 - 1;
+	/* check if blen > alen*/
+	if (blen > alen) {
+		/* deep copy b */
+		Integer bCopy;
+		deepCopyInteger(b, &bCopy);
+		addInteger(&bCopy, *a);
+		freeInteger(a);
+		shallowCopyInteger(bCopy, a);
+		return;
 	}
 
-	/* blen > alen */
-	if (blen > alen) {
-		/* allocate more memory */
-		int *digitsnew;
-		digitsnew = safeMalloc(blen);
-		/* copy digits over */
-		for (i = 0; i < alen; ++i) {
-			digitsnew[i] = a->digits[i];
-		}
-		/* old digits can be removed */
-		free(a->digits);
-		/* copy carry over */
-		for (; carry != 0 && i < blen; ++i) {
-			digitsnew[i] = b.digits[i] + carry;
-			carry = digitsnew[i] / 10;
-			digitsnew[i] %= 10;
-		}
-		if (i == blen && carry != 0) {
-			/* if there is carry for the last digit create a new array of the right length*/
-			int *temp = safeMalloc(blen + 1);
-			blen++;
-			int j;
-			/* copy values to the new array*/
-			for (j = 0; j < blen - 1; ++j) {
-				temp[j] = a->digits[j];
-			}
-			/* copy the carry */
-			temp[j] = carry;
-			/* free the old array*/
-			free(digitsnew);
-			/* put the new array in digitsnew*/
-			digitsnew = temp;
-		} else {
-			/* copy rest of digits over */
-			for (; i < blen; ++i) {
-				digitsnew[i] = b.digits[i];
-			}
-		}
-		/* finally replace digits */
-		a->digits = digitsnew;
-		a->length = blen;
+	/* for equal signs and alen >= blen */
+	int carry = 0, temp;
+	unsigned long i;
 
-	} else if (alen == blen && carry > 0) {
+	/* calculate sum */
+	for (i = 0; i < blen; ++i) {
+		temp = a->digits[i] + b.digits[i] + carry;
+		a->digits[i] = temp % 10;
+		carry = temp / 10;
+	}
+
+	/* copy the last carry */
+	for (; carry != 0 && i < alen; ++i) {
+		a->digits[i] = a->digits[i] + carry;
+		carry = a->digits[i] / 10;
+		a->digits[i] %= 10;
+	}
+
+	/* if last carry is overflowing a */
+	if (carry > 0) {
 		/* more space is needed */
 		int *digitsnew;
+		/* allocate more memory */
 		digitsnew = safeMalloc(alen + 1);
-		for (i = 0; i < alen; ++i) {
+		/* copy digits over */
+		for (i = 0; i < alen; i++) {
 			digitsnew[i] = a->digits[i];
 		}
+		/* copy the carry */
 		digitsnew[i] = carry;
+		/* free the old array */
 		free(a->digits);
+		/* put the new array in digits */
 		a->digits = digitsnew;
+		/* Make a length 1 larger*/
 		(a->length)++;
-
-	} else if (carry > 0) {
-		/* alen > blen */
-		a->digits[i] = carry;
 	}
 
 }
@@ -284,14 +271,14 @@ void simpleMul(Integer *a, int b) {
 /* splits at split moving it to 2 other integers, deep copies */
 void splitAt(Integer *high, Integer *low, Integer largeInteger, unsigned long split) {
 	unsigned long i;
-	
+
 	/* make sure the right amount of low digits is passed */
-	low->length = MIN(split,largeInteger.length);
+	low->length = MIN(split, largeInteger.length);
 	low->digits = safeMalloc(low->length);
-	for (i=0; i < low->length; ++i) {
+	for (i = 0; i < low->length; ++i) {
 		low->digits[i] = largeInteger.digits[i];
 	}
-	
+
 	/* high digits */
 	if (largeInteger.length < split) {
 		high->length = 1l;
@@ -300,16 +287,16 @@ void splitAt(Integer *high, Integer *low, Integer largeInteger, unsigned long sp
 	} else {
 		high->length = largeInteger.length - split;
 		high->digits = safeMalloc(high->length);
-		for(i=0; i < high->length; ++i) {
-			high->digits[i] = largeInteger.digits[i+split];
+		for (i = 0; i < high->length; ++i) {
+			high->digits[i] = largeInteger.digits[i + split];
 		}
 	}
-	
+
 }
 
 /* recursive karatsuba */
 Integer karatsuba(Integer a, Integer b) {
-	unsigned long alen = a.length, blen = b.length,m,m2;
+	unsigned long alen = a.length, blen = b.length, m, m2;
 
 	/* base state */
 	/* a < 10 */
@@ -321,15 +308,15 @@ Integer karatsuba(Integer a, Integer b) {
 		simpleMul(&a, b.digits[0]);
 		return a;
 	}
-	
-	m = MAX(alen,blen);
-	m2 = m/2;
-	
-	/* declare all the integers! */ 
+
+	m = MAX(alen, blen);
+	m2 = m / 2;
+
+	/* declare all the integers! */
 	Integer high1, low1, high2, low2;
-	
-	
-	
+
+
+
 	/* free the temp integers */
 	freeInteger(&high1);
 	freeInteger(&low1);
@@ -361,8 +348,8 @@ void powInteger(Integer *a, Integer b) {
 
 int main() {
 	Integer a, b;
-	makeIntegerFromString(&a, "999");
-	makeIntegerFromString(&b, "1");
+	makeIntegerFromString(&a, "-1");
+	makeIntegerFromString(&b, "-9999999999999999999999999999999999999999999999999999999");
 	printInteger(a);
 	printf("\n");
 	printInteger(b);
@@ -374,8 +361,8 @@ int main() {
 
 	freeInteger(&a);
 	freeInteger(&b);
-	
-	
+
+
 	Integer high, low;
 	makeIntegerFromString(&a, "2542");
 	makeIntegerFromString(&b, "4");
@@ -383,14 +370,14 @@ int main() {
 	printf("\n");
 	printInteger(b);
 	printf("\n");
-	
+
 	splitAt(&high, &low, a, 5l);
 	printInteger(high);
 	printf("\n");
 	printInteger(low);
 	printf("\n");
 
-	
+
 	freeInteger(&high);
 	freeInteger(&low);
 	freeInteger(&a);
