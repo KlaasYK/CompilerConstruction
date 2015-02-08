@@ -344,18 +344,21 @@ void shiftRight(Integer *a, unsigned long k) {
 Integer karatsuba(Integer a, Integer b) {
 	unsigned long alen = a.length, blen = b.length, m, m2;
 
-	Integer z0, z1, z2;
+	Integer z0, z1, z2, returnInt;
 	
 	/* base state of recursion */
 
 	/* a < 10 */
 	if (alen < 2) {
+		/* TODO: remove depency on b */
 		simpleMul(&b, a.digits[0]);
-		return b;
+		deepCopyInteger(b, &returnInt);
+		return returnInt;
 	}
 	if (blen < 2) {
 		simpleMul(&a, b.digits[0]);
-		return a;
+		deepCopyInteger(a, &returnInt);
+		return returnInt;
 	}
 
 	m = MAX(alen, blen);
@@ -394,9 +397,16 @@ Integer karatsuba(Integer a, Integer b) {
 	freeInteger(&low1);
 	freeInteger(&high2);
 	freeInteger(&low2);
+
 	
 	/* done */
-	return z2;
+	deepCopyInteger(z2, &returnInt);
+	
+	freeInteger(&z0);
+	freeInteger(&z1);
+	freeInteger(&z2);
+	
+	return returnInt;
 }
 
 /* a := a * b */
@@ -468,7 +478,7 @@ int main() {
 	freeInteger(&b);
 
 
-	makeIntegerFromString(&a, "2");
+	makeIntegerFromString(&a, "250");
 	makeIntegerFromString(&b, "4");
 	printInteger(a);
 	printf("\n");
