@@ -145,7 +145,8 @@ void testPowInteger(){
 }
 
 int main() {
-	testShiftRight();
+	testDivInteger();
+	/*testShiftRight();
 	printf("\n");
 	testAddInteger();
 	printf("\n");
@@ -157,6 +158,6 @@ int main() {
 	printf("\n");
 	testDivInteger();
 	printf("\n");
-	testModInteger();
+	testModInteger();*/
 	return 0;
 }
