@@ -42,6 +42,33 @@ void testAddInteger(){
 	operatorHelper("999", "1", addInteger, '+');
 	operatorHelper("500", "501", addInteger, '+');
 	operatorHelper("501", "500", addInteger, '+');
+	
+	operatorHelper("-2", "2", addInteger, '+');
+	operatorHelper("-293487239847239847928347", "237957909275092850928355", addInteger, '+');
+	operatorHelper("-25435", "1", addInteger, '+');
+	operatorHelper("-1", "25435", addInteger, '+');
+	operatorHelper("-1", "999", addInteger, '+');
+	operatorHelper("-999", "1", addInteger, '+');
+	operatorHelper("-500", "501", addInteger, '+');
+	operatorHelper("-501", "500", addInteger, '+');
+	
+	operatorHelper("2", "-2", addInteger, '+');
+	operatorHelper("293487239847239847928347", "-237957909275092850928355", addInteger, '+');
+	operatorHelper("25435", "-1", addInteger, '+');
+	operatorHelper("1", "-25435", addInteger, '+');
+	operatorHelper("1", "-999", addInteger, '+');
+	operatorHelper("999", "-1", addInteger, '+');
+	operatorHelper("500", "-501", addInteger, '+');
+	operatorHelper("501", "-500", addInteger, '+');
+	
+	operatorHelper("-2", "-2", addInteger, '+');
+	operatorHelper("-293487239847239847928347", "-237957909275092850928355", addInteger, '+');
+	operatorHelper("-25435", "-1", addInteger, '+');
+	operatorHelper("-1", "-25435", addInteger, '+');
+	operatorHelper("-1", "-999", addInteger, '+');
+	operatorHelper("-999", "-1", addInteger, '+');
+	operatorHelper("-500", "-501", addInteger, '+');
+	operatorHelper("-501", "-500", addInteger, '+');
 /*
 	
 	makeIntegerFromString(&a, "293487239847239847928347");
