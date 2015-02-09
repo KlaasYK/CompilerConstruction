@@ -92,7 +92,7 @@ int compareTo(Integer a, Integer b) {
 	} else {
 		//printf(" a and b of equal length, test number:\n");
 		unsigned long i;
-		for (i = a.length - 1; i+1 > 0; i--) {
+		for (i = a.length - 1; i + 1 > 0; i--) {
 			if (a.digits[i] > b.digits[i]) {
 				//printf("  a larger then b\n");
 				return 1;
@@ -364,7 +364,7 @@ void shiftRight(Integer *a, unsigned long k) {
 		newdigits[i] = 0;
 	}
 	for (i = k; i < k + a->length; ++i) {
-		newdigits[i] = a->digits[i-k];
+		newdigits[i] = a->digits[i - k];
 	}
 	free(a->digits);
 	a->digits = newdigits;
@@ -488,6 +488,18 @@ void modInteger(Integer *a, Integer b) {
 }
 
 /* a := a^b */
-void powInteger(Integer *a, Integer b) {
-
+void powInteger(Integer *base, Integer exponent) {
+	Integer result, zero;
+	makeIntegerFromString(&result, "1");
+	makeIntegerFromString(&zero, "0");
+	while (compareTo(exponent, zero) != 0) {
+		if (exponent.digits[0] % 2 == 1) {
+			mulInteger(&result, base);
+		}
+		shiftLeft(&exponent, 1);
+		mulInteger(&base, base);
+	}
+	freeInteger(base);
+	base->digits = result.digits;
+	freeInteger(&zero);
 }
