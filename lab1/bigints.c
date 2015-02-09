@@ -82,26 +82,26 @@ void shallowCopyInteger(Integer a, Integer *aCopy) {
 
 /* utility function to compare numbers */
 int compareTo(Integer a, Integer b) {
-	printf("test length:\n");
+	//printf("test length:\n");
 	if (a.length > b.length) {
-		printf(" a longer then b\n");
+		//printf(" a longer then b\n");
 		return 1;
 	} else if (b.length > a.length) {
-		printf(" b longer then a\n");
+		//printf(" b longer then a\n");
 		return -1;
 	} else {
-		printf(" a and b of equal length, test number:\n");
+		//printf(" a and b of equal length, test number:\n");
 		unsigned long i;
 		for (i = a.length - 1; i+1 > 0; i--) {
 			if (a.digits[i] > b.digits[i]) {
-				printf("  a larger then b\n");
+				//printf("  a larger then b\n");
 				return 1;
 			} else if (b.digits[i] > a.digits[i]) {
-				printf("  b larger then a\n");
+				//printf("  b larger then a\n");
 				return -1;
 			}
 		}
-		printf("  a and b equally large\n");
+		//printf("  a and b equally large\n");
 		return 0;
 	}
 
