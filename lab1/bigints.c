@@ -356,7 +356,19 @@ void splitAt(Integer *high, Integer *low, Integer largeInteger, unsigned long sp
 
 }
 
-/* a := a * BASE^k shift */
+/* a := a * BASE^k shift (makes Integer smaller (divide)) */
+void shiftLeft(Integer *a, unsigned long k) {
+	unsigned long i;
+	int *newdigits = safeMalloc(a->lenght - k);
+	for (i = k; i < a->length; --i) {
+		newdigits[i-k] = a->digits[i];
+	}
+	free(a->digits);
+	a->digits = newdigits;
+	a->length = a->length - k;
+}
+
+/* a := a * BASE^k shift (makes Intger larger (multiply) */
 void shiftRight(Integer *a, unsigned long k) {
 	unsigned long i;
 	int *newdigits = safeMalloc(a->length + k);
