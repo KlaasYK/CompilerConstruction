@@ -138,6 +138,7 @@ void testShiftRight() {
 	shiftRight(&a, 2);
 	printInteger(a);
 	printf("\n");
+	freeInteger(&a);
 }
 
 void testDivInteger(){
