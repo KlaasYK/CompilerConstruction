@@ -92,7 +92,7 @@ int compareTo(Integer a, Integer b) {
 	} else {
 		printf(" a and b of equal length, test number:\n");
 		unsigned long i;
-		for (i = a.length - 1; i >= 0; i--) {
+		for (i = a.length - 1; i+1 > 0; i--) {
 			if (a.digits[i] > b.digits[i]) {
 				printf("  a larger then b\n");
 				return 1;
