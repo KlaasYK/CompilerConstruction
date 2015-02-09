@@ -491,7 +491,8 @@ void mulInteger(Integer *a, Integer b) {
 
 /* a := a div b */
 void divInteger(Integer *a, Integer b) {
-
+	mulInteger(a,b);
+	shiftLeft(a,b.length);
 }
 
 /* a := a mod b */

@@ -130,7 +130,7 @@ void testShiftRight() {
 }
 
 void testDivInteger(){
-	
+	operatorHelper("4","2", divInteger,"/");
 }
 
 void testModInteger(){
@@ -142,12 +142,13 @@ void testPowInteger(){
 }
 
 int main() {
-	testShiftRight();
+	testDivInteger();
+	/*testShiftRight();
 	printf("\n");
 	testAddInteger();
 	printf("\n");
 	testSubInteger();
 	printf("\n");
-	testMulInteger();
+	testMulInteger();*/
 	return 0;
 }
