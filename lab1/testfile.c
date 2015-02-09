@@ -71,7 +71,41 @@ void testAddInteger(){
 }
 
 void testSubInteger(){
+	operatorHelper("2", "2", subInteger, '-');
+	operatorHelper("293487239847239847928347", "237957909275092850928355", subInteger, '-');
+	operatorHelper("25435", "1", subInteger, '-');
 	operatorHelper("1", "25435", subInteger, '-');
+	operatorHelper("1", "999", subInteger, '-');
+	operatorHelper("999", "1", subInteger, '-');
+	operatorHelper("500", "501", subInteger, '-');
+	operatorHelper("501", "500", subInteger, '-');
+	
+	operatorHelper("-2", "2", subInteger, '-');
+	operatorHelper("-293487239847239847928347", "237957909275092850928355", subInteger, '-');
+	operatorHelper("-25435", "1", subInteger, '-');
+	operatorHelper("-1", "25435", subInteger, '-');
+	operatorHelper("-1", "999", subInteger, '-');
+	operatorHelper("-999", "1", subInteger, '-');
+	operatorHelper("-500", "501", subInteger, '-');
+	operatorHelper("-501", "500", subInteger, '-');
+	
+	operatorHelper("2", "-2", subInteger, '-');
+	operatorHelper("293487239847239847928347", "-237957909275092850928355", subInteger, '-');
+	operatorHelper("25435", "-1", subInteger, '-');
+	operatorHelper("1", "-25435", subInteger, '-');
+	operatorHelper("1", "-999", subInteger, '-');
+	operatorHelper("999", "-1", subInteger, '-');
+	operatorHelper("500", "-501", subInteger, '-');
+	operatorHelper("501", "-500", subInteger, '-');
+	
+	operatorHelper("-2", "-2", subInteger, '-');
+	operatorHelper("-293487239847239847928347", "-237957909275092850928355", subInteger, '-');
+	operatorHelper("-25435", "-1", subInteger, '-');
+	operatorHelper("-1", "-25435", subInteger, '-');
+	operatorHelper("-1", "-999", subInteger, '-');
+	operatorHelper("-999", "-1", subInteger, '-');
+	operatorHelper("-500", "-501", subInteger, '-');
+	operatorHelper("-501", "-500", subInteger, '-');
 }
 
 void testMulInteger(){
@@ -94,5 +128,7 @@ int main() {
 	testAddInteger();
 	printf("\n");
 	testSubInteger();
+	printf("\n");
+	testMulInteger();
 	return 0;
 }

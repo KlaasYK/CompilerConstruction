@@ -241,8 +241,6 @@ void subInteger(Integer *a, Integer b) {
 		/* deep copy b */
 		Integer bCopy;
 		deepCopyInteger(b, &bCopy);
-		a->sign = -(a->sign);
-		bCopy.sign = -(bCopy.sign);
 		subInteger(&bCopy, *a);
 		freeInteger(a);
 		shallowCopyInteger(bCopy, a);
