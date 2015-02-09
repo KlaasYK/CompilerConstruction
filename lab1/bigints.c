@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 
 #define MIN(a,b) (a<b?a:b)
 #define MAX(a,b) (a<b?b:a)
@@ -111,7 +110,7 @@ int compareTo(Integer a, Integer b) {
 
 /* make integer form a string */
 void makeIntegerFromString(Integer *a, const char digits[]) {
-	unsigned long signCorrection = 0, strLength, i, j, k;
+	unsigned long signCorrection = 0, strLength, i, j, k, l;
 	/* store the sign */
 	if (digits[0] == '-') {
 		a->sign = -1;
@@ -131,8 +130,10 @@ void makeIntegerFromString(Integer *a, const char digits[]) {
 	j = 0;
 	for (i = strLength - 1; i + 1 > signCorrection; i -= LOGBASE) {
 		a->digits[j] = 0;
+		l=1;
 		for (k = 0; k < LOGBASE && i - k + 1 > signCorrection; k++) {
-			a->digits[j] += (digits[i - k] - 48) * pow(10, k);
+			a->digits[j] += (digits[i - k] - 48) * l;
+			l*=10;
 		}
 		j++;
 		if (LOGBASE > i) {
@@ -359,7 +360,7 @@ void splitAt(Integer *high, Integer *low, Integer largeInteger, unsigned long sp
 /* a := a * BASE^k shift (makes Integer smaller (divide)) */
 void shiftLeft(Integer *a, unsigned long k) {
 	unsigned long i;
-	int *newdigits = safeMalloc(a->lenght - k);
+	int *newdigits = safeMalloc(a->length - k);
 	for (i = k; i < a->length; --i) {
 		newdigits[i-k] = a->digits[i];
 	}
@@ -508,11 +509,11 @@ void powInteger(Integer *base, Integer exponent) {
 	makeIntegerFromString(&two, "2");
 	while (compareTo(exponent, zero) != 0) {
 		if (exponent.digits[0] % 2 == 1) {
-			mulInteger(&result, base);
+			mulInteger(&result, *base);
 			/* implicit exponent - 1 */
 		}
 		divInteger(&exponent, two);
-		mulInteger(&base, base);
+		mulInteger(base, *base);
 	}
 	freeInteger(base);
 	base->digits = result.digits;
