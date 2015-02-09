@@ -6,8 +6,9 @@
 #define MAX(a,b) a<b?b:a
 
 #define BASE 10
+#define LOGBASE 1
 
-/* datastructure for infinite intgers */
+/* datastructure for infinite integers */
 struct EGCLint {
 	int *digits; /* the value for each of the digits, big endian */
 	unsigned long length; /* maximum value is approx. 10^4294967295, 
@@ -15,6 +16,35 @@ struct EGCLint {
 	int sign; /* wheter it is positive, of negative */
 };
 typedef struct EGCLint Integer;
+
+/*** stuff to implement ***/
+
+/* make integer form a string */
+void makeIntegerFromString(Integer *a, char digits[]);
+
+/* prints integer to stdout */
+void printInteger(Integer a);
+
+/* a := a + b */
+void addInteger(Integer *a, Integer b);
+
+/* a := a - b */
+void subInteger(Integer *a, Integer b);
+
+/* a := a * b */
+void mulInteger(Integer *a, Integer b);
+
+/* a := a div b */
+void divInteger(Integer *a, Integer b);
+
+/* a := a mod b */
+void modInteger(Integer *a, Integer b);
+
+/* a := a^b */
+void powInteger(Integer *a, Integer b);
+
+
+/*** utility functions ***/
 
 /* utility function to malloc the memory*/
 int *safeMalloc(unsigned long size) {
@@ -69,31 +99,36 @@ int compareTo(Integer a, Integer b) {
 
 }
 
+/* Implementations */
+
 /* make integer form a string */
 void makeIntegerFromString(Integer *a, char digits[]) {
-	unsigned long i = 0;
+	unsigned long strLength = 0, signCorrection, i, j, k;
 	/* store the sign */
 	if (digits[0] == '-') {
 		a->sign = -1;
-		i++;
+		strLength++;
 	} else {
 		a->sign = 1;
 	}
 
 	/* determine length */
-	unsigned long k = i;
-	for (i; digits[i] != '\0'; i++) {
-	}
+	signCorrection = strLength;
+	for (strLength; digits[strLength] != '\0'; strLength++);
+	strLength -= signCorrection;
 
 	/* allocate length */
-	a->length = i - k;
+	a->length = strLength / LOGBASE;
 	a->digits = safeMalloc(a->length);
 
 	/* store the digits */
-	unsigned long j = a->length - 1;
-	for (i = k; digits[i] != '\0'; i++) {
-		a->digits[j] = digits[i] - 48;
-		--j;
+	j = 0;
+	for (i = strLength + signCorrection - 1; i >= signCorrection; i -= LOGBASE) {
+		a->digits[j] = 0;
+		for (k = 0; k < LOGBASE && i - k > signCorrection; k--) {
+			a->digits[j] += (digits[i - k] - 48) * pow(10,k);
+			j++;
+		}
 	}
 };
 
@@ -114,29 +149,6 @@ void printInteger(Integer a) {
 		}
 	}
 }
-
-/* a := a + b */
-void addInteger(Integer *a, Integer b);
-
-/* a := a - b */
-void subInteger(Integer *a, Integer b);
-
-/* a := a * b */
-void mulInteger(Integer *a, Integer b);
-
-/* a := a div b */
-void divInteger(Integer *a, Integer b);
-
-/* a := a mod b */
-void modInteger(Integer *a, Integer b);
-
-/* a := a^b */
-void powInteger(Integer *a, Integer b);
-
-/* Implementations */
-
-/* make integer form a string */
-void makeIntegerFromString(Integer *a, char digits[]);
 
 /* a := a + b */
 void addInteger(Integer *a, Integer b) {
@@ -345,7 +357,7 @@ Integer karatsuba(Integer a, Integer b) {
 	unsigned long alen = a.length, blen = b.length, m, m2;
 
 	Integer z0, z1, z2, returnInt;
-	
+
 	/* base state of recursion */
 
 	/* a < 10 */
@@ -368,44 +380,44 @@ Integer karatsuba(Integer a, Integer b) {
 	Integer high1, low1, high2, low2;
 	splitAt(&high1, &low1, a, m2);
 	splitAt(&high2, &low2, b, m2);
-	
+
 	/* divide */
 	z0 = karatsuba(low1, low2);
 	z2 = karatsuba(high1, high2);
-	
-	addInteger(&low1,high1);
-	addInteger(&low2,high2);
+
+	addInteger(&low1, high1);
+	addInteger(&low2, high2);
 	/* the low Integers now contain the sums */
 	z1 = karatsuba(low1, low2);
-	
+
 	/* now follows the z2 * 10^(2*m2) + ((z1-z2-z0)*10^(m2) + z0 */
-	
+
 	/* the z1 - z2 -z0 stored in the z1 */
 	subInteger(&z1, z2);
 	subInteger(&z1, z0);
-	
+
 	/* shift right for z1 and z2 */
 	shiftRight(&z1, m2);
 	shiftRight(&z2, m2 * 2);
-	
+
 	/* and conquer */
 	addInteger(&z2, z1);
 	addInteger(&z2, z0);
-	
+
 	/* free the temp integers */
 	freeInteger(&high1);
 	freeInteger(&low1);
 	freeInteger(&high2);
 	freeInteger(&low2);
 
-	
+
 	/* done */
 	deepCopyInteger(z2, &returnInt);
-	
+
 	freeInteger(&z0);
 	freeInteger(&z1);
 	freeInteger(&z2);
-	
+
 	return returnInt;
 }
 
