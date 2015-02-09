@@ -5,8 +5,8 @@
 #define MIN(a,b) (a<b?a:b)
 #define MAX(a,b) (a<b?b:a)
 
-#define BASE 100
-#define LOGBASE 2
+#define BASE 10
+#define LOGBASE 1
 
 /* datastructure for infinite integers */
 struct EGCLint {
@@ -116,27 +116,21 @@ void makeIntegerFromString(Integer *a, char digits[]) {
 	for (strLength = signCorrection; digits[strLength] != '\0'; strLength++);
 
 	/* allocate length (rounded up) */
-	a->length = (strLength - signCorrection + 1) / LOGBASE;
+	a->length = (strLength - signCorrection + LOGBASE - 1) / LOGBASE;
 	a->digits = safeMalloc(a->length);
 
 	/* store the digits */
 	j = 0;
 	for (i = strLength - 1; i + 1 > signCorrection; i -= LOGBASE) {
-		printf("outer: %d\n", i);
 		a->digits[j] = 0;
 		for (k = 0; k < LOGBASE && i - k + 1 > signCorrection; k++) {
-			printf(" inner: %u\n", k);
-			printf(" i - k: %u\n", i - k);
-			printf(" index: %u\n", j);
 			a->digits[j] += (digits[i - k] - 48) * pow(10, k);
-			printf(" value: %u\n", a->digits[j]);
 		}
 		j++;
 		if (LOGBASE > i) {
 			break;
 		}
 	}
-	printf("length: %u\n", a->length);
 }
 
 /* prints integer to stdout */
