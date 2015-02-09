@@ -130,10 +130,13 @@ void testShiftRight() {
 }
 
 void testDivInteger(){
-	
+	operatorHelper("5", "2", divInteger, '/');
+	operatorHelper("54509999823543694364987654935879875943", "23946239875692375752", divInteger, '/');
+	operatorHelper("23946239875692375752", "54509999823543694364987654935879875943", divInteger, '/');
 }
 
 void testModInteger(){
+	operatorHelper("5", "2", modInteger, '%');
 	
 }
 
@@ -149,5 +152,11 @@ int main() {
 	testSubInteger();
 	printf("\n");
 	testMulInteger();
+	printf("\n");
+	testMulInteger();
+	printf("\n");
+	testDivInteger();
+	printf("\n");
+	testModInteger();
 	return 0;
 }
