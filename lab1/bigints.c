@@ -378,7 +378,7 @@ Integer karatsuba(Integer a, Integer b) {
 	/* the low Integers now contain the sums */
 	z1 = karatsuba(low1, low2);
 	
-	/* now follows the z2 * 10^(2*m2) + ((z1-z2-z0)*10^(m2) + z0
+	/* now follows the z2 * 10^(2*m2) + ((z1-z2-z0)*10^(m2) + z0 */
 	
 	/* the z1 - z2 -z0 stored in the z1 */
 	subInteger(&z1, z2);
