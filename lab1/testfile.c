@@ -110,24 +110,10 @@ void testAddInteger(){
 
 void testSubInteger(){
 	operatorHelper("1", "25435", subInteger, '-');
-	
 }
 
 void testMulInteger(){
-	Integer a, b;
-
-	makeIntegerFromString(&a, "23663");
-	makeIntegerFromString(&b, "2356");
-	printInteger(a);
-	printf("\n");
-	printInteger(b);
-	printf("\n");
-	mulInteger(&a, b);
-	printInteger(a);
-	printf("\n");
-
-	freeInteger(&a);
-	freeInteger(&b);
+	operatorHelper("23663", "2356", mulInteger, '*');
 }
 
 void testDivInteger(){
