@@ -142,13 +142,18 @@ void printInteger(Integer a) {
 	}
 	for (i = a.length; i > 0; --i) {
 		val = a.digits[i - 1];
+		for (j = BASE / 10; val < j && i != a.length && val != 0; j /= 10) {
+			printf("0");
+		}
+		if (i != a.length && val == 0) {
+			for (j = 0; j < LOGBASE - 1; j++) {
+				printf("0");
+			}
+		}
 		if (val >= BASE || val < 0) {
 			/* print error */
 			printf("!(%d)!", val);
 		} else {
-			for (j = BASE / 10; val < j && i != a.length; j /= 10) {
-				printf("0", val);
-			}
 			printf("%d", val);
 		}
 	}

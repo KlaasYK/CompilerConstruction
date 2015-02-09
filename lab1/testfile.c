@@ -4,6 +4,11 @@
 
 int main() {
 	Integer a, b;
+	makeIntegerFromString(&a, "-50545936");
+	printInteger(a);
+	printf("\n");
+	freeInteger(&a);
+/*
 	makeIntegerFromString(&a, "-98");
 	makeIntegerFromString(&b, "-998");
 	printInteger(a);
@@ -31,5 +36,6 @@ int main() {
 
 	freeInteger(&a);
 	freeInteger(&b);
+*/
 	return 0;
 }
