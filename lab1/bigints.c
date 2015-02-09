@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define MIN(a,b) a<b?a:b
-#define MAX(a,b) a<b?b:a
+#define MIN(a,b) (a<b?a:b)
+#define MAX(a,b) (a<b?b:a)
 
 #define BASE 100
 #define LOGBASE 2
@@ -115,8 +115,8 @@ void makeIntegerFromString(Integer *a, char digits[]) {
 	/* determine length */
 	for (strLength = signCorrection; digits[strLength] != '\0'; strLength++);
 
-	/* allocate length */
-	a->length = (strLength - signCorrection) / LOGBASE;
+	/* allocate length (rounded up) */
+	a->length = (strLength - signCorrection + 1) / LOGBASE;
 	a->digits = safeMalloc(a->length);
 
 	/* store the digits */
@@ -125,19 +125,23 @@ void makeIntegerFromString(Integer *a, char digits[]) {
 		printf("outer: %d\n", i);
 		a->digits[j] = 0;
 		for (k = 0; k < LOGBASE && i - k + 1 > signCorrection; k++) {
-			printf(" inner: %d\n", k);
-			printf(" i - k: %d\n", i - k);
-			printf(" index: %d\n", j);
+			printf(" inner: %u\n", k);
+			printf(" i - k: %u\n", i - k);
+			printf(" index: %u\n", j);
 			a->digits[j] += (digits[i - k] - 48) * pow(10, k);
-			printf(" value: %d\n", a->digits[j]);
-			j++;
+			printf(" value: %u\n", a->digits[j]);
+		}
+		j++;
+		if (LOGBASE > i) {
+			break;
 		}
 	}
-};
+	printf("length: %u\n", a->length);
+}
 
 /* prints integer to stdout */
 void printInteger(Integer a) {
-	unsigned long i;
+	unsigned long i, j;
 	int val;
 	if (a.sign == -1) {
 		printf("-");
@@ -148,6 +152,9 @@ void printInteger(Integer a) {
 			/* print error */
 			printf("!(%d)!", val);
 		} else {
+			for (j = BASE / 10; val < j && i != a.length; j /= 10) {
+				printf("0", val);
+			}
 			printf("%d", val);
 		}
 	}
