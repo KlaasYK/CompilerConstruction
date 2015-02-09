@@ -130,7 +130,7 @@ void testShiftRight() {
 }
 
 void testDivInteger(){
-	operatorHelper("4","2", divInteger,"/");
+	operatorHelper("4","2", divInteger,'/');
 }
 
 void testModInteger(){
