@@ -5,6 +5,7 @@
 #define MIN(a,b) (a<b?a:b)
 #define MAX(a,b) (a<b?b:a)
 
+/* use only base of 10^x (otherwise makeIntegerFromString and printInteger will break) */
 #define BASE 10
 #define LOGBASE 1
 
