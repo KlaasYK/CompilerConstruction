@@ -109,8 +109,25 @@ void testSubInteger(){
 }
 
 void testMulInteger(){
-	operatorHelper("2", "3", mulInteger, '*');
-	operatorHelper("4", "5", mulInteger, '*');
+	operatorHelper("2", "3", mulInteger, '*'); // z0
+	operatorHelper("4", "5", mulInteger, '*'); // z2
+	operatorHelper("2", "4", addInteger ,'+'); // z1a
+	operatorHelper("3", "5", addInteger ,'+'); // z1b
+	operatorHelper("6", "8", mulInteger, '*'); // z1
+	
+	operatorHelper("48", "20", subInteger ,'-'); // z1 - z2
+	operatorHelper("28", "6", subInteger ,'-'); // z1 - z2 - z0
+	
+	// (z1-z2-z0) * 10
+	
+	// z2 * 100
+	
+	operatorHelper("220", "2000", addInteger ,'+');
+	operatorHelper("2220", "6", addInteger ,'+');
+	printf("%d * %d = %d\n", 42, 53, 42 * 53);
+	
+	
+	
 	operatorHelper("42", "53", mulInteger, '*');
 	//operatorHelper("23663", "2356", mulInteger, '*');
 }
