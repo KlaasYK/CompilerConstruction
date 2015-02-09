@@ -508,11 +508,11 @@ void powInteger(Integer *base, Integer exponent) {
 	makeIntegerFromString(&two, "2");
 	while (compareTo(exponent, zero) != 0) {
 		if (exponent.digits[0] % 2 == 1) {
-			mulInteger(&result, base);
+			mulInteger(&result, *base);
 			/* implicit exponent - 1 */
 		}
 		divInteger(&exponent, two);
-		mulInteger(&base, base);
+		mulInteger(base, *base);
 	}
 	freeInteger(base);
 	base->digits = result.digits;
