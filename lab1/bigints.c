@@ -356,11 +356,12 @@ void shiftRight(Integer *a, unsigned long k) {
 	for (i = 0; i < k; ++i) {
 		newdigits[i] = 0;
 	}
-	for (i = k; i < a->length; ++i) {
-		newdigits[i] = a->digits[i];
+	for (i = k; i < k + a->length; ++i) {
+		newdigits[i] = a->digits[i-k];
 	}
 	free(a->digits);
 	a->digits = newdigits;
+	a->length = a->length + k;
 }
 
 /* recursive karatsuba */

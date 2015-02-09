@@ -132,6 +132,14 @@ void testMulInteger(){
 	//operatorHelper("23663", "2356", mulInteger, '*');
 }
 
+void testShiftRight() {
+	Integer a;
+	makeIntegerFromString(&a, "42");
+	shiftRight(&a, 2);
+	printInteger(a);
+	printf("\n");
+}
+
 void testDivInteger(){
 	
 }
@@ -145,6 +153,8 @@ void testPowInteger(){
 }
 
 int main() {
+	testShiftRight();
+	printf("\n");
 	testAddInteger();
 	printf("\n");
 	testSubInteger();
