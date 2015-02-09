@@ -303,7 +303,7 @@ void subInteger(Integer *a, Integer b) {
 
 }
 
-/* a := a * b where b < 10 */
+/* a := a * b where b <= 10 */
 void simpleMul(Integer *a, Integer b) {
 	int carry = 0, val;
 	unsigned long i, alen = a->length;
@@ -491,13 +491,24 @@ void mulInteger(Integer *a, Integer b) {
 }
 
 /* a := a div b */
-void divInteger(Integer *a, Integer b) {
-
+void divInteger(Integer *n, Integer d) {
+	Integer result, one;
+	makeIntegerFromString(&result, "0");
+	makeIntegerFromString(&one, "1");
+	while(compareTo(*n, d) >= 0){
+		subInteger(n, d);
+		addInteger(&result, one);
+	}
+	freeInteger(n);
+	shallowCopyInteger(result, n);
+	freeInteger(&one);
 }
 
 /* a := a mod b */
-void modInteger(Integer *a, Integer b) {
-
+void modInteger(Integer *n, Integer d) {
+	while(compareTo(*n, d) >= 0){
+		subInteger(n, d);
+	}
 }
 
 /* a := a^b */
@@ -515,7 +526,7 @@ void powInteger(Integer *base, Integer exponent) {
 		mulInteger(base, *base);
 	}
 	freeInteger(base);
-	base->digits = result.digits;
+	shallowCopyInteger(result, base);
 	freeInteger(&zero);
 	freeInteger(&two);
 }
