@@ -5,8 +5,8 @@
 #define MIN(a,b) a<b?a:b
 #define MAX(a,b) a<b?b:a
 
-#define BASE 10
-#define LOGBASE 1
+#define BASE 100
+#define LOGBASE 2
 
 /* datastructure for infinite integers */
 struct EGCLint {
@@ -103,30 +103,33 @@ int compareTo(Integer a, Integer b) {
 
 /* make integer form a string */
 void makeIntegerFromString(Integer *a, char digits[]) {
-	unsigned long strLength = 0, signCorrection, i, j, k;
+	unsigned long signCorrection = 0, strLength, i, j, k;
 	/* store the sign */
 	if (digits[0] == '-') {
 		a->sign = -1;
-		strLength++;
+		signCorrection++;
 	} else {
 		a->sign = 1;
 	}
 
 	/* determine length */
-	signCorrection = strLength;
-	for (strLength; digits[strLength] != '\0'; strLength++);
-	strLength -= signCorrection;
+	for (strLength = signCorrection; digits[strLength] != '\0'; strLength++);
 
 	/* allocate length */
-	a->length = strLength / LOGBASE;
+	a->length = (strLength - signCorrection) / LOGBASE;
 	a->digits = safeMalloc(a->length);
 
 	/* store the digits */
 	j = 0;
-	for (i = strLength + signCorrection - 1; i >= signCorrection; i -= LOGBASE) {
+	for (i = strLength - 1; i + 1 > signCorrection; i -= LOGBASE) {
+		printf("outer: %d\n", i);
 		a->digits[j] = 0;
-		for (k = 0; k < LOGBASE && i - k > signCorrection; k--) {
-			a->digits[j] += (digits[i - k] - 48) * pow(10,k);
+		for (k = 0; k < LOGBASE && i - k + 1 > signCorrection; k++) {
+			printf(" inner: %d\n", k);
+			printf(" i - k: %d\n", i - k);
+			printf(" index: %d\n", j);
+			a->digits[j] += (digits[i - k] - 48) * pow(10, k);
+			printf(" value: %d\n", a->digits[j]);
 			j++;
 		}
 	}
