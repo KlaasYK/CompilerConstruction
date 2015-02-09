@@ -298,12 +298,12 @@ void subInteger(Integer *a, Integer b) {
 }
 
 /* a := a * b where b < 10 */
-void simpleMul(Integer *a, int b) {
+void simpleMul(Integer *a, Integer b) {
 	int carry = 0, val;
 	unsigned long i, alen = a->length;
 	/* multiply the whole "string" with the single digit */
 	for (i = 0; i < alen; ++i) {
-		val = a->digits[i] * b + carry;
+		val = a->digits[i] * b.digits[0] + carry;
 		carry = val / BASE;
 		a->digits[i] = val % BASE;
 	}
@@ -319,7 +319,7 @@ void simpleMul(Integer *a, int b) {
 		free(a->digits);
 		a->digits = newdigits;
 	}
-
+	a->sign = a->sign * b.sign;
 }
 
 /* splits at split moving it to 2 other integers, deep copies */
@@ -332,18 +332,21 @@ void splitAt(Integer *high, Integer *low, Integer largeInteger, unsigned long sp
 	for (i = 0; i < low->length; ++i) {
 		low->digits[i] = largeInteger.digits[i];
 	}
+	low->sign = largeInteger.sign;
 
 	/* high digits */
 	if (largeInteger.length < split) {
 		high->length = 1l;
 		high->digits = safeMalloc(high->length);
 		high->digits[0] = 0;
+		high->sign = 1;
 	} else {
 		high->length = largeInteger.length - split;
 		high->digits = safeMalloc(high->length);
 		for (i = 0; i < high->length; ++i) {
 			high->digits[i] = largeInteger.digits[i + split];
 		}
+		high->sign = largeInteger.sign;
 	}
 
 }
@@ -374,12 +377,12 @@ Integer karatsuba(Integer a, Integer b) {
 	if (alen < 2) {
 		/* TODO: remove depency on b */
 		deepCopyInteger(b, &returnInt);
-		simpleMul(&returnInt, a.digits[0]);
+		simpleMul(&returnInt, a);
 		return returnInt;
 	}
 	if (blen < 2) {
 		deepCopyInteger(a, &returnInt);
-		simpleMul(&returnInt, b.digits[0]);
+		simpleMul(&returnInt, b);
 		return returnInt;
 	}
 
