@@ -31,9 +31,7 @@ void testMakeIntegerFromString(){
 	freeInteger(&a);
 }
 
-void testAddInteger(){
-	Integer a, b;
-	
+void testAddInteger(){	
 	operatorHelper("2", "2", addInteger, '+');
 	operatorHelper("293487239847239847928347", "237957909275092850928355", addInteger, '+');
 	operatorHelper("25435", "1", addInteger, '+');
@@ -42,77 +40,79 @@ void testAddInteger(){
 	operatorHelper("999", "1", addInteger, '+');
 	operatorHelper("500", "501", addInteger, '+');
 	operatorHelper("501", "500", addInteger, '+');
-/*
 	
-	makeIntegerFromString(&a, "293487239847239847928347");
-	makeIntegerFromString(&b, "237957909275092850928355");
-	printInteger(a);
-	printf("+");
-	printInteger(b);
-	printf("=");
-	addInteger(&a, b);
-	printInteger(a);
-	printf("\n");
-	freeInteger(&a);
-	freeInteger(&b);
+	operatorHelper("-2", "2", addInteger, '+');
+	operatorHelper("-293487239847239847928347", "237957909275092850928355", addInteger, '+');
+	operatorHelper("-25435", "1", addInteger, '+');
+	operatorHelper("-1", "25435", addInteger, '+');
+	operatorHelper("-1", "999", addInteger, '+');
+	operatorHelper("-999", "1", addInteger, '+');
+	operatorHelper("-500", "501", addInteger, '+');
+	operatorHelper("-501", "500", addInteger, '+');
 	
-	makeIntegerFromString(&a, "283049");
-	makeIntegerFromString(&b, "1");
-	printInteger(a);
-	printf("+");
-	printInteger(b);
-	printf("=");
-	addInteger(&a, b);
-	printInteger(a);
-	printf("\n");
-	freeInteger(&a);
-	freeInteger(&b);
+	operatorHelper("2", "-2", addInteger, '+');
+	operatorHelper("293487239847239847928347", "-237957909275092850928355", addInteger, '+');
+	operatorHelper("25435", "-1", addInteger, '+');
+	operatorHelper("1", "-25435", addInteger, '+');
+	operatorHelper("1", "-999", addInteger, '+');
+	operatorHelper("999", "-1", addInteger, '+');
+	operatorHelper("500", "-501", addInteger, '+');
+	operatorHelper("501", "-500", addInteger, '+');
 	
-	makeIntegerFromString(&a, "283049");
-	makeIntegerFromString(&b, "1");
-	printInteger(a);
-	printf("+");
-	printInteger(b);
-	printf("=");
-	addInteger(&a, b);
-	printInteger(a);
-	printf("\n");
-	freeInteger(&a);
-	freeInteger(&b);
-*/
+	operatorHelper("-2", "-2", addInteger, '+');
+	operatorHelper("-293487239847239847928347", "-237957909275092850928355", addInteger, '+');
+	operatorHelper("-25435", "-1", addInteger, '+');
+	operatorHelper("-1", "-25435", addInteger, '+');
+	operatorHelper("-1", "-999", addInteger, '+');
+	operatorHelper("-999", "-1", addInteger, '+');
+	operatorHelper("-500", "-501", addInteger, '+');
+	operatorHelper("-501", "-500", addInteger, '+');
 	
 }
 
 void testSubInteger(){
-	Integer a, b;
-	makeIntegerFromString(&a, "-98");
-	makeIntegerFromString(&b, "-998");
-	printInteger(a);
-	printf("-");
-	printInteger(b);
-	printf("=");
-
-	subInteger(&a, b);
-	printInteger(a);
-	printf("\n");
+	operatorHelper("2", "2", subInteger, '-');
+	operatorHelper("293487239847239847928347", "237957909275092850928355", subInteger, '-');
+	operatorHelper("25435", "1", subInteger, '-');
+	operatorHelper("1", "25435", subInteger, '-');
+	operatorHelper("1", "999", subInteger, '-');
+	operatorHelper("999", "1", subInteger, '-');
+	operatorHelper("500", "501", subInteger, '-');
+	operatorHelper("501", "500", subInteger, '-');
 	
+	operatorHelper("-2", "2", subInteger, '-');
+	operatorHelper("-293487239847239847928347", "237957909275092850928355", subInteger, '-');
+	operatorHelper("-25435", "1", subInteger, '-');
+	operatorHelper("-1", "25435", subInteger, '-');
+	operatorHelper("-1", "999", subInteger, '-');
+	operatorHelper("-999", "1", subInteger, '-');
+	operatorHelper("-500", "501", subInteger, '-');
+	operatorHelper("-501", "500", subInteger, '-');
+	
+	operatorHelper("2", "-2", subInteger, '-');
+	operatorHelper("293487239847239847928347", "-237957909275092850928355", subInteger, '-');
+	operatorHelper("25435", "-1", subInteger, '-');
+	operatorHelper("1", "-25435", subInteger, '-');
+	operatorHelper("1", "-999", subInteger, '-');
+	operatorHelper("999", "-1", subInteger, '-');
+	operatorHelper("500", "-501", subInteger, '-');
+	operatorHelper("501", "-500", subInteger, '-');
+	
+	operatorHelper("-2", "-2", subInteger, '-');
+	operatorHelper("-293487239847239847928347", "-237957909275092850928355", subInteger, '-');
+	operatorHelper("-25435", "-1", subInteger, '-');
+	operatorHelper("-1", "-25435", subInteger, '-');
+	operatorHelper("-1", "-999", subInteger, '-');
+	operatorHelper("-999", "-1", subInteger, '-');
+	operatorHelper("-500", "-501", subInteger, '-');
+	operatorHelper("-501", "-500", subInteger, '-');
 }
 
 void testMulInteger(){
-	Integer a, b;
-
-	makeIntegerFromString(&a, "23663");
-	makeIntegerFromString(&b, "2356");
-	printInteger(a);
-	printf("\n");
-	printInteger(b);
-	printf("\n");
-	mulInteger(&a, b);
-	printInteger(a);
-	printf("\n");
-
-	freeInteger(&a);
-	freeInteger(&b);
+	operatorHelper("2", "3", mulInteger, '*');
+	operatorHelper("4", "5", mulInteger, '*');
+	operatorHelper("42", "53", mulInteger, '*');
+	operatorHelper("23663", "2356", mulInteger, '*');
 }
 
 void testDivInteger(){
@@ -129,5 +129,9 @@ void testPowInteger(){
 
 int main() {
 	testAddInteger();
+	printf("\n");
+	testSubInteger();
+	printf("\n");
+	testMulInteger();
 	return 0;
 }
