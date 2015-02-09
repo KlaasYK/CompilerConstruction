@@ -501,17 +501,20 @@ void modInteger(Integer *a, Integer b) {
 
 /* a := a^b */
 void powInteger(Integer *base, Integer exponent) {
-	Integer result, zero;
+	Integer result, zero, two;
 	makeIntegerFromString(&result, "1");
 	makeIntegerFromString(&zero, "0");
+	makeIntegerFromString(&two, "2");
 	while (compareTo(exponent, zero) != 0) {
 		if (exponent.digits[0] % 2 == 1) {
 			mulInteger(&result, base);
+			/* implicit exponent - 1 */
 		}
-		shiftLeft(&exponent, 1);
+		divInteger(&exponent, two);
 		mulInteger(&base, base);
 	}
 	freeInteger(base);
 	base->digits = result.digits;
 	freeInteger(&zero);
+	freeInteger(&two);
 }
