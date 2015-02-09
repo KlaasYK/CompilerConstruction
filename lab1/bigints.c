@@ -21,7 +21,7 @@ typedef struct EGCLint Integer;
 /*** stuff to implement ***/
 
 /* make integer form a string */
-void makeIntegerFromString(Integer *a, char digits[]);
+void makeIntegerFromString(Integer *a, const char digits[]);
 
 /* prints integer to stdout */
 void printInteger(Integer a);
@@ -103,7 +103,7 @@ int compareTo(Integer a, Integer b) {
 /* Implementations */
 
 /* make integer form a string */
-void makeIntegerFromString(Integer *a, char digits[]) {
+void makeIntegerFromString(Integer *a, const char digits[]) {
 	unsigned long signCorrection = 0, strLength, i, j, k;
 	/* store the sign */
 	if (digits[0] == '-') {

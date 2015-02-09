@@ -31,9 +31,7 @@ void testMakeIntegerFromString(){
 	freeInteger(&a);
 }
 
-void testAddInteger(){
-	Integer a, b;
-	
+void testAddInteger(){	
 	operatorHelper("2", "2", addInteger, '+');
 	operatorHelper("293487239847239847928347", "237957909275092850928355", addInteger, '+');
 	operatorHelper("25435", "1", addInteger, '+');
@@ -111,17 +109,7 @@ void testAddInteger(){
 }
 
 void testSubInteger(){
-	Integer a, b;
-	makeIntegerFromString(&a, "-98");
-	makeIntegerFromString(&b, "-998");
-	printInteger(a);
-	printf("-");
-	printInteger(b);
-	printf("=");
-
-	subInteger(&a, b);
-	printInteger(a);
-	printf("\n");
+	operatorHelper("1", "25435", subInteger, '-');
 	
 }
 
@@ -156,5 +144,7 @@ void testPowInteger(){
 
 int main() {
 	testAddInteger();
+	printf("\n");
+	testSubInteger();
 	return 0;
 }
