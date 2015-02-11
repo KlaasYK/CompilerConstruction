@@ -181,40 +181,6 @@ void makeIntegerFromString2(Integer *a, const char *digits) {
 	a->digits = newdigits;
 }
 
-/* make integer form a string */
-void makeIntegerFromString(Integer *a, const char digits[]) {
-	unsigned long signCorrection = 0, strLength, i, j, k, l;
-	/* store the sign */
-	if (digits[0] == '-') {
-		a->sign = -1;
-		signCorrection++;
-	} else {
-		a->sign = 1;
-	}
-
-	/* determine length */
-	for (strLength = signCorrection; digits[strLength] != '\0'; strLength++);
-
-	/* allocate length (rounded up) */
-	a->length = (strLength - signCorrection + LOGBASE - 1) / LOGBASE;
-	a->digits = safeMalloc(a->length);
-
-	/* store the digits */
-	j = 0;
-	for (i = strLength - 1; i + 1 > signCorrection; i -= LOGBASE) {
-		a->digits[j] = 0;
-		l=1;
-		for (k = 0; k < LOGBASE && i - k + 1 > signCorrection; k++) {
-			a->digits[j] += (digits[i - k] - 48) * l;
-			l*=10;
-		}
-		j++;
-		if (LOGBASE > i) {
-			break;
-		}
-	}
-}
-
 void printInteger2(Integer a) {
 	unsigned long i;
 	uint32_t val;
@@ -244,32 +210,6 @@ void printInteger2(Integer a) {
 	}
 	
 	free(printdigits);
-}
-
-/* prints integer to stdout */
-void printInteger(Integer a) {
-	unsigned long i, j;
-	uint32_t val;
-	if (a.sign == -1) {
-		printf("-");
-	}
-	for (i = a.length; i > 0; --i) {
-		val = a.digits[i - 1];
-		for (j = BASE / 10; val < j && i != a.length && val != 0; j /= 10) {
-			printf("0");
-		}
-		if (i != a.length && val == 0) {
-			for (j = 0; j < LOGBASE - 1; j++) {
-				printf("0");
-			}
-		}
-		if (val >= BASE || val < 0) {
-			/* print error */
-			printf("!(%d)!", val);
-		} else {
-			printf("%d", val);
-		}
-	}
 }
 
 /* a := a + b */
@@ -613,8 +553,8 @@ void divInteger(Integer *n, Integer d) {
 	
 	/* now the fucking hard parts starts... */
 	
-	makeIntegerFromString(&resultInt, "0");
-	makeIntegerFromString(&one, "1");
+	makeIntegerFromString2(&resultInt, "0");
+	makeIntegerFromString2(&one, "1");
 	
 	deepCopyInteger(d, &currentDivisor);
 
@@ -660,9 +600,9 @@ void modInteger(Integer *n, Integer d) {
 /* a := a^b */
 void powInteger(Integer *base, Integer exponent) {
 	Integer result, zero, two;
-	makeIntegerFromString(&result, "1");
-	makeIntegerFromString(&zero, "0");
-	makeIntegerFromString(&two, "2");
+	makeIntegerFromString2(&result, "1");
+	makeIntegerFromString2(&zero, "0");
+	makeIntegerFromString2(&two, "2");
 	while (compareTo(exponent, zero) != 0) {
 		if (exponent.digits[0] % 2 == 1) {
 			mulInteger(&result, *base);

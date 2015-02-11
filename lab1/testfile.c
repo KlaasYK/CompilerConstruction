@@ -7,7 +7,7 @@ void operatorHelper(const char *aStr, const char *bStr, void (*f)(Integer *, Int
 	Integer a, b;
 	makeIntegerFromString2(&a, aStr);
 	makeIntegerFromString2(&b, bStr);
-	printInteger(a);
+	printInteger2(a);
 	printf(" %c ", operator);
 	printInteger2(b);
 	printf(" = ");
@@ -25,8 +25,8 @@ void testPrintInteger(){
 
 void testMakeIntegerFromString(){
 	Integer a;
-	makeIntegerFromString(&a, "-50545000936034002");
-	printInteger(a);
+	makeIntegerFromString2(&a, "-50545000936034002");
+	printInteger2(a);
 	printf("\n");
 	freeInteger(&a);
 }
@@ -123,9 +123,9 @@ void testMulInteger(){
 
 void testShiftRight() {
 	Integer a;
-	makeIntegerFromString(&a, "42");
+	makeIntegerFromString2(&a, "42");
 	shiftRight(&a, 2);
-	printInteger(a);
+	printInteger2(a);
 	printf("\n");
 	freeInteger(&a);
 }
@@ -134,6 +134,8 @@ void testDivInteger(){
 	operatorHelper("5", "2", divInteger, '/');
 	operatorHelper("50", "2", divInteger, '/');
 	operatorHelper("65536", "2", divInteger, '/');
+	operatorHelper("65536", "65536", divInteger, '/');
+	
 	
 	operatorHelper("131072", "2", divInteger, '/');
 	
