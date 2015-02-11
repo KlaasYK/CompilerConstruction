@@ -5,14 +5,14 @@
 void operatorHelper(const char *aStr, const char *bStr, void (*f)(Integer *, Integer), char operator){
 	
 	Integer a, b;
-	makeIntegerFromString(&a, aStr);
-	makeIntegerFromString(&b, bStr);
+	makeIntegerFromString2(&a, aStr);
+	makeIntegerFromString2(&b, bStr);
 	printInteger(a);
 	printf(" %c ", operator);
-	printInteger(b);
+	printInteger2(b);
 	printf(" = ");
 	(*f)(&a, b);
-	printInteger(a);
+	printInteger2(a);
 	printf("\n");
 	freeInteger(&a);
 	freeInteger(&b);
@@ -151,8 +151,6 @@ int main() {
 	testAddInteger();
 	printf("\n");
 	testSubInteger();
-	printf("\n");
-	testMulInteger();
 	printf("\n");
 	testMulInteger();
 	printf("\n");

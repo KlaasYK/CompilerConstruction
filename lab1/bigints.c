@@ -7,8 +7,8 @@
 #define MAX(a,b) (a<b?b:a)
 
 /* use only base of 10^x (otherwise makeIntegerFromString and printInteger will break) */
-#define BASE 10 /* must become 65535 = 2 ^16 - 1*/ 
-#define LOGBASE 1
+#define BASE 65536 /* must become 65535 = 2 ^16 - 1*/ 
+#define LOGBASE 6 /* must become 6 */
 
 /* datastructure for infinite integers */
 struct EGCLint {
@@ -16,7 +16,6 @@ struct EGCLint {
 	unsigned long length; /* maximum value is approx. 10^4294967295, 
 	not infinite, but close enough. */
 	int sign; /* wheter it is positive, of negative */
-	unsigned long tenlength;
 };
 typedef struct EGCLint Integer;
 
@@ -125,13 +124,13 @@ int compareTo(Integer a, Integer b) {
 
 
 /* function to convert the value to another base */
-void addValueInBase(uint32_t *buf, unsigned long length, uint32_t value, int srcBase, int dstBase) {
-	uint32_t tmp, carry = value;
+void addValueInBase(uint32_t *digits, unsigned long length, uint32_t value, int srcBase, int dstBase) {
+	uint32_t temp, carry = value;
 	unsigned long i;
 	for (i = 0; i < length; ++i) {
-		tmp = buf[i] * srcBase + carry;
-		buf[i] = tmp % dstBase;
-		carry = tmp / dstBase;
+		temp = digits[i] * srcBase + carry;
+		digits[i] = temp % dstBase;
+		carry = temp / dstBase;
 	}
 	
 }
@@ -148,12 +147,10 @@ void makeIntegerFromString2(Integer *a, const char *digits) {
 	}
 	
 	a->length = strlen(digits) - signCorrection;
-	/* store the base ten length */
-	a->tenlength = a->length;
 	/* use calloc here to make sure all are zeros */
-	a->digits = calloc(a->length, sizeof(uint32_t));
+	a->digits = safeCalloc(a->length);
 	
-	for (i = signCorrection; i < a->length; ++i) {
+	for (i = signCorrection; i < a->length+signCorrection; ++i) {
 		addValueInBase(a->digits, a->length, digits[i] - 48, 10, BASE);
 	}
 	
@@ -163,7 +160,12 @@ void makeIntegerFromString2(Integer *a, const char *digits) {
 			break;
 		}
 	}
-	a->length = i + 1;
+	/* only zeros */
+	if (i + 1 == 0) {
+		a->length = 1;
+	} else {
+		a->length = i + 1;
+	}
 	uint32_t *newdigits = safeMalloc(a->length);
 	for (i = 0; i < a->length; ++i) {
 		newdigits[i] = a->digits[i];
@@ -207,16 +209,34 @@ void makeIntegerFromString(Integer *a, const char digits[]) {
 }
 
 void printInteger2(Integer a) {
-	unsigned long i, j;
+	unsigned long i;
 	uint32_t val;
 	if (a.sign == -1) {
 		printf("-");
 	}
-	for (i = a.length-1; i+1>= 1; --i) {
-		
-		
-		
+	uint32_t *printdigits = safeCalloc(LOGBASE * a.length);
+	for (i = a.length-1; i + 1 >= 1; --i) {
+		addValueInBase(printdigits, LOGBASE * a.length, a.digits[i], BASE, 10);
 	}
+	
+	/* remove the zeros form the end */
+	for (i = LOGBASE * a.length - 1; i+1 >= 1; --i) {
+		if (printdigits[i] > 0) {
+			break;
+		}
+	}
+	
+	/* print 0 */
+	if (i + 1 == 0) {
+		printf("0");
+		
+	} else {
+		for (i; i+1 >= 1; --i) {
+			printf("%u", printdigits[i]);
+		}
+	}
+	
+	free(printdigits);
 }
 
 /* prints integer to stdout */
@@ -568,16 +588,12 @@ void mulInteger(Integer *a, Integer b) {
 
 /* a := a div b */
 void divInteger(Integer *n, Integer d) {
-	Integer result, one;
-	makeIntegerFromString(&result, "0");
-	makeIntegerFromString(&one, "1");
-	while(compareTo(*n, d) >= 0){
-		subInteger(n, d);
-		addInteger(&result, one);
+	/* check for d = 0  => error!*/
+	if (d.length == 1 && d.digits[0] == 0) {
+		printf("Division by zero\n");
+		return;
 	}
-	freeInteger(n);
-	shallowCopyInteger(result, n);
-	freeInteger(&one);
+	/* check for d > *n  => 0*/
 }
 
 /* a := a mod b */
