@@ -151,7 +151,7 @@ void testModInteger(){
 }
 
 void testPowInteger(){
-	operatorHelper("5", "2", modInteger, '^');
+	operatorHelper("2", "-32", powInteger, '^');
 	
 }
 

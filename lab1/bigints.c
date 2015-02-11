@@ -68,8 +68,6 @@ uint32_t *safeCalloc(unsigned long size) {
 	return k;
 }
 
-
-
 /* utility function to free the memory */
 void freeInteger(Integer *a) {
 	free(a->digits);
@@ -122,26 +120,24 @@ int compareTo(Integer a, Integer b) {
 
 /* Implementations */
 
-
 /* function to convert the value to another base */
 void addValueInBase(uint32_t *digits, unsigned long length, uint32_t value, int srcBase, int dstBase) {
 	uint32_t temp, carry = value;
 	unsigned long i;
-	
+
 	/*if (srcBase < dstBase) { */
-		for (i = 0; i < length; ++i) {
-			temp = digits[i] * srcBase + carry;
-			digits[i] = temp % dstBase;
-			carry = temp / dstBase;
-		} /*
+	for (i = 0; i < length; ++i) {
+		temp = digits[i] * srcBase + carry;
+		digits[i] = temp % dstBase;
+		carry = temp / dstBase;
+	} /*
 	} else if (srcBase > dstBase) {
 		
 		
 		
 	}*/
-	
-}
 
+}
 
 void makeIntegerFromString(Integer *a, const char *digits) {
 	unsigned long signCorrection = 0, strLength, i, j, k, l;
@@ -152,17 +148,17 @@ void makeIntegerFromString(Integer *a, const char *digits) {
 	} else {
 		a->sign = 1;
 	}
-	
+
 	a->length = strlen(digits) - signCorrection;
 	/* use calloc here to make sure all are zeros */
 	a->digits = safeCalloc(a->length);
-	
-	for (i = signCorrection; i < a->length+signCorrection; ++i) {
+
+	for (i = signCorrection; i < a->length + signCorrection; ++i) {
 		addValueInBase(a->digits, a->length, digits[i] - 48, 10, BASE);
 	}
-	
+
 	/* remove the zeros form the end */
-	for (i = a->length - 1; i+1 >= 1; --i) {
+	for (i = a->length - 1; i + 1 >= 1; --i) {
 		if (a->digits[i] > 0) {
 			break;
 		}
@@ -188,27 +184,27 @@ void printInteger(Integer a) {
 		printf("-");
 	}
 	uint32_t *printdigits = safeCalloc(LOGBASE * a.length);
-	for (i = a.length-1; i + 1 >= 1; --i) {
+	for (i = a.length - 1; i + 1 >= 1; --i) {
 		addValueInBase(printdigits, LOGBASE * a.length, a.digits[i], BASE, 10);
 	}
-	
+
 	/* remove the zeros form the end */
-	for (i = LOGBASE * a.length - 1; i+1 >= 1; --i) {
+	for (i = LOGBASE * a.length - 1; i + 1 >= 1; --i) {
 		if (printdigits[i] > 0) {
 			break;
 		}
 	}
-	
+
 	/* print 0 */
 	if (i + 1 == 0) {
 		printf("0");
-		
+
 	} else {
-		for (i; i+1 >= 1; --i) {
+		for (i; i + 1 >= 1; --i) {
 			printf("%u", printdigits[i]);
 		}
 	}
-	
+
 	free(printdigits);
 }
 
@@ -406,7 +402,7 @@ void shiftLeft(Integer *a, unsigned long k) {
 	unsigned long i;
 	uint32_t *newdigits = safeMalloc(a->length - k);
 	for (i = k; i < a->length; ++i) {
-		newdigits[i-k] = a->digits[i];
+		newdigits[i - k] = a->digits[i];
 	}
 	free(a->digits);
 	a->digits = newdigits;
@@ -537,82 +533,98 @@ void mulInteger(Integer *a, Integer b) {
 void divInteger(Integer *n, Integer d) {
 	/* check for d = 0  => error!*/
 	unsigned long shifts = 0;
-	Integer resultInt, currentDivisor,one;
-	
+	Integer resultInt, currentDivisor, one;
+
 	if (d.length == 1 && d.digits[0] == 0) {
 		printf("Division by zero\n");
 		return;
 	}
-	
+
 	/* check for d > *n  => 0*/
 	if (compareTo(*n, d) < 0) {
 		freeInteger(n);
 		makeIntegerFromString(n, "0");
 		return;
 	}
-	
+
 	/* now the fucking hard parts starts... */
-	
+
 	makeIntegerFromString(&resultInt, "0");
 	makeIntegerFromString(&one, "1");
-	
+
 	deepCopyInteger(d, &currentDivisor);
 
 	while (compareTo(*n, currentDivisor) >= 0) {
 		shiftRight(&currentDivisor, 1);
 		shifts++;
 	}
-	
+
 	shifts--;
 	shiftLeft(&currentDivisor, 1);
-	
-	while (shifts+1 >= 1) {
-		
-		while (! (compareTo(*n, currentDivisor) < 0) ) {
+
+	while (shifts + 1 >= 1) {
+
+		while (!(compareTo(*n, currentDivisor) < 0)) {
 			subInteger(n, currentDivisor);
 			addInteger(&resultInt, one);
 		}
-		
+
 		/* add so that it is larger again (a bit) */
 		/* addInteger(n, currentDivisor); */
-	
+
 		shiftLeft(&currentDivisor, 1);
 		shiftRight(&resultInt, 1);
 		shifts--;
 	}
-	
-	shiftLeft(&resultInt,1);
-	
+
+	shiftLeft(&resultInt, 1);
+
 	freeInteger(n);
 	shallowCopyInteger(resultInt, n);
-	
+
 	freeInteger(&one);
 	freeInteger(&currentDivisor);
 }
 
 /* a := a mod b */
 void modInteger(Integer *n, Integer d) {
-	while(compareTo(*n, d) >= 0){
+	while (compareTo(*n, d) >= 0) {
 		subInteger(n, d);
 	}
 }
 
 /* a := a^b */
 void powInteger(Integer *base, Integer exponent) {
-	Integer result, one, two;
-	makeIntegerFromString(&result, "1");
-	makeIntegerFromString(&one, "1");
-	makeIntegerFromString(&two, "2");
-	while (compareTo(exponent, one) != 0) {
-		if (exponent.digits[0] % 2 == 1) {
+	Integer result, zero, one, two, expCopy;
+	makeIntegerFromString(&zero, "0");
+	if (exponent.sign == -1) {
+		freeInteger(base);
+		shallowCopyInteger(zero, base);
+	} else {
+		makeIntegerFromString(&one, "1");
+		if (compareTo(exponent, zero) == 0) {
+			freeInteger(base);
+			shallowCopyInteger(one, base);
+		} else {
+			makeIntegerFromString(&result, "1");
+			makeIntegerFromString(&two, "2");
+			deepCopyInteger(exponent, &expCopy);
+			while (compareTo(expCopy, one) != 0) {
+				if (expCopy.digits[0] % 2 == 1) {
+					mulInteger(&result, *base);
+					/* implicit exponent - 1 */
+				}
+				divInteger(&expCopy, two);
+				mulInteger(base, *base);
+			}
 			mulInteger(&result, *base);
-			/* implicit exponent - 1 */
+			freeInteger(base);
+			shallowCopyInteger(result, base);
+			freeInteger(&expCopy);
+			freeInteger(&one);
+			freeInteger(&two);
 		}
-		divInteger(&exponent, two);
-		mulInteger(base, *base);
+
+		freeInteger(&zero);
 	}
-	freeInteger(base);
-	shallowCopyInteger(result, base);
-	freeInteger(&one);
-	freeInteger(&two);
 }
