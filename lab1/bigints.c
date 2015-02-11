@@ -599,11 +599,11 @@ void modInteger(Integer *n, Integer d) {
 
 /* a := a^b */
 void powInteger(Integer *base, Integer exponent) {
-	Integer result, zero, two;
+	Integer result, one, two;
 	makeIntegerFromString(&result, "1");
-	makeIntegerFromString(&zero, "0");
+	makeIntegerFromString(&one, "1");
 	makeIntegerFromString(&two, "2");
-	while (compareTo(exponent, zero) != 0) {
+	while (compareTo(exponent, one) != 0) {
 		if (exponent.digits[0] % 2 == 1) {
 			mulInteger(&result, *base);
 			/* implicit exponent - 1 */
@@ -613,6 +613,6 @@ void powInteger(Integer *base, Integer exponent) {
 	}
 	freeInteger(base);
 	shallowCopyInteger(result, base);
-	freeInteger(&zero);
+	freeInteger(&one);
 	freeInteger(&two);
 }

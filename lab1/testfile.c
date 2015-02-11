@@ -151,6 +151,7 @@ void testModInteger(){
 }
 
 void testPowInteger(){
+	operatorHelper("5", "2", modInteger, '^');
 	
 }
 
@@ -167,5 +168,7 @@ int main() {
 	testDivInteger();
 	/*printf("\n");
 	testModInteger();*/
+	printf("\n");
+	testPowInteger();
 	return 0;
 }
