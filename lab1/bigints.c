@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #define MIN(a,b) (a<b?a:b)
 #define MAX(a,b) (a<b?b:a)
@@ -10,7 +11,7 @@
 
 /* datastructure for infinite integers */
 struct EGCLint {
-	int *digits; /* the value for each of the digits, big endian */
+	uint32_t *digits; /* the value for each of the digits, big endian */
 	unsigned long length; /* maximum value is approx. 10^4294967295, 
 	not infinite, but close enough. */
 	int sign; /* wheter it is positive, of negative */
@@ -47,8 +48,8 @@ void powInteger(Integer *a, Integer b);
 /*** utility functions ***/
 
 /* utility function to malloc the memory*/
-int *safeMalloc(unsigned long size) {
-	int *k = malloc(size * sizeof (int));
+uint32_t *safeMalloc(unsigned long size) {
+	uint32_t *k = malloc(size * sizeof (uint32_t));
 	if (k == NULL) {
 		printf("Error during allocation\n");
 		exit(-1);
@@ -145,7 +146,7 @@ void makeIntegerFromString(Integer *a, const char digits[]) {
 /* prints integer to stdout */
 void printInteger(Integer a) {
 	unsigned long i, j;
-	int val;
+	uint32_t val;
 	if (a.sign == -1) {
 		printf("-");
 	}
@@ -193,7 +194,7 @@ void addInteger(Integer *a, Integer b) {
 	}
 
 	/* for equal signs and a >= b */
-	int carry = 0, temp;
+	uint32_t carry = 0, temp;
 	unsigned long i;
 
 	/* calculate sum */
@@ -213,7 +214,7 @@ void addInteger(Integer *a, Integer b) {
 	/* if last carry is overflowing a */
 	if (carry > 0) {
 		/* more space is needed */
-		int *digitsnew;
+		uint32_t *digitsnew;
 		/* allocate more memory */
 		digitsnew = safeMalloc(alen + 1);
 		/* copy digits over */
@@ -257,7 +258,7 @@ void subInteger(Integer *a, Integer b) {
 	}
 
 	/* for equal signs and a >= b */
-	int carry = 0, temp;
+	uint32_t carry = 0, temp;
 	unsigned long i;
 
 	/* calculate sum */
@@ -286,7 +287,7 @@ void subInteger(Integer *a, Integer b) {
 		}
 		unsigned long j;
 		/* more space is needed */
-		int *digitsnew;
+		uint32_t *digitsnew;
 		/* allocate more memory */
 		digitsnew = safeMalloc(alen - i);
 		/* copy digits over */
@@ -305,7 +306,7 @@ void subInteger(Integer *a, Integer b) {
 
 /* a := a * b where b <= 10 */
 void simpleMul(Integer *a, Integer b) {
-	int carry = 0, val;
+	uint32_t carry = 0, val;
 	unsigned long i, alen = a->length;
 	/* multiply the whole "string" with the single digit */
 	for (i = 0; i < alen; ++i) {
@@ -316,7 +317,7 @@ void simpleMul(Integer *a, Integer b) {
 
 	/* allocate an extra digit, add carry */
 	if (carry > 0) {
-		int *newdigits = safeMalloc(alen + 1);
+		uint32_t *newdigits = safeMalloc(alen + 1);
 		for (i = 0; i < alen; ++i) {
 			newdigits[i] = a->digits[i];
 		}
@@ -360,7 +361,7 @@ void splitAt(Integer *high, Integer *low, Integer largeInteger, unsigned long sp
 /* a := a * BASE^k shift (makes Integer smaller (divide)) */
 void shiftLeft(Integer *a, unsigned long k) {
 	unsigned long i;
-	int *newdigits = safeMalloc(a->length - k);
+	uint32_t *newdigits = safeMalloc(a->length - k);
 	for (i = k; i < a->length; --i) {
 		newdigits[i-k] = a->digits[i];
 	}
@@ -372,7 +373,7 @@ void shiftLeft(Integer *a, unsigned long k) {
 /* a := a * BASE^k shift (makes Intger larger (multiply) */
 void shiftRight(Integer *a, unsigned long k) {
 	unsigned long i;
-	int *newdigits = safeMalloc(a->length + k);
+	uint32_t *newdigits = safeMalloc(a->length + k);
 	for (i = 0; i < k; ++i) {
 		newdigits[i] = 0;
 	}
@@ -394,7 +395,6 @@ Integer karatsuba(Integer a, Integer b) {
 
 	/* a < 10 */
 	if (alen < 2) {
-		/* TODO: remove depency on b */
 		deepCopyInteger(b, &returnInt);
 		simpleMul(&returnInt, a);
 		return returnInt;
@@ -471,7 +471,7 @@ void mulInteger(Integer *a, Integer b) {
 		i--;
 		a->sign = 1;
 		/* more space is needed */
-		int *digitsnew;
+		uint32_t *digitsnew;
 		/* allocate more memory */
 		digitsnew = safeMalloc(alen - i);
 		/* copy digits over */
