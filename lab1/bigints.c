@@ -143,7 +143,7 @@ void makeIntegerFromString2(Integer *a, const char *digits) {
 	}
 	
 	/* remove the zeros form the end */
-	for (i = a->length - 1; i >= 0; --i) {
+	for (i = a->length - 1; i+1 >= 1; --i) {
 		if (a->digits[i] > 0) {
 			break;
 		}
