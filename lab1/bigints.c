@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 
 #define MIN(a,b) (a<b?a:b)
 #define MAX(a,b) (a<b?b:a)
 
 /* use only base of 10^x (otherwise makeIntegerFromString and printInteger will break) */
-#define BASE 10
+#define BASE 10 /* must become 65535 = 2 ^16 - 1*/ 
 #define LOGBASE 1
 
 /* datastructure for infinite integers */
@@ -108,6 +109,53 @@ int compareTo(Integer a, Integer b) {
 }
 
 /* Implementations */
+
+
+/* function to convert the value to another base */
+void addValueInBase(uint32_t *buf, unsigned long length, uint32_t value, int srcBase, int dstBase) {
+	uint32_t tmp, carry = value;
+	unsigned long i;
+	for (i = 0; i < length; ++i) {
+		tmp = buf[i] * srcBase + carry;
+		buf[i] = tmp % dstBase;
+		carry = tmp / dstBase;
+	}
+	
+}
+
+
+void makeIntegerFromString2(Integer *a, const char *digits) {
+	unsigned long signCorrection = 0, strLength, i, j, k, l;
+	/* store the sign */
+	if (digits[0] == '-') {
+		a->sign = -1;
+		signCorrection++;
+	} else {
+		a->sign = 1;
+	}
+	
+	a->length = strlen(digits) - signCorrection;
+	/* use calloc here to make sure all are zeros */
+	a->digits = calloc(a->length, sizeof(uint32_t));
+	
+	for (i = signCorrection; i < a->length; ++i) {
+		addValueInBase(a->digits, a->length, digits[i] - 48, 10, BASE);
+	}
+	
+	/* remove the zeros form the end */
+	for (i = a->length - 1; i >= 0; --i) {
+		if (a->digits[i] > 0) {
+			break;
+		}
+	}
+	a->length = i + 1;
+	uint32_t *newdigits = safeMalloc(a->length);
+	for (i = 0; i < a->length; ++i) {
+		newdigits[i] = a->digits[i];
+	}
+	free(a->digits);
+	a->digits = newdigits;
+}
 
 /* make integer form a string */
 void makeIntegerFromString(Integer *a, const char digits[]) {
