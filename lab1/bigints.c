@@ -60,7 +60,7 @@ uint32_t *safeMalloc(unsigned long size) {
 }
 
 /* utility function to calloc the memory*/
-uint32_t *safeMalloc(unsigned long size) {
+uint32_t *safeCalloc(unsigned long size) {
 	uint32_t *k = calloc(size, sizeof (uint32_t));
 	if (k == NULL) {
 		printf("Error during allocation\n");
