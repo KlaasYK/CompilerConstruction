@@ -569,9 +569,6 @@ void divInteger(Integer *n, Integer d) {
 			addInteger(&resultInt, one);
 		}
 
-		/* add so that it is larger again (a bit) */
-		/* addInteger(n, currentDivisor); */
-
 		shiftLeft(&currentDivisor, 1);
 		shiftRight(&resultInt, 1);
 		shifts--;
@@ -588,9 +585,42 @@ void divInteger(Integer *n, Integer d) {
 
 /* a := a mod b */
 void modInteger(Integer *n, Integer d) {
-	while (compareTo(*n, d) >= 0) {
-		subInteger(n, d);
+	/* check for d = 0  => error!*/
+	unsigned long shifts = 0;
+	Integer currentDivisor;
+
+	if (d.length == 1 && d.digits[0] == 0) {
+		printf("Division by zero\n");
+		return;
 	}
+
+	/* check for d > *n  => *n */
+	if (compareTo(*n, d) < 0) {
+		return;
+	}
+
+	/* now the fucking hard parts starts... */
+	deepCopyInteger(d, &currentDivisor);
+
+	while (compareTo(*n, currentDivisor) >= 0) {
+		shiftRight(&currentDivisor, 1);
+		shifts++;
+	}
+
+	shifts--;
+	shiftLeft(&currentDivisor, 1);
+
+	while (shifts + 1 >= 1) {
+
+		while (!(compareTo(*n, currentDivisor) < 0)) {
+			subInteger(n, currentDivisor);
+		}
+
+		shiftLeft(&currentDivisor, 1);
+		shifts--;
+	}
+
+	freeInteger(&currentDivisor);
 }
 
 /* a := a^b */
