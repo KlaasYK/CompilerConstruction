@@ -458,7 +458,7 @@ void splitAt(Integer *high, Integer *low, Integer largeInteger, unsigned long sp
 void shiftLeft(Integer *a, unsigned long k) {
 	unsigned long i;
 	uint32_t *newdigits = safeMalloc(a->length - k);
-	for (i = k; i < a->length; --i) {
+	for (i = k; i < a->length; ++i) {
 		newdigits[i-k] = a->digits[i];
 	}
 	free(a->digits);
@@ -589,11 +589,58 @@ void mulInteger(Integer *a, Integer b) {
 /* a := a div b */
 void divInteger(Integer *n, Integer d) {
 	/* check for d = 0  => error!*/
+	unsigned long shifts = 0;
+	Integer resultInt, currentDivisor,one;
+	
 	if (d.length == 1 && d.digits[0] == 0) {
 		printf("Division by zero\n");
 		return;
 	}
+	
 	/* check for d > *n  => 0*/
+	if (compareTo(*n, d) < 0) {
+		freeInteger(n);
+		makeIntegerFromString2(n, "0");
+		return;
+	}
+	
+	/* now the fucking hard parts starts... */
+	
+	makeIntegerFromString(&resultInt, "0");
+	makeIntegerFromString(&one, "1");
+	
+	deepCopyInteger(d, &currentDivisor);
+
+	while (compareTo(*n, currentDivisor) > 0) {
+		shiftRight(&currentDivisor, 1);
+		shifts++;
+	}
+	
+	shifts--;
+	shiftLeft(&currentDivisor, 1);
+	
+	while (shifts+1 >= 1) {
+		
+		while (compareTo(*n, currentDivisor) > 0) {
+			subInteger(n, currentDivisor);
+			addInteger(&resultInt, one);
+		}
+		
+		/* add so that it is larger again (a bit) */
+		addInteger(n, currentDivisor);
+	
+		shiftLeft(&currentDivisor, 1);
+		shiftRight(&resultInt, 1);
+		shifts--;
+	}
+	
+	shiftLeft(&resultInt,1);
+	
+	freeInteger(n);
+	shallowCopyInteger(resultInt, n);
+	
+	freeInteger(&one);
+	freeInteger(&currentDivisor);
 }
 
 /* a := a mod b */
