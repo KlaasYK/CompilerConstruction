@@ -151,14 +151,14 @@ void testModInteger(){
 }
 
 void testSelf() {
-	Integer a
-	makeIntegerFromString2(&a, "5");
-	printInteger2(a);
-	printf(" + ");
-	printInteger2(a);
+	Integer a;
+	makeIntegerFromString(&a, "5");
+	printInteger(a);
+	printf(" * ");
+	printInteger(a);
 	printf(" = ");
-	addInteger(&a, a);
-	printInteger2(a);
+	mulInteger(&a, a);
+	printInteger(a);
 	printf("\n");
 	freeInteger(&a);
 }
@@ -169,6 +169,7 @@ void testPowInteger(){
 }
 
 int main() {
+	testSelf();
 	/*testDivInteger();
 	/*testShiftRight();*/
 	printf("\n");
