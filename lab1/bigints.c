@@ -16,6 +16,7 @@ struct EGCLint {
 	unsigned long length; /* maximum value is approx. 10^4294967295, 
 	not infinite, but close enough. */
 	int sign; /* wheter it is positive, of negative */
+	unsigned long tenlength;
 };
 typedef struct EGCLint Integer;
 
@@ -57,6 +58,18 @@ uint32_t *safeMalloc(unsigned long size) {
 	}
 	return k;
 }
+
+/* utility function to calloc the memory*/
+uint32_t *safeMalloc(unsigned long size) {
+	uint32_t *k = calloc(size, sizeof (uint32_t));
+	if (k == NULL) {
+		printf("Error during allocation\n");
+		exit(-1);
+	}
+	return k;
+}
+
+
 
 /* utility function to free the memory */
 void freeInteger(Integer *a) {
@@ -135,6 +148,8 @@ void makeIntegerFromString2(Integer *a, const char *digits) {
 	}
 	
 	a->length = strlen(digits) - signCorrection;
+	/* store the base ten length */
+	a->tenlength = a->length;
 	/* use calloc here to make sure all are zeros */
 	a->digits = calloc(a->length, sizeof(uint32_t));
 	
@@ -188,6 +203,19 @@ void makeIntegerFromString(Integer *a, const char digits[]) {
 		if (LOGBASE > i) {
 			break;
 		}
+	}
+}
+
+void printInteger2(Integer a) {
+	unsigned long i, j;
+	uint32_t val;
+	if (a.sign == -1) {
+		printf("-");
+	}
+	for (i = a.length-1; i+1>= 1; --i) {
+		
+		
+		
 	}
 }
 
