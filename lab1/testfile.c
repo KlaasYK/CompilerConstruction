@@ -150,6 +150,19 @@ void testModInteger(){
 	
 }
 
+void testSelf() {
+	Integer a
+	makeIntegerFromString2(&a, "5");
+	printInteger2(a);
+	printf(" + ");
+	printInteger2(a);
+	printf(" = ");
+	addInteger(&a, a);
+	printInteger2(a);
+	printf("\n");
+	freeInteger(&a);
+}
+
 void testPowInteger(){
 	
 }
