@@ -135,6 +135,8 @@ void testDivInteger(){
 	operatorHelper("50", "2", divInteger, '/');
 	operatorHelper("65536", "2", divInteger, '/');
 	
+	operatorHelper("131072", "2", divInteger, '/');
+	
 	operatorHelper("54509999823543694364987654935879875943", "23946239875692375752", divInteger, '/');
 	operatorHelper("23946239875692375752", "54509999823543694364987654935879875943", divInteger, '/');
 	operatorHelper("42", "0", divInteger, '/');

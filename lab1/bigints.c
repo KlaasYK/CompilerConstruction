@@ -128,17 +128,17 @@ void addValueInBase(uint32_t *digits, unsigned long length, uint32_t value, int 
 	uint32_t temp, carry = value;
 	unsigned long i;
 	
-	if (srcBase < dstBase) {
+	/*if (srcBase < dstBase) { */
 		for (i = 0; i < length; ++i) {
 			temp = digits[i] * srcBase + carry;
 			digits[i] = temp % dstBase;
 			carry = temp / dstBase;
-		}
+		} /*
 	} else if (srcBase > dstBase) {
 		
 		
 		
-	}
+	}*/
 	
 }
 
