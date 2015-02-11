@@ -127,10 +127,17 @@ int compareTo(Integer a, Integer b) {
 void addValueInBase(uint32_t *digits, unsigned long length, uint32_t value, int srcBase, int dstBase) {
 	uint32_t temp, carry = value;
 	unsigned long i;
-	for (i = 0; i < length; ++i) {
-		temp = digits[i] * srcBase + carry;
-		digits[i] = temp % dstBase;
-		carry = temp / dstBase;
+	
+	if (srcBase < dstBase) {
+		for (i = 0; i < length; ++i) {
+			temp = digits[i] * srcBase + carry;
+			digits[i] = temp % dstBase;
+			carry = temp / dstBase;
+		}
+	} else if (srcBase > dstBase) {
+		
+		
+		
 	}
 	
 }
@@ -611,7 +618,7 @@ void divInteger(Integer *n, Integer d) {
 	
 	deepCopyInteger(d, &currentDivisor);
 
-	while (compareTo(*n, currentDivisor) > 0) {
+	while (compareTo(*n, currentDivisor) >= 0) {
 		shiftRight(&currentDivisor, 1);
 		shifts++;
 	}
@@ -621,13 +628,13 @@ void divInteger(Integer *n, Integer d) {
 	
 	while (shifts+1 >= 1) {
 		
-		while (compareTo(*n, currentDivisor) > 0) {
+		while (! (compareTo(*n, currentDivisor) < 0) ) {
 			subInteger(n, currentDivisor);
 			addInteger(&resultInt, one);
 		}
 		
 		/* add so that it is larger again (a bit) */
-		addInteger(n, currentDivisor);
+		/* addInteger(n, currentDivisor); */
 	
 		shiftLeft(&currentDivisor, 1);
 		shiftRight(&resultInt, 1);

@@ -118,6 +118,7 @@ void testMulInteger(){
 	operatorHelper("-25", "4", mulInteger, '*');
 	operatorHelper("-25", "-4", mulInteger, '*');
 	operatorHelper("-293487239847239847928347", "-237957909275092850928355", mulInteger, '*');
+
 }
 
 void testShiftRight() {
@@ -131,6 +132,9 @@ void testShiftRight() {
 
 void testDivInteger(){
 	operatorHelper("5", "2", divInteger, '/');
+	operatorHelper("50", "2", divInteger, '/');
+	operatorHelper("65536", "2", divInteger, '/');
+	
 	operatorHelper("54509999823543694364987654935879875943", "23946239875692375752", divInteger, '/');
 	operatorHelper("23946239875692375752", "54509999823543694364987654935879875943", divInteger, '/');
 	operatorHelper("42", "0", divInteger, '/');
