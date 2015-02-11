@@ -143,7 +143,7 @@ void addValueInBase(uint32_t *digits, unsigned long length, uint32_t value, int 
 }
 
 
-void makeIntegerFromString2(Integer *a, const char *digits) {
+void makeIntegerFromString(Integer *a, const char *digits) {
 	unsigned long signCorrection = 0, strLength, i, j, k, l;
 	/* store the sign */
 	if (digits[0] == '-') {
@@ -181,7 +181,7 @@ void makeIntegerFromString2(Integer *a, const char *digits) {
 	a->digits = newdigits;
 }
 
-void printInteger2(Integer a) {
+void printInteger(Integer a) {
 	unsigned long i;
 	uint32_t val;
 	if (a.sign == -1) {
@@ -547,14 +547,14 @@ void divInteger(Integer *n, Integer d) {
 	/* check for d > *n  => 0*/
 	if (compareTo(*n, d) < 0) {
 		freeInteger(n);
-		makeIntegerFromString2(n, "0");
+		makeIntegerFromString(n, "0");
 		return;
 	}
 	
 	/* now the fucking hard parts starts... */
 	
-	makeIntegerFromString2(&resultInt, "0");
-	makeIntegerFromString2(&one, "1");
+	makeIntegerFromString(&resultInt, "0");
+	makeIntegerFromString(&one, "1");
 	
 	deepCopyInteger(d, &currentDivisor);
 
@@ -599,11 +599,11 @@ void modInteger(Integer *n, Integer d) {
 
 /* a := a^b */
 void powInteger(Integer *base, Integer exponent) {
-	Integer result, zero, two;
-	makeIntegerFromString2(&result, "1");
-	makeIntegerFromString2(&zero, "0");
-	makeIntegerFromString2(&two, "2");
-	while (compareTo(exponent, zero) != 0) {
+	Integer result, one, two;
+	makeIntegerFromString(&result, "1");
+	makeIntegerFromString(&one, "1");
+	makeIntegerFromString(&two, "2");
+	while (compareTo(exponent, one) != 0) {
 		if (exponent.digits[0] % 2 == 1) {
 			mulInteger(&result, *base);
 			/* implicit exponent - 1 */
@@ -613,6 +613,6 @@ void powInteger(Integer *base, Integer exponent) {
 	}
 	freeInteger(base);
 	shallowCopyInteger(result, base);
-	freeInteger(&zero);
+	freeInteger(&one);
 	freeInteger(&two);
 }

@@ -5,14 +5,14 @@
 void operatorHelper(const char *aStr, const char *bStr, void (*f)(Integer *, Integer), char operator){
 	
 	Integer a, b;
-	makeIntegerFromString2(&a, aStr);
-	makeIntegerFromString2(&b, bStr);
-	printInteger2(a);
+	makeIntegerFromString(&a, aStr);
+	makeIntegerFromString(&b, bStr);
+	printInteger(a);
 	printf(" %c ", operator);
-	printInteger2(b);
+	printInteger(b);
 	printf(" = ");
 	(*f)(&a, b);
-	printInteger2(a);
+	printInteger(a);
 	printf("\n");
 	freeInteger(&a);
 	freeInteger(&b);
@@ -25,8 +25,8 @@ void testPrintInteger(){
 
 void testMakeIntegerFromString(){
 	Integer a;
-	makeIntegerFromString2(&a, "-50545000936034002");
-	printInteger2(a);
+	makeIntegerFromString(&a, "-50545000936034002");
+	printInteger(a);
 	printf("\n");
 	freeInteger(&a);
 }
@@ -123,9 +123,9 @@ void testMulInteger(){
 
 void testShiftRight() {
 	Integer a;
-	makeIntegerFromString2(&a, "42");
+	makeIntegerFromString(&a, "42");
 	shiftRight(&a, 2);
-	printInteger2(a);
+	printInteger(a);
 	printf("\n");
 	freeInteger(&a);
 }
@@ -164,6 +164,7 @@ void testSelf() {
 }
 
 void testPowInteger(){
+	operatorHelper("5", "2", modInteger, '^');
 	
 }
 
@@ -180,5 +181,7 @@ int main() {
 	testDivInteger();
 	/*printf("\n");
 	testModInteger();*/
+	printf("\n");
+	testPowInteger();
 	return 0;
 }
