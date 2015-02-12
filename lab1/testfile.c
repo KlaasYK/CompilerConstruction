@@ -170,6 +170,20 @@ void testPowInteger(){
 	operatorHelper("2", "-32", powInteger, '^');
 	operatorHelper("5", "3", powInteger, '^');
 	operatorHelper("10", "1000", powInteger, '^');
+	operatorHelper("10", "10", mulInteger, '*');
+	operatorHelper("1000", "2", divInteger, '/');
+	operatorHelper("100", "100", mulInteger, '*');
+	operatorHelper("500", "2", divInteger, '/');
+	operatorHelper("10000", "10000", mulInteger, '*');
+	operatorHelper("250", "2", divInteger, '/');
+	operatorHelper("100000000", "100000000", mulInteger, '*');
+	operatorHelper("125", "2", divInteger, '/');
+	operatorHelper("1", "10000000000000000", mulInteger, '*');
+	operatorHelper("10000000000000000", "10000000000000000", mulInteger, '*');
+	operatorHelper("62", "2", divInteger, '/');
+	operatorHelper("100000000000000000000000000000000", "100000000000000000000000000000000", mulInteger, '*');
+	operatorHelper("31", "2", divInteger, '/');
+	
 	
 }
 
