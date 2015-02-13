@@ -389,9 +389,16 @@ void splitAt(Integer *high, Integer *low, Integer largeInteger, unsigned long sp
 		high->sign = 1;
 	} else {
 		high->length = largeInteger.length - split;
-		high->digits = safeMalloc(high->length);
-		for (i = 0; i < high->length; ++i) {
-			high->digits[i] = largeInteger.digits[i + split];
+		
+		if (high->length == 0) {
+			/* multiply small with very large numer */
+			makeIntegerFromString(high,"0");
+		} else {
+			/* this one allocs 0 bytes... */
+			high->digits = safeMalloc(high->length);
+			for (i = 0; i < high->length; ++i) {
+				high->digits[i] = largeInteger.digits[i + split];
+			}
 		}
 		high->sign = largeInteger.sign;
 	}
@@ -648,10 +655,6 @@ void powInteger(Integer *base, Integer exponent) {
 				
 				divInteger(&expCopy, two);
 				mulInteger(base, *base);
-				printInteger(*base);
-				printf("^");
-				printInteger(expCopy);
-				printf("\n");
 			}
 			mulInteger(&result, *base);
 			freeInteger(base);
