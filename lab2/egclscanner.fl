@@ -1,0 +1,75 @@
+%{
+#include <stdio.h>
+#include <stdlib.h>
+
+#define EOF 1000
+#define BEGIN 1010
+#define END 1020
+#define COMMENT 1030
+#define PROGRAM 1040
+#define DOBEGIN 1050
+#define DOEND 1060
+#define IFBEGIN 1070
+#define IFEND 1080
+#define OR 1090
+#define AND 1100
+#define VAR 1110
+#define ASSIGNMENTOP 1120
+#define VARIABLE 1130
+#define NUMBER 1140
+#define COMPAREOP 1150
+#define TYPEOP 1160
+#define THENOP 1170
+#define CONSTANT 1180
+#define COMMA 1190
+#define SEMICOLON 1200
+#define ALTGUARD 1210
+#define PLUSOP 1220
+#define MULOP 1230
+#define BOOLEAN 1240
+#define FUNCNAME 1250
+#define STRING 1260
+
+
+%}
+
+%%
+begin {return
+end 
+[([01]*[a-zA-Z]+[01]*)*]\n] { return 1; }
+<<EOF>> { return EOF; }
+%%
+
+int main(int argc, char** argv) {
+	int linecount = 1;
+
+	if (argc > 2) {
+		fprintf(stderr, "Usage: %s [filename.c]\n", argv[0]);
+		exit(-1);
+  	}
+	if (argc == 2) {
+		yyin = fopen(argv[1], "r");
+	}
+
+	//Lees tot EOF
+	int val = yylex();
+	while (val > 0) {
+		switch(val) {
+			case 1: printf("%d: Invalid character(s)", linecount); break;
+			case 2: printf("%d: ACCEPT", linecount); break;
+			case 3: printf("%d: FAIL", linecount); break;
+		}
+		++linecount;
+		val = yylex();
+	}
+
+	if (argc == 2) {
+		fclose(yyin);
+	}
+	
+	printf("Linecount: %d\n", linecount);
+	printf("Wordcount: %d\n", wordcount);
+	printf("Charcount: %d\n", charcount);	
+	
+	return 0;
+}
