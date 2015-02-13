@@ -345,11 +345,12 @@ void subInteger(Integer *a, Integer b) {
 
 /* a := a * b where b <= 10 */
 void simpleMul(Integer *a, Integer b) {
-	uint32_t carry = 0, val;
+	uint32_t carry = 0, val, val2;
 	unsigned long i, alen = a->length;
 	/* multiply the whole "string" with the single digit */
 	for (i = 0; i < alen; ++i) {
-		val = a->digits[i] * b.digits[0] + carry;
+		val2 = a->digits[i];
+		val = val2 * b.digits[0] + carry;
 		carry = val / BASE;
 		a->digits[i] = val % BASE;
 	}
@@ -382,7 +383,7 @@ void splitAt(Integer *high, Integer *low, Integer largeInteger, unsigned long sp
 
 	/* high digits */
 	if (largeInteger.length < split) {
-		high->length = 1l;
+		high->length = 1;
 		high->digits = safeMalloc(high->length);
 		high->digits[0] = 0;
 		high->sign = 1;
@@ -644,8 +645,13 @@ void powInteger(Integer *base, Integer exponent) {
 					mulInteger(&result, *base);
 					/* implicit exponent - 1 */
 				}
+				
 				divInteger(&expCopy, two);
 				mulInteger(base, *base);
+				printInteger(*base);
+				printf("^");
+				printInteger(expCopy);
+				printf("\n");
 			}
 			mulInteger(&result, *base);
 			freeInteger(base);
