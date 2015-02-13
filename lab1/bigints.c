@@ -544,7 +544,7 @@ void divInteger(Integer *n, Integer d) {
 	Integer resultInt, currentDivisor, one;
 
 	if (d.length == 1 && d.digits[0] == 0) {
-		printf("Division by zero\n");
+		printf("Division by zero: ");
 		return;
 	}
 
