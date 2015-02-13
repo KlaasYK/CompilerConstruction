@@ -182,6 +182,8 @@ void testPowInteger(){
 	operatorHelper("2", "0", powInteger, '^');
 	operatorHelper("2", "-32", powInteger, '^');
 	operatorHelper("5", "3", powInteger, '^');
+	operatorHelper("-5", "3", powInteger, '^');
+	operatorHelper("-5", "4", powInteger, '^');
 	operatorHelper("10", "1000", powInteger, '^');
 
 	
