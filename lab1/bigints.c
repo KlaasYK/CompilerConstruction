@@ -598,7 +598,7 @@ void modInteger(Integer *n, Integer d) {
 	Integer currentDivisor;
 
 	if (d.length == 1 && d.digits[0] == 0) {
-		printf("Division by zero\n");
+		printf("Division by zero: ");
 		return;
 	}
 
