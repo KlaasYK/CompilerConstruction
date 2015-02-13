@@ -28,14 +28,37 @@
 #define MULOP 1230
 #define BOOLEAN 1240
 #define FUNCNAME 1250
+#define PROGRAMNAME 1251
 #define STRING 1260
-
+#define IDENTIFIER 1270
+#define POWOP 1280
+#define NOT 1290
+#define TYPE 1300
 
 %}
 
 %%
 
 ;	{return SEMICOLON; }
+: {return TYPEOP; }
+, {return COMMA; }
+-> {return THENOP; }
+
+[+-] {return PLUSOP;}
+[\*/\%] {return MULOP;}
+\^ {return POWOP;}
+
+\<\> {return COMPAREOP;}
+[\<\>] {return COMPAREOP; }
+[\<\>]= {return COMPAREOP; }
+
+integer {return TYPE;}
+boolean {return TYPE;}
+
+not {return NOT;}
+and {return AND;}
+
+\[\] {return ALTGUARD;}
 
 
 program { return PROGRAM; }
@@ -53,7 +76,7 @@ false {return BOOLEAN;}
 true {return BOOLEAN;}
 [0-9] {return NUMBER;}
 
-[a-zA-Z](_?)([a-zA-Z0-9]_?)* {return VARIABLE;}
+[a-zA-Z](_?)([a-zA-Z0-9]_?)* {return IDENTIFIER;}
 
 #(.)*\n { return COMMENT; }
 
@@ -76,7 +99,8 @@ int main(int argc, char** argv) {
 	int val = yylex();
 	while (val > EOFT) {
 		switch (val) {
-			case VARIABLE: printf (" ||%s|| ", yytext); break;
+			case COMMENT: printf("|COMMENT|\n"); break;
+			case IDENTIFIER: printf (" ||%s|| ", yytext); break;
 			default: printf (" |%s| ", yytext);
 		}
 	
@@ -87,5 +111,6 @@ int main(int argc, char** argv) {
 		fclose(yyin);
 	}
 
+	printf("\n");
 	return 0;
 }
