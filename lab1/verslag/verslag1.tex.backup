@@ -1,0 +1,87 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[UKenglish]{babel}
+\usepackage{fontenc}
+\usepackage{graphicx}
+
+\title{Compliler Construction: Infinite precision signed integers }
+\author{Klaas Kliffen, Rik Schaaf}
+\date{}
+
+\begin{document}
+\maketitle
+
+
+\section{Problem description}
+The aim of this lab is to give a library to use with a compiler for a language with infinite precision integers.
+Furthermore the following function must be defined:
+\begin{itemize}
+ \item Creating an integer from string
+ \item Printing an integer to stdout
+ \item Adding two integers
+ \item Substracting two integers
+ \item Multiplying two integers
+ \item Dividing an integer by another integer
+ \item Apply a modulo on an integer
+ \item Apply a power to an integer
+\end{itemize}
+
+\section{Problem analysis}
+First there must be a datastructure to define the Big integers.
+A logical solution is to store each digit of the number in an array as integers in C are not infinite.
+To keep track of the sign, another numeric variable can be used.
+For exanple a -1 for negative integers and 1 for positive.
+When using an array representation, a length too can be usefull, as C does provide a length function for integers.
+\subsection{Creating from string}
+
+\subsection{Printing an integer}
+
+\subsection{Adding}
+
+\subsection{Subtracting}
+
+\subsection{Multiplying}
+There are multiple algorithms to choose from when multiplying.
+The standard long multiplication algorithm which runs in $O(n)$.
+As there can be a lot of mulitplications in a program, a lower order function is prefered.
+An example discussed here is the karatsuba algorithm.
+
+
+
+\subsection{Division}
+
+\subsection{Modulo}
+
+\subsection{Power function}
+
+
+%actual code discussion
+\section{Design of solution}
+
+\subsection{Creating from string}
+
+\subsection{Printing an integer}
+
+\subsection{Adding}
+
+\subsection{Subtracting}
+
+\subsection{Multiplying}
+
+\subsection{Division}
+
+\subsection{Modulo}
+
+\subsection{Power function}
+
+\section{Evaluation}
+The performance of the algorithms used is adequate.
+One thing that could be improved upon is the allocation of memory.
+At runtime a lot of memory is allocated, reallocated and copied over.
+Instead of keeping the digit arrays at the exact needed length, a function can be used to double the amount digits when needed.
+Doubling the length of the array makes sure there are less memory allocations and the digit array is always large enough to contain all digits.
+
+\section{Program code}
+%insert code here
+\end{document}
