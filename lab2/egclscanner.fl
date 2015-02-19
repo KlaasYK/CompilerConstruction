@@ -63,6 +63,8 @@
 #define RPARREN 1350
 #define PROCEDURE_TOK 1360;
 
+#define WHITESPACE 1370
+
 %}
 
 %%
