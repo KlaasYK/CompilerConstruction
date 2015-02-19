@@ -1,0 +1,14 @@
+program random;
+# chooses randomly from {0,1,2,3,4}
+
+begin
+  var i : integer;
+      stop : boolean;
+  
+  i,stop := 0,false;
+  do not stop and i<>4 -> i := i+1;
+  [] not stop and i<>4 -> stop := true;
+  od;
+
+  println i;
+end;
