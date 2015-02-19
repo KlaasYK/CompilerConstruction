@@ -44,6 +44,11 @@
 #define SEMICOLON 1200
 #define ALTGUARD 1210
 
+
+
+#define FUNCNAME 1250
+#define PROGRAMNAME 1251
+
 #define IDENTIFIER 1270
 
 #define NOT_TOK 1290
