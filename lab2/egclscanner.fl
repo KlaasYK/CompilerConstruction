@@ -79,9 +79,7 @@
 -> {return THEN_TOK; }
 
 [+-] {return PLUS_OP;}
-[\*/\%] {return MUL_OP;}
-div {return MUL_OP;}
-mod {return MUL_OP;}
+([\*/\%]|div|mod) {return MUL_OP;}
 \^ {return POW_OP;}
 
 \<\> {return COMPARE_OP;}
@@ -125,7 +123,7 @@ true {return BOOLEAN;}
 
 #(.)*\n { return COMMENT; }
 
-
+[ \t]+ { return WHITESPACE; }
 <<EOF>> { return EOF; }
 
 %%
@@ -163,6 +161,7 @@ int main(int argc, char** argv) {
 			case COMMENT: printf("\n"); linecount++; columnnr = 0; break;
 			case IDENTIFIER: printf (" ||%s|| ", yytext); columnnr += strlen(yytext); break;
 			case EOL : printf("\n"); linecount++; columnnr = 0; break;
+			case WHITESPACE: printf(" "); linecount++; columnnr = 0; break;
 			case ERROR : printError(yytext, linecount, columnnr); break;
 			default: printf (" |%s| ", yytext); columnnr += strlen(yytext);
 		}
