@@ -125,18 +125,11 @@ void addValueInBase(uint32_t *digits, unsigned long length, uint32_t value, int 
 	uint32_t temp, carry = value;
 	unsigned long i;
 
-	/*if (srcBase < dstBase) { */
 	for (i = 0; i < length; ++i) {
 		temp = digits[i] * srcBase + carry;
 		digits[i] = temp % dstBase;
 		carry = temp / dstBase;
-	} /*
-	} else if (srcBase > dstBase) {
-		
-		
-		
-	}*/
-
+	} 
 }
 
 void makeIntegerFromString(Integer *a, const char *digits) {
@@ -394,7 +387,6 @@ void splitAt(Integer *high, Integer *low, Integer largeInteger, unsigned long sp
 			/* multiply small with very large numer */
 			makeIntegerFromString(high,"0");
 		} else {
-			/* this one allocs 0 bytes... */
 			high->digits = safeMalloc(high->length);
 			for (i = 0; i < high->length; ++i) {
 				high->digits[i] = largeInteger.digits[i + split];
