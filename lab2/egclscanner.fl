@@ -149,8 +149,8 @@ void readFile(char *filename) {
 
 void printError(char *illchar, int line, int column) {
 	int i = 0;
-	printf("\nError in line %d: %s", line, lines[line]);
-	for (i; i < column + 17; i++) {
+	printf("\nError in line %4d: %s", line, lines[line]);
+	for (i; i < column + 20; i++) {
 		printf(" ");
 	}
 	printf("^\n");
