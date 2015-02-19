@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define EOF 0
+#define EOFT 0
 #define BEGIN_TOK 1010
 #define END_TOK 1020
 #define COMMENT 1030
@@ -53,7 +53,9 @@
 
 #define EOL 1310
 
-#define ERROR -1
+#define ERROR 1320
+
+#define DOT 1330
 
 %}
 
@@ -62,6 +64,7 @@
 ;	{return SEMICOLON; }
 : {return TYPE_OP; }
 , {return COMMA; }
+\. {return DOT; }
 -> {return THEN_TOK; }
 
 [+-] {return PLUS_OP;}
@@ -104,10 +107,6 @@ true {return BOOLEAN;}
 #(.)*\n { return COMMENT; }
 
 
-\n {return EOL;}
-
-. {return ERROR;}
-
 <<EOF>> { return EOF; }
 
 %%
@@ -118,6 +117,7 @@ void printError(char *illchar, int line, int column) {
 	/* TODO: print line */
 	int i = 0;
 	printf("Error in line %d: %s", line, "to be added" /*lines[line]*/);
+	/* TODO: add more colums for each number */
 	for (i; i < column + 17; i++) {
 		printf(" ");
 	}
