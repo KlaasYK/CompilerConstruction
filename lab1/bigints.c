@@ -547,8 +547,6 @@ void divInteger(Integer *n, Integer d) {
 		return;
 	}
 
-	/* now the fucking hard parts starts... */
-
 	makeIntegerFromString(&resultInt, "0");
 	makeIntegerFromString(&one, "1");
 
@@ -599,7 +597,6 @@ void modInteger(Integer *n, Integer d) {
 		return;
 	}
 
-	/* now the fucking hard parts starts... */
 	deepCopyInteger(d, &currentDivisor);
 
 	while (compareTo(*n, currentDivisor) >= 0) {
