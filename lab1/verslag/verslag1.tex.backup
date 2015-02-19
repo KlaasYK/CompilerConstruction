@@ -4,23 +4,44 @@
 \usepackage[UKenglish]{babel}
 \usepackage{fontenc}
 \usepackage{graphicx}
+\usepackage{amsmath}
+
+\usepackage{listings}
+\usepackage{color}
+\usepackage{url}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{lightgray}{rgb}{0.9,0.9,0.9}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
 
 \title{Compliler Construction: Infinite precision signed integers }
 \author{Klaas Kliffen, Rik Schaaf}
 \date{}
 
 \begin{document}
+\lstset{ %TODO: change this
+language=C,
+backgroundcolor=\color{lightgray},
+basicstyle=\footnotesize,
+breakatwhitespace=false,
+breaklines=true,
+commentstyle=\color{mygreen},
+keywordstyle=\color{blue},
+stringstyle=\color{muave},
+tabsize=2,
+}
+
 \maketitle
 
 
 \section{Problem description}
 The aim of this lab is to give a library to use with a compiler for a language with infinite precision integers.
-Furthermore the following function must be defined:
+Furthermore the following operations on these integers must be implemented:
 \begin{itemize}
  \item Creating an integer from string
  \item Printing an integer to stdout
  \item Adding two integers
- \item Substracting two integers
+ \item Subtracting two integers
  \item Multiplying two integers
  \item Dividing an integer by another integer
  \item Apply a modulo on an integer
@@ -28,11 +49,11 @@ Furthermore the following function must be defined:
 \end{itemize}
 
 \section{Problem analysis}
-First there must be a datastructure to define the Big integers.
+First there must be a data structure to define the Big integers.
 A logical solution is to store each digit of the number in an array as integers in C are not infinite.
 To keep track of the sign, another numeric variable can be used.
-For exanple a -1 for negative integers and 1 for positive.
-When using an array representation, a length too can be usefull, as C does provide a length function for integers.
+For example a -1 for negative integers and 1 for positive.
+When using an array representation, a length too can be useful, as C does provide a length function for integers.
 \subsection{Creating from string}
 
 \subsection{Printing an integer}
@@ -43,22 +64,53 @@ When using an array representation, a length too can be usefull, as C does provi
 
 \subsection{Multiplying}
 There are multiple algorithms to choose from when multiplying.
-The standard long multiplication algorithm which runs in $O(n)$.
-As there can be a lot of mulitplications in a program, a lower order function is prefered.
-An example discussed here is the karatsuba algorithm.
-
-
+The standard long multiplication algorithm which runs in $O(n^2)$.
+As there can be a lot of multiplications in a program, a lower order function is preferred.
+An example discussed here is the karatsuba algorithm which uses a divide and conquer method.
+In pseudo code it looks like this:
+\begin{lstlisting}
+procedure karatsuba(num1, num2)
+  if (num1 < 10) or (num2 < 10)
+    return num1*num2
+  /* calculates the size of the numbers */
+  m = max(size_base10(num1), size_base10(num2))
+  m2 = m/2
+  /* split the digit sequences about the middle */
+  high1, low1 = split_at(num1, m2)
+  high2, low2 = split_at(num2, m2)
+  /* 3 calls made to numbers approximately half the size */
+  z0 = karatsuba(low1,low2)
+  z1 = karatsuba((low1+high1),(low2+high2))
+  z2 = karatsuba(high1,high2)
+  return (z2*10^(2*m2))+((z1-z2-z0)*10^(m2))+(z0)
+\end{lstlisting}
+Using this algorithm you perform three multiplications of integers with approximately half of the number of digits of large integers.
+This should yield a complexity (for sufficiently high n) of $\Theta (n^{ \text{log} _2(3)})$.
 
 \subsection{Division}
-
+There are not many efficient division algorithms so the algorithm chosen here is the long division method.
+%TODO: moeten we dit echt gaan uitleggen?
 \subsection{Modulo}
+The module operation is the counterpart of the devision method, so the same method for the long division is used here.
 
 \subsection{Power function}
-
+The straightforward method of exponentiation of multiplying k times for $n^k$ can be easily optimized.
+For the power operation the exponentiation by squaring is used.
+This vastly reduces the number of multiplying operations and runs in $O((n \text{log} (x))^{ \text{log} _2(3)}$ when using the karatsuba algorithm for multiplication.
 
 %actual code discussion
 \section{Design of solution}
-
+The chosen data structure has been implemented as follows:
+\begin{lstlisting}
+struct EGCLint {
+  uint32_t *digits; /* the value for each of the digits, big endian */
+  unsigned long length; /* maximum value is approx. 10^4294967295, not infinite, but close enough. */
+  int sign; /* wheter it is positive, of negative */
+};
+typedef struct EGCLint Integer;
+\end{lstlisting}
+\\
+In the following algorithms, we try to copy every input integer when needed, preventing overwriting the values of the second operand.
 \subsection{Creating from string}
 
 \subsection{Printing an integer}
@@ -68,6 +120,75 @@ An example discussed here is the karatsuba algorithm.
 \subsection{Subtracting}
 
 \subsection{Multiplying}
+The karatsuba algorithm is implemented in a recursive manner:
+\begin{lstlisting}
+/* recursive karatsuba */
+Integer karatsuba(Integer a, Integer b) {
+  unsigned long alen = a.length, blen = b.length, m, m2;
+  Integer z0, z1, z2, returnInt;
+  
+  /* base state of recursion */
+  /* a < 10 */
+  if (alen < 2) {
+    deepCopyInteger(b, &returnInt);
+    simpleMul(&returnInt, a);
+    return returnInt;
+  }
+  if (blen < 2) {
+    deepCopyInteger(a, &returnInt);
+    simpleMul(&returnInt, b);
+    return returnInt;
+  }
+  
+  m = MAX(alen, blen);
+  m2 = m / 2;
+  
+  Integer high1, low1, high2, low2;
+  splitAt(&high1, &low1, a, m2);
+  splitAt(&high2, &low2, b, m2);
+  
+  /* divide */
+  z0 = karatsuba(low1, low2);
+  z2 = karatsuba(high1, high2);
+  addInteger(&low1, high1);
+  addInteger(&low2, high2);
+  /* the low Integers now contain the sums */
+  z1 = karatsuba(low1, low2);
+  
+  /* now follows the z2 * 10^(2*m2) + ((z1-z2-z0)*10^(m2) + z0 */
+  /* the z1 - z2 -z0 stored in the z1 */
+  subInteger(&z1, z2);
+  subInteger(&z1, z0);
+  
+  /* shift right for z1 and z2 */
+  shiftRight(&z1, m2);
+  shiftRight(&z2, m2 * 2);
+  
+  /* and conquer */
+  addInteger(&z2, z1);
+  addInteger(&z2, z0);
+
+  /* free the temp integers */
+  freeInteger(&high1);
+  freeInteger(&low1);
+  freeInteger(&high2);
+  freeInteger(&low2);
+  /* done */
+  deepCopyInteger(z2, &returnInt);
+  freeInteger(&z0);
+  freeInteger(&z1);
+  freeInteger(&z2);
+  return returnInt;
+}
+\end{lstlisting}
+The base state of the recursion occurs when one of the operand is a single digit number.
+In this state it is possible to multiply the other operand in a simple loop, adding a carry if needed.\\
+In the recursion both integers are split and the low and high order bits are stored.
+After that z0, z1 and z2 are calculated.
+Before the adding is done, z2 and z1 are shifted tot the right (shift left in little endian).
+This is the exponentiation 
+After this the results can be added
+
 
 \subsection{Division}
 
@@ -80,7 +201,8 @@ The performance of the algorithms used is adequate.
 One thing that could be improved upon is the allocation of memory.
 At runtime a lot of memory is allocated, reallocated and copied over.
 Instead of keeping the digit arrays at the exact needed length, a function can be used to double the amount digits when needed.
-Doubling the length of the array makes sure there are less memory allocations and the digit array is always large enough to contain all digits.
+Doubling the length of the array makes sure there are less memory allocations and the digit array is always large enough to contain all digits.\\
+Another optimization 
 
 \section{Program code}
 %insert code here
