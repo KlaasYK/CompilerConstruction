@@ -125,6 +125,7 @@ true {return BOOLEAN;}
 
 [ \t]+ { return WHITESPACE; }
 <<EOF>> { return EOF; }
+(\n|\r\n) { return EOL; }
 [^<<EOF>>A-Za-z0-9\%\^\*\(\)+-/=\<\>';\[\]_:(-\>)(\\'),\. \t\r\n] {return ERROR; }
 %%
 
