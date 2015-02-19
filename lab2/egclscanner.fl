@@ -1,56 +1,74 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-#define EOFT 1000
-#define BEGINT 1010
-#define END 1020
+#define EOF_TOK 1000
+#define BEGIN_TOK 1010
+#define END_TOK 1020
 #define COMMENT 1030
-#define PROGRAM 1040
-#define DOBEGIN 1050
-#define DOEND 1060
-#define IFBEGIN 1070
-#define IFEND 1080
-#define OR 1090
-#define AND 1100
-#define VAR 1110
-#define ASSIGNMENTOP 1120
+
+#define PROGRAM_TOK 1040
+#define DOBEGIN_TOK 1050
+#define DOEND_TOK 1060
+#define IFBEGIN_TOK 1070
+#define IFEND_TOK 1080
+
+#define OR_OP 1090
+#define AND_OP 1100
+#define CAND_OP 1101
+
+#define ASSIGNMENT_OP 1120
+
+#define PLUS_OP 1220
+#define MULOP 1230
+#define POW_OP 1280
+
+#define COMPARE_OP 1150
+
+#define VAR_TOK 1110
+
 #define VARIABLE 1130
 #define NUMBER 1140
-#define COMPAREOP 1150
-#define TYPEOP 1160
-#define THENOP 1170
-#define CONSTANT 1180
+#define STRING 1260
+#define BOOLEAN 1240
+
+#define TYPE_TOK 1160
+#define THEN_TOK 1170
+#define CONSTANT_TOK 1180
 #define COMMA 1190
 #define SEMICOLON 1200
 #define ALTGUARD 1210
-#define PLUSOP 1220
-#define MULOP 1230
-#define BOOLEAN 1240
+
 #define FUNCNAME 1250
 #define PROGRAMNAME 1251
-#define STRING 1260
+
 #define IDENTIFIER 1270
-#define POWOP 1280
+
 #define NOT 1290
 #define TYPE 1300
+
+#define EOL 1310
+
+#define ERROR -1
 
 %}
 
 %%
 
 ;	{return SEMICOLON; }
-: {return TYPEOP; }
+: {return TYPE_OP; }
 , {return COMMA; }
--> {return THENOP; }
+-> {return THEN_TOK; }
 
-[+-] {return PLUSOP;}
-[\*/\%] {return MULOP;}
-\^ {return POWOP;}
+[+-] {return PLUS_OP;}
+[\*/\%] {return MUL_OP;}
+\^ {return POW_OP;}
 
-\<\> {return COMPAREOP;}
-[\<\>] {return COMPAREOP; }
-[\<\>]= {return COMPAREOP; }
+\<\> {return COMPARE_OP;}
+[\<\>] {return COMPARE_OP; }
+[\<\>]= {return COMPARE_OP; }
+
 
 integer {return TYPE;}
 boolean {return TYPE;}
@@ -61,14 +79,14 @@ and {return AND;}
 \[\] {return ALTGUARD;}
 
 
-program { return PROGRAM; }
-begin { return BEGINT; }
-end  {return END; }
-var {return VAR; }
-do {return DOBEGIN; }
-od {return DOEND; }
-if {return IFBEGIN; }
-fi {return IFEND; }
+program { return PROGRAM_TOK; }
+begin { return BEGIN_TOK; }
+end  {return END_TOK; }
+var {return VAR_TOK; }
+do {return DOBEGIN_TOK; }
+od {return DOEND_TOK; }
+if {return IFBEGIN_TOK; }
+fi {return IFEND_TOk; }
 
 := {return ASSIGNMENTOP; }
 
@@ -81,11 +99,31 @@ true {return BOOLEAN;}
 #(.)*\n { return COMMENT; }
 
 
+\n {return EOL;}
+
+. {return ERROR;}
 
 <<EOF>> { return EOF; }
 %%
 
+char **lines;
+
+void printError(char *illchar, int line, int column, int argc, int yyin) {
+	/* TODO: print line */
+	int i = 0;
+	printf("Error in line %d: %s", line, lines[line]);
+	for (i; i < column + 17; i++) {
+		printf(" ");
+	}
+	printf("^\n");
+	printf("Illegal character (%s) detected at column %d\n", illchar, column);
+	exit(ERROR_STATE);
+}
+
 int main(int argc, char** argv) {
+	int linecount = 0, columnr = 0;
+	
+	
 
 	if (argc > 2) {
 		fprintf(stderr, "Usage: %s [filename.c]\n", argv[0]);
@@ -99,9 +137,11 @@ int main(int argc, char** argv) {
 	int val = yylex();
 	while (val > EOFT) {
 		switch (val) {
-			case COMMENT: printf("|COMMENT|\n"); break;
-			case IDENTIFIER: printf (" ||%s|| ", yytext); break;
-			default: printf (" |%s| ", yytext);
+			case COMMENT: printf("\n"); linecount++; columnr = 0; break;
+			case IDENTIFIER: printf (" ||%s|| ", yytext); columnnr += strlen(yytext); break;
+			case EOL : printf("\n"); linecount++ columnr = 0; break;
+			case ERROR : printError(yytext, linecount, columnnr, argc, yyin); break;
+			default: printf (" |%s| ", yytext); columnnr += strlen(yytext);
 		}
 	
 		val = yylex();
