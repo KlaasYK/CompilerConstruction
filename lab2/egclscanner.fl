@@ -130,6 +130,19 @@ true {return BOOLEAN;}
 
 char **lines;
 
+void readFile(char **filename) {
+	struct File *fin = fopen(filename, "r");
+	int i = 0;
+	size_t len = 0;
+	/* TODO: remove hardcoded limit */
+	lines = malloc(100 * sizeof(char*)); 
+	
+	while (getline(&(lines[i]), &len, fin)) != -1) {
+		i++;
+	}
+	fclose(fin);
+}
+
 void printError(char *illchar, int line, int column) {
 	/* TODO: print line */
 	int i = 0;
@@ -151,6 +164,7 @@ int main(int argc, char** argv) {
 		exit(-1);
   	}
 	if (argc == 2) {
+		readFile(argv[1]);
 		yyin = fopen(argv[1], "r");
 	}
 
@@ -173,6 +187,7 @@ int main(int argc, char** argv) {
 		fclose(yyin);
 	}
 
+	/* TODO: free the lijst */
 	printf("Lexing succesfull\n");
 	return 0;
 }
