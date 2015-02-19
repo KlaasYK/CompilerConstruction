@@ -43,6 +43,8 @@
 #define SEMICOLON 1200
 #define ALTGUARD 1210
 
+
+
 #define FUNCNAME 1250
 #define PROGRAMNAME 1251
 
@@ -57,6 +59,10 @@
 
 #define DOT 1330
 
+#define LPARREN 1340
+#define RPARREN 1350
+#define PROCEDURE_TOK 1360;
+
 %}
 
 %%
@@ -65,6 +71,8 @@
 : {return TYPE_OP; }
 , {return COMMA; }
 \. {return DOT; }
+\( {return LPARREN;}
+\) {return RPARREN;}
 -> {return THEN_TOK; }
 
 [+-] {return PLUS_OP;}
@@ -81,12 +89,14 @@ boolean {return TYPE;}
 
 not {return NOT_TOK;}
 and {return AND_OP;}
+or {return OR_OP;}
 cand {return CAND_OP;}
 cor {return COR_OP;}
 
 \[\] {return ALTGUARD;}
 
-
+procedure {return PROCEDURE_TOK;}
+constant { return CONSTANT_TOK;}
 program { return PROGRAM_TOK; }
 begin { return BEGIN_TOK; }
 end  {return END_TOK; }
@@ -100,7 +110,7 @@ fi {return IFEND_TOK; }
 
 false {return BOOLEAN;}
 true {return BOOLEAN;}
-[0-9] {return NUMBER;}
+[0-9]* {return NUMBER;}
 
 [a-zA-Z](_?)([a-zA-Z0-9]_?)* {return IDENTIFIER;}
 
