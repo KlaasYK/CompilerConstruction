@@ -79,7 +79,7 @@
 -> {return THEN_TOK; }
 
 [+-] {return PLUS_OP;}
-[\*/\%] {return MUL_OP;}
+([\*/\%]|div|mod) {return MUL_OP;}
 \^ {return POW_OP;}
 
 \<\> {return COMPARE_OP;}
