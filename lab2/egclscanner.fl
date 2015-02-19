@@ -14,6 +14,7 @@
 #define DOEND_TOK 1060
 #define IFBEGIN_TOK 1070
 #define IFEND_TOK 1080
+#define FUNCTION_TOK 1081
 
 #define OR_OP 1090
 #define AND_OP 1100
@@ -95,9 +96,12 @@ or {return OR_OP;}
 cand {return CAND_OP;}
 cor {return COR_OP;}
 
+ '(\\'|[^'])*' {return STRING;}
+
 \[\] {return ALTGUARD;}
 
 procedure {return PROCEDURE_TOK;}
+function {return FUNCTION_TOK;}
 constant { return CONSTANT_TOK;}
 program { return PROGRAM_TOK; }
 begin { return BEGIN_TOK; }
