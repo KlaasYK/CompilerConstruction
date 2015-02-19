@@ -175,7 +175,7 @@ int main(int argc, char** argv) {
 			case COMMENT: printf("\n"); linecount++; columnnr = 0; break;
 			case IDENTIFIER: printf (" ||%s|| ", yytext); columnnr += strlen(yytext); break;
 			case EOL : printf("\n"); linecount++; columnnr = 0; break;
-			case WHITESPACE: printf(" "); linecount++; columnnr = 0; break;
+			case WHITESPACE: printf(" "); columnnr += strlen(yytext); break;
 			case ERROR : printError(yytext, linecount, columnnr); break;
 			default: printf (" |%s| ", yytext); columnnr += strlen(yytext);
 		}
