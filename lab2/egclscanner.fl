@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define EOFT 1000
+#define EOF 0
 #define BEGIN_TOK 1010
 #define END_TOK 1020
 #define COMMENT 1030
@@ -139,7 +139,7 @@ int main(int argc, char** argv) {
 
 	//Lees tot EOF
 	int val = yylex();
-	while (val > EOFT) {
+	while (val > EOF) {
 		switch (val) {
 			case COMMENT: printf("\n"); linecount++; columnnr = 0; break;
 			case IDENTIFIER: printf (" ||%s|| ", yytext); columnnr += strlen(yytext); break;
