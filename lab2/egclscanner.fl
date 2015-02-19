@@ -147,14 +147,14 @@ void readFile(char *filename) {
 void printError(char *illchar, int line, int column) {
 	/* TODO: print line */
 	int i = 0;
-	printf("Error in line %d: %s", line, "to be added" /*lines[line]*/);
+	printf("\nError in line %d: %s", line, lines[line]);
 	/* TODO: add more colums for each number */
 	for (i; i < column + 17; i++) {
 		printf(" ");
 	}
 	printf("^\n");
 	printf("Illegal character (%s) detected at column %d\n", illchar, column);
-	
+	exit(-1);
 }
 
 int main(int argc, char** argv) {
