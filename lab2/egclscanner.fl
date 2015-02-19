@@ -174,11 +174,11 @@ int main(int argc, char** argv) {
 	while (val > EOF) {
 		switch (val) {
 			case COMMENT: printf("\n"); linecount++; columnnr = 0; break;
-			case IDENTIFIER: printf (" ||%s|| ", yytext); columnnr += strlen(yytext); break;
+			case IDENTIFIER: printf ("||%s|| ", yytext); columnnr += strlen(yytext); break;
 			case EOL : printf("\n"); linecount++; columnnr = 0; break;
-			case WHITESPACE: printf(" "); columnnr += strlen(yytext); break;
+			case WHITESPACE: columnnr += strlen(yytext); break;
 			case ERROR : printError(yytext, linecount, columnnr); break;
-			default: printf (" |%s| ", yytext); columnnr += strlen(yytext);
+			default: printf ("|%s| ", yytext); columnnr += strlen(yytext);
 		}
 	
 		val = yylex();
