@@ -1,0 +1,21 @@
+%option noyywrap
+
+%{	
+        #include <stdio.h>
+        #include <stdlib.h>
+	#include "grammar.h"
+%}
+
+%%
+
+"a"		{ return ATOK; }
+"b"		{ return BTOK; }
+"("		{ return LPAR; }
+")"		{ return RPAR; }
+"+"		{ return PLUS; }
+[ \t\n]	{ }
+
+.		{ fprintf(stderr, "Illegal char: %s\n", yytext); 
+                  exit(EXIT_FAILURE);
+                }
+
