@@ -1,9 +1,9 @@
 %option noyywrap
 
 %{	
-        #include <stdio.h>
-        #include <stdlib.h>
-	#include "grammar.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include "grammar.h"
 %}
 
 %%
