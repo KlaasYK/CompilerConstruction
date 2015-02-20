@@ -1,0 +1,12 @@
+program gcd;
+# Euclid's algorithm 
+
+var a, b : integer;
+
+begin
+  a := 7453478376373655456544364564657835389772;
+  b := 656546567567746769343490496;
+  do b <> 0  ->  a, b := b, a mod b;
+  od;
+  println a;
+end.

@@ -1,0 +1,17 @@
+program RussianPeasantMultiplication;
+# multiplication: z := x*y
+
+begin
+  var x,y,z : integer;
+  print 'x=';
+  read x;
+  print 'y=';
+  read y;
+  print x, '*', y, '=';
+  z := 0;  
+  do y>0 cand y mod 2 = 0 -> y, x := y div 2, x+x;
+  [] y mod 2 = 1          -> y, z := y-1, z+x;
+  od;
+  println z;
+end.
+
