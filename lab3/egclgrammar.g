@@ -1,5 +1,5 @@
 %start parser, start;
-%token BEGIN_TOK, END_TOK, COMMENT, PROGRAM_TOK, DOBEGIN_TOK, DOEND_TOK, IFBEGIN_TOK, IFEND_TOK, FUNCTION_TOK, OR_OP, AND_OP, CAND_OP, COR_OP, ASSIGNMENT_OP, PLUS_OP, MUL_OP, POW_OP, COMPARE_OP, TYPE_OP, VAR_TOK, VARIABLE, NUMBER,STRING, BOOLEAN, THEN_TOK, CONSTANT_TOK, COMMA, SEMICOLON, ALTGUARD, FUNCNAME, PROGRAMNAME, IDENTIFIER, NOT_TOK, TYPE, EOL, ERROR, DOT, LPARREN, RPARREN, PROCEDURE_TOK, WHITESPACE;
+%token BEGIN_TOK, END_TOK, COMMENT, PROGRAM_TOK, DOBEGIN_TOK, DOEND_TOK, IFBEGIN_TOK, IFEND_TOK, FUNCTION_TOK, OR_OP, AND_OP, CAND_OP, COR_OP, ASSIGNMENT_OP, PLUS_OP, MIN_OP, MUL_OP, POW_OP, COMPARE_OP, TYPE_OP, VAR_TOK, VARIABLE, NUMBER,STRING, BOOLEAN, THEN_TOK, CONSTANT_TOK, COMMA, SEMICOLON, ALTGUARD, FUNCNAME, PROGRAMNAME, IDENTIFIER, NOT_TOK, TYPE, EOL, ERROR, DOT, LPARREN, RPARREN, PROCEDURE_TOK, WHITESPACE;
 %options "generate-symbol-table generate-lexer-wrapper";
 %lexical yylex;
 
@@ -107,39 +107,138 @@ int main(int argc, char** argv) {
 /* EOF c FILE */
 }
 
-
-start		: header programbody
-			; 
-
-header		: PROGRAM_TOK IDENTIFIER SEMICOLON 
+rootexpr	: LPARREN expr RPARREN
+			| IDENTIFIER
+			| NUMBER
 			;
+
+
+powbase	: MIN_OP rootexpr
+			| rootexpr
+			;
+
+factor2	: POW_OP powbase factor2
+		| /* epsilon */
+		;
+
+factor	: powbase factor2 
+		;
+
+term2	: MUL_OP factor term2
+		| /* epsilon */
+		;
+
+term	: factor term2
+		;
+
+sumexpr2	: PLUS_OP term sumexpr2
+			| MIN_OP term sumexpr2
+			| /* epsilon */
+			;
+
+sumexpr	: term sumexpr2
+		;
+
+relexpr2	: COMPARE_OP sumexpr relexpr2
+			| /* epsilon */
+			;
+
+relexpr : sumexpr relexpr2
+		;
+
+notexpr	: NOT_TOK relexpr
+		| relexpr
+		;
+
+andexpr2	: AND_OP notexpr andexpr2
+			| CAND_OP notexpr andexpr2
+			| /* epsilon */
+			;
+
+andexpr	: notexpr andexpr2 
+		;
 			
-			/* first procuders then functions? */
-programbody : constant_def* procedure* function* BEGIN_TOK functioncall END_TOK DOT
-			;
+expr2	: OR_OP andexpr expr2
+		| COR_OP andexpr expr2
+		| /* epsilon */
+		;
 
-procedure	: PROCEDURE_TOK IDENTIFIER LPARREN parameters? RPARREN SEMICOLON statement*  END_TOK SEMICOLON
-			;
-			
-function	: FUNCTION_TOK IDENTIFIER LPARREN parameters? RPARREN SEMICOLON statement+  END_TOK SEMICOLON
-			
-parameters 	: VAR_TOK IDENTIFIER [COMMA parameters]?
-			| IDENTIFIER [TYPE_OP TYPE]?
-			;
+expr	: andexpr expr2
+		;
 
-statement	: NUMBER
-			;
-
-
-constant_def	: CONSTANT_TOK IDENTIFIER TYPE_OP TYPE COMPARE_OP variable SEMICOLON
+/* C-like guard? */
+guardedcommand	: expr THEN_TOK statementset
 				;
-				
+
+guardedcommandset	: guardedcommand [ALTGUARD guardedcommand]
+					;
+
+identifierarray	: IDENTIFIER [COMMA identifierarray]?
+				;
+
+functioncall	: STRING
+				| LPARREN identifierarray RPARREN
+				;
+
+dostatement	:	DOBEGIN_TOK guardedcommandset DOEND_TOK
+			;
+
+ifstatement	:	IFBEGIN_TOK guardedcommandset IFEND_TOK
+			;
+
+assignmentcall	: ASSIGNMENT_OP expr
+				| COMMA IDENTIFIER assignmentcall COMMA expr
+				;
+
+call	:	functioncall
+		|	assignmentcall
+		;
+
+declaration : VAR_TOK identifierarray TYPE_OP TYPE
+			;
+
+statement	: declaration
+			| IDENTIFIER call
+			| dostatement
+			| ifstatement
+			;
+
+parameterset 	: identifierarray TYPE_OP TYPE
+				;
+
 variable		: BOOLEAN
 				| NUMBER
 				| STRING
 				;
-
-functioncall	: IDENTIFIER STRING SEMICOLON
+			
+/* can the last statement in a block end with a semicolon? internet says of a certain version of gcl that a statement has the rule: S -> S;S | ...*/
+statementset3	: statement statementset2
+				| /* epsilon */
 				;
 
+statementset2	: SEMICOLON statementset3
+				| /* epsilon */
+				;
 
+statementset	: statement statementset2
+				| /* epsilon */
+				;
+
+function	: FUNCTION_TOK IDENTIFIER LPARREN parameterset? RPARREN THEN_TOK TYPE SEMICOLON statementset END_TOK SEMICOLON
+			;
+
+procedure	: PROCEDURE_TOK IDENTIFIER LPARREN VAR_TOK parameterset? RPARREN SEMICOLON statementset END_TOK SEMICOLON
+			;
+
+constant_def	: CONSTANT_TOK IDENTIFIER TYPE_OP TYPE COMPARE_OP variable SEMICOLON
+				;
+
+			/* first procuders then functions? */
+programbody : constant_def* procedure* function* BEGIN_TOK statementset END_TOK DOT
+			;
+
+header		: PROGRAM_TOK IDENTIFIER SEMICOLON 
+			;
+
+start		: header programbody
+			; 

@@ -8,7 +8,7 @@
 #define FLEX_SCANNER
 #define YY_FLEX_MAJOR_VERSION 2
 #define YY_FLEX_MINOR_VERSION 5
-#define YY_FLEX_SUBMINOR_VERSION 35
+#define YY_FLEX_SUBMINOR_VERSION 39
 #if YY_FLEX_SUBMINOR_VERSION > 0
 #define FLEX_BETA
 #endif
@@ -141,15 +141,7 @@ typedef unsigned int flex_uint32_t;
 
 /* Size of default input buffer. */
 #ifndef YY_BUF_SIZE
-#ifdef __ia64__
-/* On IA-64, the buffer size is 16k, not 8k.
- * Moreover, YY_BUF_SIZE is 2*YY_READ_BUF_SIZE in the general case.
- * Ditto for the __ia64__ case accordingly.
- */
-#define YY_BUF_SIZE 32768
-#else
 #define YY_BUF_SIZE 16384
-#endif /* __ia64__ */
 #endif
 
 /* The state buf must be large enough to hold one state per character in the main buffer.
@@ -161,7 +153,12 @@ typedef unsigned int flex_uint32_t;
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
 #endif
 
-extern int yyleng;
+#ifndef YY_TYPEDEF_YY_SIZE_T
+#define YY_TYPEDEF_YY_SIZE_T
+typedef size_t yy_size_t;
+#endif
+
+extern yy_size_t yyleng;
 
 extern FILE *yyin, *yyout;
 
@@ -170,6 +167,7 @@ extern FILE *yyin, *yyout;
 #define EOB_ACT_LAST_MATCH 2
 
     #define YY_LESS_LINENO(n)
+    #define YY_LINENO_REWIND_TO(ptr)
     
 /* Return all but the first "n" matched characters back to the input stream. */
 #define yyless(n) \
@@ -186,11 +184,6 @@ extern FILE *yyin, *yyout;
 	while ( 0 )
 
 #define unput(c) yyunput( c, (yytext_ptr)  )
-
-#ifndef YY_TYPEDEF_YY_SIZE_T
-#define YY_TYPEDEF_YY_SIZE_T
-typedef size_t yy_size_t;
-#endif
 
 #ifndef YY_STRUCT_YY_BUFFER_STATE
 #define YY_STRUCT_YY_BUFFER_STATE
@@ -209,7 +202,7 @@ struct yy_buffer_state
 	/* Number of characters read into yy_ch_buf, not including EOB
 	 * characters.
 	 */
-	int yy_n_chars;
+	yy_size_t yy_n_chars;
 
 	/* Whether we "own" the buffer - i.e., we know we created it,
 	 * and can realloc() it to grow it, and should free() it to
@@ -279,8 +272,8 @@ static YY_BUFFER_STATE * yy_buffer_stack = 0; /**< Stack as an array. */
 
 /* yy_hold_char holds the character lost when yytext is formed. */
 static char yy_hold_char;
-static int yy_n_chars;		/* number of characters read into yy_ch_buf */
-int yyleng;
+static yy_size_t yy_n_chars;		/* number of characters read into yy_ch_buf */
+yy_size_t yyleng;
 
 /* Points to current character in buffer. */
 static char *yy_c_buf_p = (char *) 0;
@@ -308,7 +301,7 @@ static void yy_init_buffer (YY_BUFFER_STATE b,FILE *file  );
 
 YY_BUFFER_STATE yy_scan_buffer (char *base,yy_size_t size  );
 YY_BUFFER_STATE yy_scan_string (yyconst char *yy_str  );
-YY_BUFFER_STATE yy_scan_bytes (yyconst char *bytes,int len  );
+YY_BUFFER_STATE yy_scan_bytes (yyconst char *bytes,yy_size_t len  );
 
 void *yyalloc (yy_size_t  );
 void *yyrealloc (void *,yy_size_t  );
@@ -340,7 +333,7 @@ void yyfree (void *  );
 
 /* Begin user sect3 */
 
-#define yywrap(n) 1
+#define yywrap() 1
 #define YY_SKIP_YYWRAP
 
 typedef unsigned char YY_CHAR;
@@ -371,8 +364,8 @@ static void yy_fatal_error (yyconst char msg[]  );
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
 
-#define YY_NUM_RULES 44
-#define YY_END_OF_BUFFER 45
+#define YY_NUM_RULES 45
+#define YY_END_OF_BUFFER 46
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -382,20 +375,20 @@ struct yy_trans_info
 	};
 static yyconst flex_int16_t yy_accept[127] =
     {   0,
-       38,   38,   45,   43,   41,   42,   44,   43,    9,   44,
-        5,    6,    8,    3,    8,    4,   38,    2,    1,   12,
-       14,   12,   39,   44,   44,   10,   39,   39,   39,   39,
-       39,   39,   39,   39,   39,   39,   39,   39,   39,   41,
-       42,    0,   40,    0,   22,    0,    7,   38,   35,   13,
-       11,   39,   39,   23,   39,   39,   39,   39,   39,   39,
-       31,   39,   39,   34,   39,   33,   39,   39,   39,   32,
-       19,   39,   39,   39,   22,   39,   18,   39,   39,   39,
-       39,   21,    9,   29,   39,   39,   39,   17,   39,   39,
-       30,   39,   39,   20,   39,   39,   39,   39,   39,   39,
+       39,   39,   46,   44,   42,   43,   45,   44,   10,   45,
+        5,    6,    8,    3,    9,    4,   39,    2,    1,   13,
+       15,   13,   40,   45,   45,   11,   40,   40,   40,   40,
+       40,   40,   40,   40,   40,   40,   40,   40,   40,   42,
+       43,    0,   41,    0,   23,    0,    7,   39,   36,   14,
+       12,   40,   40,   24,   40,   40,   40,   40,   40,   40,
+       32,   40,   40,   35,   40,   34,   40,   40,   40,   33,
+       20,   40,   40,   40,   23,   40,   19,   40,   40,   40,
+       40,   22,   10,   30,   40,   40,   40,   18,   40,   40,
+       31,   40,   40,   21,   40,   40,   40,   40,   40,   40,
 
-       37,   28,   39,   39,   36,   39,   39,   39,   39,   39,
-       39,   39,   39,   39,   39,   16,   39,   39,   15,   39,
-       27,   26,   25,   39,   24,    0
+       38,   29,   40,   40,   37,   40,   40,   40,   40,   40,
+       40,   40,   40,   40,   40,   17,   40,   40,   16,   40,
+       28,   27,   26,   40,   25,    0
     } ;
 
 static yyconst flex_int32_t yy_ec[256] =
@@ -568,7 +561,7 @@ extern int columnnr;
 
 extern void printLexError(char *illchar, int line, int column);
 
-#line 572 "lex.yy.c"
+#line 565 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -607,7 +600,7 @@ FILE *yyget_out (void );
 
 void yyset_out  (FILE * out_str  );
 
-int yyget_leng (void );
+yy_size_t yyget_leng (void );
 
 char *yyget_text (void );
 
@@ -649,12 +642,7 @@ static int input (void );
 
 /* Amount of stuff to slurp up with each read. */
 #ifndef YY_READ_BUF_SIZE
-#ifdef __ia64__
-/* On IA-64, the buffer size is 16k, not 8k */
-#define YY_READ_BUF_SIZE 16384
-#else
 #define YY_READ_BUF_SIZE 8192
-#endif /* __ia64__ */
 #endif
 
 /* Copy whatever the last rule matched to the standard output. */
@@ -755,11 +743,6 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 16 "egclscanner.fl"
-
-
-#line 762 "lex.yy.c"
-
 	if ( !(yy_init) )
 		{
 		(yy_init) = 1;
@@ -786,6 +769,12 @@ YY_DECL
 		yy_load_buffer_state( );
 		}
 
+	{
+#line 16 "egclscanner.fl"
+
+
+#line 777 "lex.yy.c"
+
 	while ( 1 )		/* loops until end-of-file is reached */
 		{
 		yy_cp = (yy_c_buf_p);
@@ -802,7 +791,7 @@ YY_DECL
 yy_match:
 		do
 			{
-			register YY_CHAR yy_c = yy_ec[YY_SC_TO_UI(*yy_cp)];
+			register YY_CHAR yy_c = yy_ec[YY_SC_TO_UI(*yy_cp)] ;
 			if ( yy_accept[yy_current_state] )
 				{
 				(yy_last_accepting_state) = yy_current_state;
@@ -884,22 +873,22 @@ YY_RULE_SETUP
 case 9:
 YY_RULE_SETUP
 #line 27 "egclscanner.fl"
-{ columnnr += strlen(yytext); return MUL_OP;}
+{columnnr++; return MIN_OP;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
 #line 28 "egclscanner.fl"
-{ columnnr += strlen(yytext); return POW_OP;}
+{ columnnr += strlen(yytext); return MUL_OP;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 30 "egclscanner.fl"
-{ columnnr += strlen(yytext); return COMPARE_OP;}
+#line 29 "egclscanner.fl"
+{ columnnr += strlen(yytext); return POW_OP;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
 #line 31 "egclscanner.fl"
-{columnnr += strlen(yytext); return COMPARE_OP; }
+{ columnnr += strlen(yytext); return COMPARE_OP;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
@@ -909,12 +898,12 @@ YY_RULE_SETUP
 case 14:
 YY_RULE_SETUP
 #line 33 "egclscanner.fl"
-{ columnnr += strlen(yytext); return COMPARE_OP; }
+{columnnr += strlen(yytext); return COMPARE_OP; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 36 "egclscanner.fl"
-{columnnr += strlen(yytext); return TYPE;}
+#line 34 "egclscanner.fl"
+{ columnnr += strlen(yytext); return COMPARE_OP; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
@@ -923,104 +912,104 @@ YY_RULE_SETUP
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 39 "egclscanner.fl"
-{columnnr += strlen(yytext); return NOT_TOK;}
+#line 38 "egclscanner.fl"
+{columnnr += strlen(yytext); return TYPE;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
 #line 40 "egclscanner.fl"
-{ columnnr += strlen(yytext); return AND_OP;}
+{columnnr += strlen(yytext); return NOT_TOK;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
 #line 41 "egclscanner.fl"
-{ columnnr += strlen(yytext); return OR_OP;}
+{ columnnr += strlen(yytext); return AND_OP;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
 #line 42 "egclscanner.fl"
-{ columnnr += strlen(yytext); return CAND_OP;}
+{ columnnr += strlen(yytext); return OR_OP;}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
 #line 43 "egclscanner.fl"
-{ columnnr += strlen(yytext); return COR_OP;}
+{ columnnr += strlen(yytext); return CAND_OP;}
 	YY_BREAK
 case 22:
-/* rule 22 can match eol */
 YY_RULE_SETUP
-#line 45 "egclscanner.fl"
-{ columnnr += strlen(yytext); return STRING;}
+#line 44 "egclscanner.fl"
+{ columnnr += strlen(yytext); return COR_OP;}
 	YY_BREAK
 case 23:
+/* rule 23 can match eol */
 YY_RULE_SETUP
-#line 47 "egclscanner.fl"
-{columnnr += strlen(yytext); return ALTGUARD;}
+#line 46 "egclscanner.fl"
+{ columnnr += strlen(yytext); return STRING;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 49 "egclscanner.fl"
-{columnnr += strlen(yytext); return PROCEDURE_TOK;}
+#line 48 "egclscanner.fl"
+{columnnr += strlen(yytext); return ALTGUARD;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
 #line 50 "egclscanner.fl"
-{ columnnr += strlen(yytext); return FUNCTION_TOK;}
+{columnnr += strlen(yytext); return PROCEDURE_TOK;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
 #line 51 "egclscanner.fl"
-{columnnr += strlen(yytext);  return CONSTANT_TOK;}
+{ columnnr += strlen(yytext); return FUNCTION_TOK;}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
 #line 52 "egclscanner.fl"
-{columnnr += strlen(yytext);  return PROGRAM_TOK; }
+{columnnr += strlen(yytext);  return CONSTANT_TOK;}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
 #line 53 "egclscanner.fl"
-{ columnnr += strlen(yytext); return BEGIN_TOK; }
+{columnnr += strlen(yytext);  return PROGRAM_TOK; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
 #line 54 "egclscanner.fl"
-{columnnr += strlen(yytext); return END_TOK; }
+{ columnnr += strlen(yytext); return BEGIN_TOK; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
 #line 55 "egclscanner.fl"
-{ columnnr += strlen(yytext); return VAR_TOK; }
+{columnnr += strlen(yytext); return END_TOK; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
 #line 56 "egclscanner.fl"
-{ columnnr += strlen(yytext); return DOBEGIN_TOK; }
+{ columnnr += strlen(yytext); return VAR_TOK; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
 #line 57 "egclscanner.fl"
-{columnnr += strlen(yytext); return DOEND_TOK; }
+{ columnnr += strlen(yytext); return DOBEGIN_TOK; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
 #line 58 "egclscanner.fl"
-{columnnr += strlen(yytext); return IFBEGIN_TOK; }
+{columnnr += strlen(yytext); return DOEND_TOK; }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
 #line 59 "egclscanner.fl"
-{columnnr += strlen(yytext); return IFEND_TOK; }
+{columnnr += strlen(yytext); return IFBEGIN_TOK; }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 61 "egclscanner.fl"
-{columnnr += strlen(yytext); return ASSIGNMENT_OP; }
+#line 60 "egclscanner.fl"
+{columnnr += strlen(yytext); return IFEND_TOK; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 63 "egclscanner.fl"
-{columnnr += strlen(yytext); return BOOLEAN;}
+#line 62 "egclscanner.fl"
+{columnnr += strlen(yytext); return ASSIGNMENT_OP; }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
@@ -1030,45 +1019,50 @@ YY_RULE_SETUP
 case 38:
 YY_RULE_SETUP
 #line 65 "egclscanner.fl"
-{ columnnr += strlen(yytext); return NUMBER;}
+{columnnr += strlen(yytext); return BOOLEAN;}
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 67 "egclscanner.fl"
-{columnnr += strlen(yytext); return IDENTIFIER;}
+#line 66 "egclscanner.fl"
+{ columnnr += strlen(yytext); return NUMBER;}
 	YY_BREAK
 case 40:
-/* rule 40 can match eol */
 YY_RULE_SETUP
-#line 69 "egclscanner.fl"
-{columnnr += strlen(yytext); linecount++; /* skip return COMMENT;*/ }
+#line 68 "egclscanner.fl"
+{columnnr += strlen(yytext); return IDENTIFIER;}
 	YY_BREAK
 case 41:
+/* rule 41 can match eol */
 YY_RULE_SETUP
-#line 71 "egclscanner.fl"
+#line 70 "egclscanner.fl"
+{columnnr += strlen(yytext); linecount++; /* skip return COMMENT;*/ }
+	YY_BREAK
+case 42:
+YY_RULE_SETUP
+#line 72 "egclscanner.fl"
 { columnnr += strlen(yytext); /* skip return WHITESPACE;*/ }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 72 "egclscanner.fl"
+#line 73 "egclscanner.fl"
 { return EOF; }
 	YY_BREAK
-case 42:
-/* rule 42 can match eol */
-YY_RULE_SETUP
-#line 73 "egclscanner.fl"
-{ linecount++; /* skip return EOL; */ }
-	YY_BREAK
 case 43:
+/* rule 43 can match eol */
 YY_RULE_SETUP
 #line 74 "egclscanner.fl"
-{ printLexError(yytext, linecount, columnnr); }
+{ linecount++; /* skip return EOL; */ }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
 #line 75 "egclscanner.fl"
+{ printLexError(yytext, linecount, columnnr); }
+	YY_BREAK
+case 45:
+YY_RULE_SETUP
+#line 76 "egclscanner.fl"
 ECHO;
 	YY_BREAK
-#line 1072 "lex.yy.c"
+#line 1066 "lex.yy.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1197,6 +1191,7 @@ ECHO;
 			"fatal flex scanner internal error--no action found" );
 	} /* end of action switch */
 		} /* end of scanning one token */
+	} /* end of user's declarations */
 } /* end of yylex */
 
 /* yy_get_next_buffer - try to read in a new buffer
@@ -1252,21 +1247,21 @@ static int yy_get_next_buffer (void)
 
 	else
 		{
-			int num_to_read =
+			yy_size_t num_to_read =
 			YY_CURRENT_BUFFER_LVALUE->yy_buf_size - number_to_move - 1;
 
 		while ( num_to_read <= 0 )
 			{ /* Not enough room in the buffer - grow it. */
 
 			/* just a shorter name for the current buffer */
-			YY_BUFFER_STATE b = YY_CURRENT_BUFFER;
+			YY_BUFFER_STATE b = YY_CURRENT_BUFFER_LVALUE;
 
 			int yy_c_buf_p_offset =
 				(int) ((yy_c_buf_p) - b->yy_ch_buf);
 
 			if ( b->yy_is_our_buffer )
 				{
-				int new_size = b->yy_buf_size * 2;
+				yy_size_t new_size = b->yy_buf_size * 2;
 
 				if ( new_size <= 0 )
 					b->yy_buf_size += b->yy_buf_size / 8;
@@ -1297,7 +1292,7 @@ static int yy_get_next_buffer (void)
 
 		/* Read in more data. */
 		YY_INPUT( (&YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[number_to_move]),
-			(yy_n_chars), (size_t) num_to_read );
+			(yy_n_chars), num_to_read );
 
 		YY_CURRENT_BUFFER_LVALUE->yy_n_chars = (yy_n_chars);
 		}
@@ -1392,7 +1387,7 @@ static int yy_get_next_buffer (void)
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
 	yy_is_jam = (yy_current_state == 126);
 
-	return yy_is_jam ? 0 : yy_current_state;
+		return yy_is_jam ? 0 : yy_current_state;
 }
 
     static void yyunput (int c, register char * yy_bp )
@@ -1407,7 +1402,7 @@ static int yy_get_next_buffer (void)
 	if ( yy_cp < YY_CURRENT_BUFFER_LVALUE->yy_ch_buf + 2 )
 		{ /* need to shift things up to make room */
 		/* +2 for EOB chars. */
-		register int number_to_move = (yy_n_chars) + 2;
+		register yy_size_t number_to_move = (yy_n_chars) + 2;
 		register char *dest = &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[
 					YY_CURRENT_BUFFER_LVALUE->yy_buf_size + 2];
 		register char *source =
@@ -1456,7 +1451,7 @@ static int yy_get_next_buffer (void)
 
 		else
 			{ /* need more input */
-			int offset = (yy_c_buf_p) - (yytext_ptr);
+			yy_size_t offset = (yy_c_buf_p) - (yytext_ptr);
 			++(yy_c_buf_p);
 
 			switch ( yy_get_next_buffer(  ) )
@@ -1616,10 +1611,6 @@ static void yy_load_buffer_state  (void)
 	yyfree((void *) b  );
 }
 
-#ifndef __cplusplus
-extern int isatty (int );
-#endif /* __cplusplus */
-    
 /* Initializes or reinitializes a buffer.
  * This function is sometimes called more than once on the same buffer,
  * such as during a yyrestart() or at EOF.
@@ -1732,7 +1723,7 @@ void yypop_buffer_state (void)
  */
 static void yyensure_buffer_stack (void)
 {
-	int num_to_alloc;
+	yy_size_t num_to_alloc;
     
 	if (!(yy_buffer_stack)) {
 
@@ -1829,12 +1820,12 @@ YY_BUFFER_STATE yy_scan_string (yyconst char * yystr )
  * 
  * @return the newly allocated buffer state object.
  */
-YY_BUFFER_STATE yy_scan_bytes  (yyconst char * yybytes, int  _yybytes_len )
+YY_BUFFER_STATE yy_scan_bytes  (yyconst char * yybytes, yy_size_t  _yybytes_len )
 {
 	YY_BUFFER_STATE b;
 	char *buf;
 	yy_size_t n;
-	int i;
+	yy_size_t i;
     
 	/* Get memory for full buffer, including space for trailing EOB's. */
 	n = _yybytes_len + 2;
@@ -1916,7 +1907,7 @@ FILE *yyget_out  (void)
 /** Get the length of the current token.
  * 
  */
-int yyget_leng  (void)
+yy_size_t yyget_leng  (void)
 {
         return yyleng;
 }
@@ -2064,7 +2055,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 75 "egclscanner.fl"
+#line 76 "egclscanner.fl"
 
 
 

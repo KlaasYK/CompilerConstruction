@@ -21,9 +21,10 @@ extern void printLexError(char *illchar, int line, int column);
 \. { columnnr++; return DOT; }
 \( { columnnr++; return LPARREN;}
 \) { columnnr++; return RPARREN;}
--> { columnnr += 2; return THEN_TOK; }
+-\> { columnnr += 2; return THEN_TOK; }
 
-[+-] {columnnr++; return PLUS_OP;}
+\+ {columnnr++; return PLUS_OP;}
+\- {columnnr++; return MIN_OP;}
 ([\*/\%]|div|mod) { columnnr += strlen(yytext); return MUL_OP;}
 \^ { columnnr += strlen(yytext); return POW_OP;}
 
