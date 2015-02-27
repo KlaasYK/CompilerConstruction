@@ -114,9 +114,28 @@ start		: header programbody
 header		: PROGRAM_TOK IDENTIFIER SEMICOLON 
 			;
 
-programbody : BEGIN_TOK functioncall END_TOK DOT
+programbody : constant_def* procedure* BEGIN_TOK functioncall END_TOK DOT
+			;
+
+procedure	: PROCEDURE_TOK IDENTIFIER LPARREN parameters? RPARREN SEMICOLON statement*  END_TOK SEMICOLON
 			;
 			
+parameters 	: VAR_TOK IDENTIFIER (, parameters)?
+			| IDENTIFIER (TYPE_OP TYPE)?
+			;
+
+statement	: NUMBER
+			;
+
+
+constant_def	: CONSTANT_TOK IDENTIFIER TYPE_OP TYPE COMPARE_OP variable SEMICOLON
+				;
+				
+variable		: BOOLEAN
+				| NUMBER
+				| STRING
+				;
+
 functioncall	: IDENTIFIER STRING SEMICOLON
 				;
 
