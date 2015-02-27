@@ -41,6 +41,10 @@ void freeLines() {
 		free(lines[i]);
 	}
 	free(lines);
+	if (yyin != NULL) {
+		fclose(yyin);
+		yyin = NULL;
+	}
 	/* flex buffers */
 	yylex_destroy();
 }
@@ -88,23 +92,9 @@ int main(int argc, char** argv) {
 	
 	parser();
 
-	//Lees tot EOF
-	/* int val = yylex();
-	while (val > EOF) {
-		switch (val) {
-			case COMMENT: printf("\n"); linecount++; columnnr = 0; break;
-			case IDENTIFIER: printf ("||%s|| ", yytext); columnnr += strlen(yytext); break;
-			case EOL : printf("\n"); linecount++; columnnr = 0; break;
-			case WHITESPACE: columnnr += strlen(yytext); break;
-			case ERROR : printLexError(yytext, linecount, columnnr); break;
-			default: printf ("|%s| ", yytext); columnnr += strlen(yytext);
-		}
-	
-		val = yylex();
-	}*/
-
 	if (argc == 2) {
 		fclose(yyin);
+		yyin = NULL;
 	}
 
 	printf("Parsing succesfull\n");
@@ -113,16 +103,6 @@ int main(int argc, char** argv) {
 	
 	return EXIT_SUCCESS;
 }
-
-
-
-
-/*int main(int argc, char *argv[]) {
-	parser();
-	printf("Accepted\n");
-	return 0;
-}*/
-
 
 /* EOF c FILE */
 }
