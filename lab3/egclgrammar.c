@@ -106,6 +106,10 @@ extern char * yytext;
 char **lines;
 int linesread;
 
+/* to keep track of errors */
+int columnnr;
+int linecount;
+
 void readFile(char *filename) {
 	FILE * fin = fopen(filename, "r");
 	int i = 0;
@@ -148,7 +152,7 @@ void printLexError(char *illchar, int line, int column) {
 }
 
 int main(int argc, char** argv) {
-	int linecount = 0, columnnr = 0;
+	linecount = 0, columnnr = 0;
 	
 	if (argc > 2) {
 		fprintf(stderr, "Usage: %s [filename.c]\n", argv[0]);
@@ -201,7 +205,7 @@ void LLmessage(int token) {
 
 /* EOF c FILE */
 
-#line 205 "egclgrammar.c"
+#line 209 "egclgrammar.c"
 static void LL0_start(void);
 static void LL1_header(void);
 static void LL0_start(void){

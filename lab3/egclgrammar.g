@@ -14,6 +14,10 @@ extern char * yytext;
 char **lines;
 int linesread;
 
+/* to keep track of errors */
+int columnnr;
+int linecount;
+
 void readFile(char *filename) {
 	FILE * fin = fopen(filename, "r");
 	int i = 0;
@@ -56,7 +60,7 @@ void printLexError(char *illchar, int line, int column) {
 }
 
 int main(int argc, char** argv) {
-	int linecount = 0, columnnr = 0;
+	linecount = 0, columnnr = 0;
 	
 	if (argc > 2) {
 		fprintf(stderr, "Usage: %s [filename.c]\n", argv[0]);
@@ -114,6 +118,6 @@ void LLmessage(int token) {
 start		:	header
 			; 
 
-header	: PROGRAM_TOK IDENTIFIER SEMICOLON
+header		: PROGRAM_TOK IDENTIFIER SEMICOLON
 			;
 

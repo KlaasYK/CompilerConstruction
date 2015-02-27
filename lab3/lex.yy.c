@@ -560,9 +560,15 @@ char *yytext;
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "egclgrammar.h"
 
-#line 566 "lex.yy.c"
+extern int linecount;
+extern int columnnr;
+
+extern void printLexError(char *illchar, int line, int column);
+
+#line 572 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -749,10 +755,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 10 "egclscanner.fl"
+#line 16 "egclscanner.fl"
 
 
-#line 756 "lex.yy.c"
+#line 762 "lex.yy.c"
 
 	if ( !(yy_init) )
 		{
@@ -837,232 +843,232 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 12 "egclscanner.fl"
-{return SEMICOLON; }
+#line 18 "egclscanner.fl"
+{ columnnr++; return SEMICOLON; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 13 "egclscanner.fl"
-{return TYPE_OP; }
+#line 19 "egclscanner.fl"
+{ columnnr++; return TYPE_OP; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 14 "egclscanner.fl"
-{return COMMA; }
+#line 20 "egclscanner.fl"
+{ columnnr++; return COMMA; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 15 "egclscanner.fl"
-{return DOT; }
+#line 21 "egclscanner.fl"
+{ columnnr++; return DOT; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 16 "egclscanner.fl"
-{return LPARREN;}
+#line 22 "egclscanner.fl"
+{ columnnr++; return LPARREN;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 17 "egclscanner.fl"
-{return RPARREN;}
+#line 23 "egclscanner.fl"
+{ columnnr++; return RPARREN;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 18 "egclscanner.fl"
-{return THEN_TOK; }
+#line 24 "egclscanner.fl"
+{ columnnr += 2; return THEN_TOK; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 20 "egclscanner.fl"
-{return PLUS_OP;}
+#line 26 "egclscanner.fl"
+{columnnr++; return PLUS_OP;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 21 "egclscanner.fl"
-{return MUL_OP;}
+#line 27 "egclscanner.fl"
+{ columnnr += strlen(yytext); return MUL_OP;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 22 "egclscanner.fl"
-{return POW_OP;}
+#line 28 "egclscanner.fl"
+{ columnnr += strlen(yytext); return POW_OP;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 24 "egclscanner.fl"
-{return COMPARE_OP;}
+#line 30 "egclscanner.fl"
+{ columnnr += strlen(yytext); return COMPARE_OP;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 25 "egclscanner.fl"
-{return COMPARE_OP; }
+#line 31 "egclscanner.fl"
+{columnnr += strlen(yytext); return COMPARE_OP; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 26 "egclscanner.fl"
-{return COMPARE_OP; }
+#line 32 "egclscanner.fl"
+{columnnr += strlen(yytext); return COMPARE_OP; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 27 "egclscanner.fl"
-{return COMPARE_OP; }
+#line 33 "egclscanner.fl"
+{ columnnr += strlen(yytext); return COMPARE_OP; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 30 "egclscanner.fl"
-{return TYPE;}
+#line 36 "egclscanner.fl"
+{columnnr += strlen(yytext); return TYPE;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 31 "egclscanner.fl"
-{return TYPE;}
+#line 37 "egclscanner.fl"
+{columnnr += strlen(yytext); return TYPE;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 33 "egclscanner.fl"
-{return NOT_TOK;}
+#line 39 "egclscanner.fl"
+{columnnr += strlen(yytext); return NOT_TOK;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 34 "egclscanner.fl"
-{return AND_OP;}
+#line 40 "egclscanner.fl"
+{ columnnr += strlen(yytext); return AND_OP;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 35 "egclscanner.fl"
-{return OR_OP;}
+#line 41 "egclscanner.fl"
+{ columnnr += strlen(yytext); return OR_OP;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 36 "egclscanner.fl"
-{return CAND_OP;}
+#line 42 "egclscanner.fl"
+{ columnnr += strlen(yytext); return CAND_OP;}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 37 "egclscanner.fl"
-{return COR_OP;}
+#line 43 "egclscanner.fl"
+{ columnnr += strlen(yytext); return COR_OP;}
 	YY_BREAK
 case 22:
 /* rule 22 can match eol */
 YY_RULE_SETUP
-#line 39 "egclscanner.fl"
-{return STRING;}
+#line 45 "egclscanner.fl"
+{ columnnr += strlen(yytext); return STRING;}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 41 "egclscanner.fl"
-{return ALTGUARD;}
+#line 47 "egclscanner.fl"
+{columnnr += strlen(yytext); return ALTGUARD;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 43 "egclscanner.fl"
-{return PROCEDURE_TOK;}
+#line 49 "egclscanner.fl"
+{columnnr += strlen(yytext); return PROCEDURE_TOK;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 44 "egclscanner.fl"
-{return FUNCTION_TOK;}
+#line 50 "egclscanner.fl"
+{ columnnr += strlen(yytext); return FUNCTION_TOK;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 45 "egclscanner.fl"
-{ return CONSTANT_TOK;}
+#line 51 "egclscanner.fl"
+{columnnr += strlen(yytext);  return CONSTANT_TOK;}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 46 "egclscanner.fl"
-{ return PROGRAM_TOK; }
+#line 52 "egclscanner.fl"
+{columnnr += strlen(yytext);  return PROGRAM_TOK; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 47 "egclscanner.fl"
-{ return BEGIN_TOK; }
+#line 53 "egclscanner.fl"
+{ columnnr += strlen(yytext); return BEGIN_TOK; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 48 "egclscanner.fl"
-{return END_TOK; }
+#line 54 "egclscanner.fl"
+{columnnr += strlen(yytext); return END_TOK; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 49 "egclscanner.fl"
-{return VAR_TOK; }
+#line 55 "egclscanner.fl"
+{ columnnr += strlen(yytext); return VAR_TOK; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 50 "egclscanner.fl"
-{return DOBEGIN_TOK; }
+#line 56 "egclscanner.fl"
+{ columnnr += strlen(yytext); return DOBEGIN_TOK; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 51 "egclscanner.fl"
-{return DOEND_TOK; }
+#line 57 "egclscanner.fl"
+{columnnr += strlen(yytext); return DOEND_TOK; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 52 "egclscanner.fl"
-{return IFBEGIN_TOK; }
+#line 58 "egclscanner.fl"
+{columnnr += strlen(yytext); return IFBEGIN_TOK; }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 53 "egclscanner.fl"
-{return IFEND_TOK; }
+#line 59 "egclscanner.fl"
+{columnnr += strlen(yytext); return IFEND_TOK; }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 55 "egclscanner.fl"
-{return ASSIGNMENT_OP; }
+#line 61 "egclscanner.fl"
+{columnnr += strlen(yytext); return ASSIGNMENT_OP; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 57 "egclscanner.fl"
-{return BOOLEAN;}
+#line 63 "egclscanner.fl"
+{columnnr += strlen(yytext); return BOOLEAN;}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 58 "egclscanner.fl"
-{return BOOLEAN;}
+#line 64 "egclscanner.fl"
+{columnnr += strlen(yytext); return BOOLEAN;}
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 59 "egclscanner.fl"
-{return NUMBER;}
+#line 65 "egclscanner.fl"
+{ columnnr += strlen(yytext); return NUMBER;}
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 61 "egclscanner.fl"
-{return IDENTIFIER;}
+#line 67 "egclscanner.fl"
+{columnnr += strlen(yytext); return IDENTIFIER;}
 	YY_BREAK
 case 40:
 /* rule 40 can match eol */
 YY_RULE_SETUP
-#line 63 "egclscanner.fl"
-{ return COMMENT; }
+#line 69 "egclscanner.fl"
+{columnnr += strlen(yytext); linecount++; /* skip return COMMENT;*/ }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 65 "egclscanner.fl"
-{ return WHITESPACE; }
+#line 71 "egclscanner.fl"
+{ columnnr += strlen(yytext); /* skip return WHITESPACE;*/ }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 66 "egclscanner.fl"
+#line 72 "egclscanner.fl"
 { return EOF; }
 	YY_BREAK
 case 42:
 /* rule 42 can match eol */
 YY_RULE_SETUP
-#line 67 "egclscanner.fl"
-{ return EOL; }
+#line 73 "egclscanner.fl"
+{ linecount++; /* skip return EOL; */ }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 68 "egclscanner.fl"
-{return ERROR; }
+#line 74 "egclscanner.fl"
+{ printLexError(yytext, linecount, columnnr); }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 69 "egclscanner.fl"
+#line 75 "egclscanner.fl"
 ECHO;
 	YY_BREAK
-#line 1066 "lex.yy.c"
+#line 1072 "lex.yy.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2058,7 +2064,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 69 "egclscanner.fl"
+#line 75 "egclscanner.fl"
 
 
 

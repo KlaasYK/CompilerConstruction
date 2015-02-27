@@ -3,68 +3,74 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "egclgrammar.h"
+
+extern int linecount;
+extern int columnnr;
+
+extern void printLexError(char *illchar, int line, int column);
 
 %}
 
 %%
 
-;	{return SEMICOLON; }
-: {return TYPE_OP; }
-, {return COMMA; }
-\. {return DOT; }
-\( {return LPARREN;}
-\) {return RPARREN;}
--> {return THEN_TOK; }
+;	{ columnnr++; return SEMICOLON; }
+: { columnnr++; return TYPE_OP; }
+, { columnnr++; return COMMA; }
+\. { columnnr++; return DOT; }
+\( { columnnr++; return LPARREN;}
+\) { columnnr++; return RPARREN;}
+-> { columnnr += 2; return THEN_TOK; }
 
-[+-] {return PLUS_OP;}
-([\*/\%]|div|mod) {return MUL_OP;}
-\^ {return POW_OP;}
+[+-] {columnnr++; return PLUS_OP;}
+([\*/\%]|div|mod) { columnnr += strlen(yytext); return MUL_OP;}
+\^ { columnnr += strlen(yytext); return POW_OP;}
 
-\<\> {return COMPARE_OP;}
-[\<\>] {return COMPARE_OP; }
-[\<\>]= {return COMPARE_OP; }
-= {return COMPARE_OP; }
+\<\> { columnnr += strlen(yytext); return COMPARE_OP;}
+[\<\>] {columnnr += strlen(yytext); return COMPARE_OP; }
+[\<\>]= {columnnr += strlen(yytext); return COMPARE_OP; }
+= { columnnr += strlen(yytext); return COMPARE_OP; }
 
 
-integer {return TYPE;}
-boolean {return TYPE;}
+integer {columnnr += strlen(yytext); return TYPE;}
+boolean {columnnr += strlen(yytext); return TYPE;}
 
-not {return NOT_TOK;}
-and {return AND_OP;}
-or {return OR_OP;}
-cand {return CAND_OP;}
-cor {return COR_OP;}
+not {columnnr += strlen(yytext); return NOT_TOK;}
+and { columnnr += strlen(yytext); return AND_OP;}
+or { columnnr += strlen(yytext); return OR_OP;}
+cand { columnnr += strlen(yytext); return CAND_OP;}
+cor { columnnr += strlen(yytext); return COR_OP;}
 
- '(\\'|[^'])*' {return STRING;}
+ '(\\'|[^'])*' { columnnr += strlen(yytext); return STRING;}
 
-\[\] {return ALTGUARD;}
+\[\] {columnnr += strlen(yytext); return ALTGUARD;}
 
-procedure {return PROCEDURE_TOK;}
-function {return FUNCTION_TOK;}
-constant { return CONSTANT_TOK;}
-program { return PROGRAM_TOK; }
-begin { return BEGIN_TOK; }
-end  {return END_TOK; }
-var {return VAR_TOK; }
-do {return DOBEGIN_TOK; }
-od {return DOEND_TOK; }
-if {return IFBEGIN_TOK; }
-fi {return IFEND_TOK; }
+procedure {columnnr += strlen(yytext); return PROCEDURE_TOK;}
+function { columnnr += strlen(yytext); return FUNCTION_TOK;}
+constant {columnnr += strlen(yytext);  return CONSTANT_TOK;}
+program {columnnr += strlen(yytext);  return PROGRAM_TOK; }
+begin { columnnr += strlen(yytext); return BEGIN_TOK; }
+end  {columnnr += strlen(yytext); return END_TOK; }
+var { columnnr += strlen(yytext); return VAR_TOK; }
+do { columnnr += strlen(yytext); return DOBEGIN_TOK; }
+od {columnnr += strlen(yytext); return DOEND_TOK; }
+if {columnnr += strlen(yytext); return IFBEGIN_TOK; }
+fi {columnnr += strlen(yytext); return IFEND_TOK; }
 
-:= {return ASSIGNMENT_OP; }
+:= {columnnr += strlen(yytext); return ASSIGNMENT_OP; }
 
-false {return BOOLEAN;}
-true {return BOOLEAN;}
-[0-9]* {return NUMBER;}
+false {columnnr += strlen(yytext); return BOOLEAN;}
+true {columnnr += strlen(yytext); return BOOLEAN;}
+[0-9]* { columnnr += strlen(yytext); return NUMBER;}
 
-[a-zA-Z](_?)([a-zA-Z0-9]_?)* {return IDENTIFIER;}
+[a-zA-Z](_?)([a-zA-Z0-9]_?)* {columnnr += strlen(yytext); return IDENTIFIER;}
 
-#(.)*\n { return COMMENT; }
+#(.)*\n {columnnr += strlen(yytext); linecount++; /* skip return COMMENT;*/ }
 
-[ \t]+ { return WHITESPACE; }
+[ \t]+ { columnnr += strlen(yytext); /* skip return WHITESPACE;*/ }
 <<EOF>> { return EOF; }
-(\n|\r\n) { return EOL; }
-[^<<EOF>>A-Za-z0-9\%\^\*\(\)+-/=\<\>';\[\]_:(-\>)(\\'),\. \t\r\n] {return ERROR; }
+(\n|\r\n) { linecount++; /* skip return EOL; */ }
+[^<<EOF>>A-Za-z0-9\%\^\*\(\)+-/=\<\>';\[\]_:(-\>)(\\'),\. \t\r\n] { printLexError(yytext, linecount, columnnr); }
 %%
 
