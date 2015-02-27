@@ -1,6 +1,6 @@
 %start parser, start;
-%token  EOF_TOK, BEGIN_TOK, END_TOK, COMMENT, PROGRAM_TOK, DOBEGIN_TOK, DOEND_TOK, IFBEGIN_TOK, IFEND_TOK, FUNCTION_TOK, OR_OP, AND_OP, CAND_OP, COR_OP, ASSIGNMENT_OP, PLUS_OP, MUL_OP, POW_OP, COMPARE_OP, TYPE_OP, VAR_TOK, VARIABLE, NUMBER,STRING, BOOLEAN, THEN_TOK, CONSTANT_TOK, COMMA, SEMICOLON, ALTGUARD, FUNCNAME, PROGRAMNAME, IDENTIFIER, NOT_TOK, TYPE, EOL, ERROR, DOT, LPARREN, RPARREN, PROCEDURE_TOK, WHITESPACE;
-%options "generate-lexer-wrapper";
+%token BEGIN_TOK, END_TOK, COMMENT, PROGRAM_TOK, DOBEGIN_TOK, DOEND_TOK, IFBEGIN_TOK, IFEND_TOK, FUNCTION_TOK, OR_OP, AND_OP, CAND_OP, COR_OP, ASSIGNMENT_OP, PLUS_OP, MUL_OP, POW_OP, COMPARE_OP, TYPE_OP, VAR_TOK, VARIABLE, NUMBER,STRING, BOOLEAN, THEN_TOK, CONSTANT_TOK, COMMA, SEMICOLON, ALTGUARD, FUNCNAME, PROGRAMNAME, IDENTIFIER, NOT_TOK, TYPE, EOL, ERROR, DOT, LPARREN, RPARREN, PROCEDURE_TOK, WHITESPACE;
+%options "generate-symbol-table generate-lexer-wrapper";
 %lexical yylex;
 
 {
@@ -12,6 +12,7 @@ extern FILE * yyin;
 extern char * yytext;
 
 char **lines;
+char * file_name;
 int linesread;
 
 /* to keep track of errors */
@@ -40,9 +41,6 @@ void freeLines() {
 		free(lines[i]);
 	}
 	free(lines);
-	if (yyin != NULL) {
-		fclose(yyin);
-	}
 	/* flex buffers */
 	yylex_destroy();
 }
@@ -59,6 +57,22 @@ void printLexError(char *illchar, int line, int column) {
 	exit(EXIT_FAILURE);
 }
 
+void LLmessage(int token) {
+	switch (token) {
+		case LL_MISSINGEOF:
+		printf("%s:%d: Expected %s, found %s (%s).\n", file_name, linecount, LLgetSymbol(EOFILE), LLgetSymbol(LLsymb), yytext);
+		break;
+		case LL_DELETE:
+		printf("%s:%d: Unexpected %s (%s).\n", file_name, linecount, LLgetSymbol(LLsymb), yytext);
+		break;
+		default:
+		printf("%s:%d: Expected %s, found %s (%s).\n", file_name, linecount, LLgetSymbol(token), LLgetSymbol(LLsymb), yytext);
+		break;
+	}
+	freeLines();
+	exit(EXIT_FAILURE);
+}
+
 int main(int argc, char** argv) {
 	linecount = 0, columnnr = 0;
 	
@@ -67,6 +81,7 @@ int main(int argc, char** argv) {
 		exit(-1);
   	}
 	if (argc == 2) {
+		file_name = argv[1];
 		readFile(argv[1]);
 		yyin = fopen(argv[1], "r");
 	}
@@ -108,10 +123,6 @@ int main(int argc, char** argv) {
 	return 0;
 }*/
 
-void LLmessage(int token) {
-	printf("Parse error: %d\n", token);
-	exit(EXIT_FAILURE);
-}
 
 /* EOF c FILE */
 }
@@ -120,6 +131,6 @@ void LLmessage(int token) {
 start		:	header
 			; 
 
-header		: PROGRAM_TOK IDENTIFIER SEMICOLON
+header		: PROGRAM_TOK IDENTIFIER SEMICOLON 
 			;
 
