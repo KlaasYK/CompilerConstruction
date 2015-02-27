@@ -1,5 +1,55 @@
 program test;
+# Euclid's algorithm 
 
-begin
-	print 'Hello World!';
+constant A : integer = 7453478376373655456544364564657835389772;
+constant B : integer = 656546567567746769343490496;
+
+procedure swap(var a, b : integer);
+  a, b := b, a;
+end;
+
+function gcd(a, b : integer) -> integer;
+  do b <> 0  ->  a := a mod b;
+                 swap(a, b);
+  od;
+  gcd := a;
+end; # function gcd
+
+function sqrt(x : integer) -> integer;
+  var m, y, z : integer;
+  y :=0;
+  z:=x+1;
+  # invariant: y^2 <= x < z^2
+  do y+1 <> z -> m := (y+z) div 2;
+                 if m^2 <= x -> y :=m;
+                 [] m^2 > x  -> z := m;
+                 fi;                 
+  od;
+  sqrt := y;
+end;
+
+# the main program starts here
+begin 
+#euclid gcd
+  var g : integer;
+  g := gcd(A, B);
+  print 'gcd(', A, ',', B,')=';
+  println g;
+  
+#random number
+  var i : integer;
+  var stop : boolean;
+  
+  i,stop := 0,false;
+  do not stop and i<>4 -> i := i+1;
+  [] not stop and i<>4 -> stop := true;
+  od;
+
+  println i;
+
+#square root
+  var n : integer;
+  print 'input? ';
+  read n;
+  println 'floor(sqrt(', n, '))=', sqrt(n);
 end.
