@@ -1,1 +1,5 @@
 program test;
+
+begin
+	print 'Hello World!';
+end.

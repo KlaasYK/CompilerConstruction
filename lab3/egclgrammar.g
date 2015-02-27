@@ -128,9 +128,16 @@ int main(int argc, char** argv) {
 }
 
 
-start		:	header
+start		: header programbody
 			; 
 
 header		: PROGRAM_TOK IDENTIFIER SEMICOLON 
 			;
+
+programbody : BEGIN_TOK functioncall END_TOK DOT
+			;
+			
+functioncall	: IDENTIFIER STRING SEMICOLON
+				;
+
 
