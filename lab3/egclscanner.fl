@@ -69,7 +69,7 @@ true {columnnr += strlen(yytext); return BOOLEAN;}
 #(.)*\n {columnnr += strlen(yytext); linecount++; /* skip return COMMENT;*/ }
 
 [ \t]+ { columnnr += strlen(yytext); /* skip return WHITESPACE;*/ }
-<<EOF>> { return EOF; }
+<<EOF>> { return EOF_TOK; }
 (\n|\r\n) { linecount++; /* skip return EOL; */ }
 [^<<EOF>>A-Za-z0-9\%\^\*\(\)+-/=\<\>';\[\]_:(-\>)(\\'),\. \t\r\n] { printLexError(yytext, linecount, columnnr); }
 %%

@@ -1,5 +1,5 @@
 %start parser, start;
-%token  BEGIN_TOK, END_TOK, COMMENT, PROGRAM_TOK, DOBEGIN_TOK, DOEND_TOK, IFBEGIN_TOK, IFEND_TOK, FUNCTION_TOK, OR_OP, AND_OP, CAND_OP, COR_OP, ASSIGNMENT_OP, PLUS_OP, MUL_OP, POW_OP, COMPARE_OP, TYPE_OP, VAR_TOK, VARIABLE, NUMBER,STRING, BOOLEAN, THEN_TOK, CONSTANT_TOK, COMMA, SEMICOLON, ALTGUARD, FUNCNAME, PROGRAMNAME, IDENTIFIER, NOT_TOK, TYPE, EOL, ERROR, DOT, LPARREN, RPARREN, PROCEDURE_TOK, WHITESPACE;
+%token  EOF_TOK, BEGIN_TOK, END_TOK, COMMENT, PROGRAM_TOK, DOBEGIN_TOK, DOEND_TOK, IFBEGIN_TOK, IFEND_TOK, FUNCTION_TOK, OR_OP, AND_OP, CAND_OP, COR_OP, ASSIGNMENT_OP, PLUS_OP, MUL_OP, POW_OP, COMPARE_OP, TYPE_OP, VAR_TOK, VARIABLE, NUMBER,STRING, BOOLEAN, THEN_TOK, CONSTANT_TOK, COMMA, SEMICOLON, ALTGUARD, FUNCNAME, PROGRAMNAME, IDENTIFIER, NOT_TOK, TYPE, EOL, ERROR, DOT, LPARREN, RPARREN, PROCEDURE_TOK, WHITESPACE;
 %options "generate-lexer-wrapper";
 %lexical yylex;
 
@@ -70,9 +70,11 @@ int main(int argc, char** argv) {
 		readFile(argv[1]);
 		yyin = fopen(argv[1], "r");
 	}
+	
+	parser();
 
 	//Lees tot EOF
-	int val = yylex();
+	/* int val = yylex();
 	while (val > EOF) {
 		switch (val) {
 			case COMMENT: printf("\n"); linecount++; columnnr = 0; break;
@@ -84,13 +86,13 @@ int main(int argc, char** argv) {
 		}
 	
 		val = yylex();
-	}
+	}*/
 
 	if (argc == 2) {
 		fclose(yyin);
 	}
 
-	printf("Lexing succesfull\n");
+	printf("Parsing succesfull\n");
 	
 	freeLines();
 	

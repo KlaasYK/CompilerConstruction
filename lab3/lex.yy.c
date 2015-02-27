@@ -1050,7 +1050,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
 #line 72 "egclscanner.fl"
-{ return EOF; }
+{ return EOF_TOK; }
 	YY_BREAK
 case 42:
 /* rule 42 can match eol */
