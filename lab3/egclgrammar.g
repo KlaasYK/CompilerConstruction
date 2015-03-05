@@ -192,8 +192,16 @@ identifierarray	: IDENTIFIER [COMMA identifierarray]?
 functioncall	: LPARREN identifierarray RPARREN
 				;
 
-assignmentcall	: ASSIGNMENT_OP expr
-				| COMMA IDENTIFIER assignmentcall COMMA expr
+/* original version of assignmentcall that has an equal length for the identifiers and the following expressions (could make semantics very hard to handle) */
+assignmentcallV1	: ASSIGNMENT_OP expr
+					| COMMA IDENTIFIER assignmentcall COMMA expr
+					;
+
+/* newer version of assignmentcall that doesn't make sure yet that the amount of identifers equals the amount of expressions */
+assignmentcallV2	: [COMMA IDENTIFIER]* ASSIGNMENT_OP expr [COMMA expr]*
+					;
+
+assignmentcall	: assignmentcallV2
 				;
 
 dostatement	:	DOBEGIN_TOK guardedcommandset DOEND_TOK
