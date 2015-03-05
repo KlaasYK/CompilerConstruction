@@ -25,8 +25,8 @@ static const char LLsets[] = {
 	'\x00', 	'\x00', 	'\x00', 	'\x40', 	'\x08', 	'\x00', 	'\x00', 	'\x00', 
 	'\x00', 	'\xF0', 	'\x3F', 	'\x4A', 	'\x18', 	'\x02', 	'\x00', 	'\x00', 
 	'\xA0', 	'\xFC', 	'\xBE', 	'\x1A', 	'\x19', 	'\x02', 	'\x00', 	'\x00', 
-	'\x00', 	'\x00', 	'\x00', 	'\x0E', 	'\x08', 	'\x00', 	'\x00', 	'\x00', 
-	'\xA0', 	'\x0C', 	'\x80', 	'\x4E', 	'\x08', 	'\x00', 	'\x00', 	'\x00', 
+	'\x00', 	'\x00', 	'\x04', 	'\x0E', 	'\x18', 	'\x02', 	'\x00', 	'\x00', 
+	'\xA0', 	'\x0C', 	'\x84', 	'\x4E', 	'\x18', 	'\x02', 	'\x00', 	'\x00', 
 	'\x00', 	'\x00', 	'\x00', 	'\x0E', 	'\x00', 	'\x00', 	'\x00', 	'\x00', 
 	'\xA6', 	'\x0E', 	'\x80', 	'\x20', 	'\x08', 	'\x08', 	'\x00', 	'\x00', 
 	0
@@ -862,40 +862,14 @@ LLscnt[17]--;
 LL_SCANDONE(282);/* STRING */
 LLread();
 break;
-case 35:/* IDENTIFIER */
-LLscnt[17]--;
-LLtcnt[41]++;
-LL_SCANDONE(291);/* IDENTIFIER */
-LLread();
-LL_1:
-switch (LLcsymb) {
-default:
-if (LLskip()) goto LL_1;
-LLtcnt[41]--;
-break;
-case 2:/* END_TOK */
-case 6:/* DOEND_TOK */
-case 8:/* IFEND_TOK */
-case 30:/* COMMA */
-case 31:/* SEMICOLON */
-case 32:/* ALTGUARD */
-LLtcnt[41]--;
-break;
-case 41:/* LPARREN */
-LLtcnt[41]--;
-LL18_functioncall();
-LLread();
-}
-break;
+case 18:/* MIN_OP */
 case 25:/* NUMBER */
-LLscnt[17]--;
-LL_SCANDONE(281);/* NUMBER */
-LLread();
-break;
 case 27:/* BOOLEAN */
+case 35:/* IDENTIFIER */
+case 36:/* NOT_TOK */
+case 41:/* LPARREN */
 LLscnt[17]--;
-LL_SCANDONE(283);/* BOOLEAN */
-LLread();
+LL14_expr();
 break;
 }
 }
