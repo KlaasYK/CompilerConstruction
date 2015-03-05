@@ -1,5 +1,5 @@
 %start parser, start;
-%token BEGIN_TOK, END_TOK, COMMENT, PROGRAM_TOK, DOBEGIN_TOK, DOEND_TOK, IFBEGIN_TOK, IFEND_TOK, FUNCTION_TOK, OR_OP, AND_OP, CAND_OP, COR_OP, ASSIGNMENT_OP, PLUS_OP, MIN_OP, MUL_OP, POW_OP, COMPARE_OP, TYPE_OP, VAR_TOK, VARIABLE, NUMBER,STRING, BOOLEAN, THEN_TOK, CONSTANT_TOK, COMMA, SEMICOLON, ALTGUARD, FUNCNAME, PROGRAMNAME, IDENTIFIER, NOT_TOK, TYPE, EOL, ERROR, DOT, LPARREN, RPARREN, PROCEDURE_TOK, WHITESPACE;
+%token BEGIN_TOK, END_TOK, COMMENT, PROGRAM_TOK, DOBEGIN_TOK, DOEND_TOK, IFBEGIN_TOK, IFEND_TOK, FUNCTION_TOK, PRINT_TOK, READ_TOK, OR_OP, AND_OP, CAND_OP, COR_OP, ASSIGNMENT_OP, PLUS_OP, MIN_OP, MUL_OP, POW_OP, COMPARE_OP, TYPE_OP, VAR_TOK, VARIABLE, NUMBER,STRING, BOOLEAN, THEN_TOK, CONSTANT_TOK, COMMA, SEMICOLON, ALTGUARD, FUNCNAME, PROGRAMNAME, IDENTIFIER, NOT_TOK, TYPE, EOL, ERROR, DOT, LPARREN, RPARREN, PROCEDURE_TOK, WHITESPACE;
 %options "generate-symbol-table generate-lexer-wrapper";
 %lexical yylex;
 
@@ -51,7 +51,7 @@ void freeLines() {
 
 void printLexError(char *illchar, int line, int column) {
 	int i = 0;
-	printf("\nError on line %4d: %s", line, lines[line]);
+	printf("\nError on line %4d: %s", line+1, lines[line]);
 	for (i; i < column + 20; i++) {
 		printf(" ");
 	}
@@ -64,13 +64,13 @@ void printLexError(char *illchar, int line, int column) {
 void LLmessage(int token) {
 	switch (token) {
 		case LL_MISSINGEOF:
-		printf("%s:%d: Expected %s, found %s (%s).\n", file_name, linecount, LLgetSymbol(EOFILE), LLgetSymbol(LLsymb), yytext);
+		printf("%s:%d: Expected %s, found %s (%s).\n", file_name, linecount+1, LLgetSymbol(EOFILE), LLgetSymbol(LLsymb), yytext);
 		break;
 		case LL_DELETE:
-		printf("%s:%d: Unexpected %s (%s).\n", file_name, linecount, LLgetSymbol(LLsymb), yytext);
+		printf("%s:%d: Unexpected %s (%s).\n", file_name, linecount+1, LLgetSymbol(LLsymb), yytext);
 		break;
 		default:
-		printf("%s:%d: Expected %s, found %s (%s).\n", file_name, linecount, LLgetSymbol(token), LLgetSymbol(LLsymb), yytext);
+		printf("%s:%d: Expected %s, found %s (%s).\n", file_name, linecount+1, LLgetSymbol(token), LLgetSymbol(LLsymb), yytext);
 		break;
 	}
 	freeLines();
@@ -108,7 +108,7 @@ int main(int argc, char** argv) {
 }
 
 rootexpr	: LPARREN expr RPARREN
-			| IDENTIFIER
+			| IDENTIFIER functioncall?
 			| NUMBER
 			;
 
@@ -144,6 +144,7 @@ relexpr2	: COMPARE_OP sumexpr relexpr2
 			;
 
 relexpr : sumexpr relexpr2
+		| BOOLEAN
 		;
 
 notexpr	: NOT_TOK relexpr
@@ -170,14 +171,17 @@ expr	: andexpr expr2
 guardedcommand	: expr THEN_TOK statementset
 				;
 
-guardedcommandset	: guardedcommand [ALTGUARD guardedcommand]
+guardedcommandset	: guardedcommand [ALTGUARD guardedcommand]?
 					;
 
 identifierarray	: IDENTIFIER [COMMA identifierarray]?
 				;
 
-functioncall	: STRING
-				| LPARREN identifierarray RPARREN
+functioncall	: LPARREN identifierarray RPARREN
+				;
+
+assignmentcall	: ASSIGNMENT_OP expr
+				| COMMA IDENTIFIER assignmentcall COMMA expr
 				;
 
 dostatement	:	DOBEGIN_TOK guardedcommandset DOEND_TOK
@@ -186,9 +190,17 @@ dostatement	:	DOBEGIN_TOK guardedcommandset DOEND_TOK
 ifstatement	:	IFBEGIN_TOK guardedcommandset IFEND_TOK
 			;
 
-assignmentcall	: ASSIGNMENT_OP expr
-				| COMMA IDENTIFIER assignmentcall COMMA expr
-				;
+printable	: STRING
+			| IDENTIFIER functioncall?
+			| NUMBER
+			| BOOLEAN
+			;
+
+printcall	: PRINT_TOK printable [COMMA printable]*
+			;
+
+readcall	: READ_TOK IDENTIFIER [COMMA IDENTIFIER]*
+			;
 
 call	:	functioncall
 		|	assignmentcall
@@ -199,6 +211,8 @@ declaration : VAR_TOK identifierarray TYPE_OP TYPE
 
 statement	: declaration
 			| IDENTIFIER call
+			| printcall
+			| readcall
 			| dostatement
 			| ifstatement
 			;
@@ -212,11 +226,7 @@ variable		: BOOLEAN
 				;
 			
 /* can the last statement in a block end with a semicolon? internet says of a certain version of gcl that a statement has the rule: S -> S;S | ...*/
-statementset3	: statement statementset2
-				| /* epsilon */
-				;
-
-statementset2	: SEMICOLON statementset3
+statementset2	: SEMICOLON statementset
 				| /* epsilon */
 				;
 
@@ -234,11 +244,11 @@ constant_def	: CONSTANT_TOK IDENTIFIER TYPE_OP TYPE COMPARE_OP variable SEMICOLO
 				;
 
 			/* first procuders then functions? */
-programbody : constant_def* procedure* function* BEGIN_TOK statementset END_TOK DOT
+programbody : constant_def* procedure* function* BEGIN_TOK statementset END_TOK
 			;
 
 header		: PROGRAM_TOK IDENTIFIER SEMICOLON 
 			;
 
-start		: header programbody
+start		: header programbody DOT
 			; 

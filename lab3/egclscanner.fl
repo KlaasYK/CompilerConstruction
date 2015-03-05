@@ -58,6 +58,8 @@ do { columnnr += strlen(yytext); return DOBEGIN_TOK; }
 od {columnnr += strlen(yytext); return DOEND_TOK; }
 if {columnnr += strlen(yytext); return IFBEGIN_TOK; }
 fi {columnnr += strlen(yytext); return IFEND_TOK; }
+print|println {columnnr += strlen(yytext); return PRINT_TOK; }
+read {columnnr += strlen(yytext); return READ_TOK; }
 
 := {columnnr += strlen(yytext); return ASSIGNMENT_OP; }
 
