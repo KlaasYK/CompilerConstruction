@@ -202,9 +202,7 @@ ifstatement	:	IFBEGIN_TOK guardedcommandset IFEND_TOK
 			;
 
 printable	: STRING
-			| IDENTIFIER functioncall?
-			| NUMBER
-			| BOOLEAN
+			| expr
 			;
 
 printcall	: PRINT_TOK printable [COMMA printable]*
