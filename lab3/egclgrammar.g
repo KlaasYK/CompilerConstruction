@@ -125,9 +125,9 @@ rootexpr	: LPARREN expr RPARREN
 			;
 
 
-powbase	: MIN_OP rootexpr
-			| rootexpr
-			;
+powbase	: MIN_OP powbase
+		| rootexpr
+		;
 
 factor2	: POW_OP powbase factor2
 		| /* epsilon */
