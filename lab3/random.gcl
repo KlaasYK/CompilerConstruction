@@ -8,6 +8,7 @@ begin
   i,stop := 0,false;
   do not stop and i<>4 -> i := i+1;
   [] not stop and i<>4 -> stop := true;
+  [] not stop and i<>4 -> stop := true;
   od;
 
   println i;
