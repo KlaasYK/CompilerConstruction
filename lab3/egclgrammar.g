@@ -64,23 +64,24 @@ void printLexError(char *illchar, int line, int column) {
 }
 
 void LLmessage(int token) {
-	int i = 0, k;
+	int i = 0, k, c;
 	printf("\n");
 	k = printf("Error on line %d: ", linecount+1);
+	c = columnnr - strlen(yytext);
 	printf("%s", lines[linecount]);
-	for (i; i < columnnr + k; i++) {
+	for (i; i < c + k; i++) {
 		printf(" ");
 	}
 	printf("^\n");
 	switch (token) {
 		case LL_MISSINGEOF:
-		printf("%s:%d: Expected %s, found %s (%s).\n", file_name, linecount+1, LLgetSymbol(EOFILE), LLgetSymbol(LLsymb), yytext);
+		printf("Expected %s, found %s (%s).\n", LLgetSymbol(EOFILE), LLgetSymbol(LLsymb), yytext);
 		break;
 		case LL_DELETE:
-		printf("%s:%d: Unexpected %s (%s).\n", file_name, linecount+1, LLgetSymbol(LLsymb), yytext);
+		printf("Unexpected %s (%s).\n", LLgetSymbol(LLsymb), yytext);
 		break;
 		default:
-		printf("%s:%d: Expected %s, found %s (%s).\n", file_name, linecount+1, LLgetSymbol(token), LLgetSymbol(LLsymb), yytext);
+		printf("Expected %s, found %s (%s).\n", LLgetSymbol(token), LLgetSymbol(LLsymb), yytext);
 		break;
 	}
 	freeLines();
