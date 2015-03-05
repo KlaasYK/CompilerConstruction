@@ -249,7 +249,8 @@ statementsetV2	: statement SEMICOLON statementset
 				| /* epsilon */
 				;
 
-statementset	: statementsetV1
+/* select statementset V1 or V2 */
+statementset	: statementsetV2
 				;
 
 function	: FUNCTION_TOK IDENTIFIER LPARREN parameterset? RPARREN THEN_TOK TYPE SEMICOLON statementset END_TOK SEMICOLON
