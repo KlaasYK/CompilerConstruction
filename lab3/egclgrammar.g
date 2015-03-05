@@ -1,5 +1,5 @@
 %start parser, start;
-%token BEGIN_TOK, END_TOK, COMMENT, PROGRAM_TOK, DOBEGIN_TOK, DOEND_TOK, IFBEGIN_TOK, IFEND_TOK, FUNCTION_TOK, PRINT_TOK, READ_TOK, OR_OP, AND_OP, CAND_OP, COR_OP, ASSIGNMENT_OP, PLUS_OP, MIN_OP, MUL_OP, POW_OP, COMPARE_OP, TYPE_OP, VAR_TOK, VARIABLE, NUMBER,STRING, BOOLEAN, THEN_TOK, CONSTANT_TOK, COMMA, SEMICOLON, ALTGUARD, FUNCNAME, PROGRAMNAME, IDENTIFIER, NOT_TOK, TYPE, EOL, ERROR, DOT, LPARREN, RPARREN, PROCEDURE_TOK, WHITESPACE;
+%token BEGIN_TOK, END_TOK, PROGRAM_TOK, DOBEGIN_TOK, DOEND_TOK, IFBEGIN_TOK, IFEND_TOK, FUNCTION_TOK, PRINT_TOK, READ_TOK, OR_OP, AND_OP, CAND_OP, COR_OP, ASSIGNMENT_OP, PLUS_OP, MIN_OP, MUL_OP, POW_OP, COMPARE_OP, TYPE_OP, VAR_TOK, NUMBER,STRING, BOOLEAN, THEN_TOK, CONSTANT_TOK, COMMA, SEMICOLON, ALTGUARD, IDENTIFIER, NOT_TOK, TYPE, DOT, LPARREN, RPARREN, PROCEDURE_TOK;
 %options "generate-symbol-table generate-lexer-wrapper";
 %lexical yylex;
 
@@ -64,6 +64,14 @@ void printLexError(char *illchar, int line, int column) {
 }
 
 void LLmessage(int token) {
+	int i = 0, k;
+	printf("\n");
+	k = printf("Error on line %d: ", linecount+1);
+	printf("%s", lines[linecount]);
+	for (i; i < columnnr + k; i++) {
+		printf(" ");
+	}
+	printf("^\n");
 	switch (token) {
 		case LL_MISSINGEOF:
 		printf("%s:%d: Expected %s, found %s (%s).\n", file_name, linecount+1, LLgetSymbol(EOFILE), LLgetSymbol(LLsymb), yytext);
