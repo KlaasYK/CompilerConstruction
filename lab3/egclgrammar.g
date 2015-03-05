@@ -250,7 +250,7 @@ statementsetV2	: statement SEMICOLON statementset
 				;
 
 /* select statementset V1 or V2 */
-statementset	: statementsetV2
+statementset	: statementsetV1
 				;
 
 function	: FUNCTION_TOK IDENTIFIER LPARREN parameterset? RPARREN THEN_TOK TYPE SEMICOLON statementset END_TOK SEMICOLON
@@ -263,7 +263,7 @@ constant_def	: CONSTANT_TOK IDENTIFIER TYPE_OP TYPE COMPARE_OP variable SEMICOLO
 				;
 
 			/* first procuders then functions? */
-programbody : constant_def* procedure* function* BEGIN_TOK statementset END_TOK
+programbody : constant_def* [declaration SEMICOLON]* procedure* function* BEGIN_TOK statementset END_TOK
 			;
 
 header		: PROGRAM_TOK IDENTIFIER SEMICOLON 
