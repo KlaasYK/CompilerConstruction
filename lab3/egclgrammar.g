@@ -150,7 +150,7 @@ relexpr : sumexpr relexpr2
 		| BOOLEAN
 		;
 
-notexpr	: NOT_TOK relexpr
+notexpr	: NOT_TOK notexpr
 		| relexpr
 		;
 

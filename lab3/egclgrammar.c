@@ -622,10 +622,10 @@ LL_0:
 switch (LLcsymb) {
 case 36:/* NOT_TOK */
 LLscnt[8]--;
-LLscnt[7]++;
+LLscnt[8]++;
 LL_SCANDONE(292);/* NOT_TOK */
 LLread();
-LL9_relexpr();
+LL10_notexpr();
 break;
 default:
 if (LLskip())
