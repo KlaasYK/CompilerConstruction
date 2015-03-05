@@ -50,13 +50,15 @@ void freeLines() {
 }
 
 void printLexError(char *illchar, int line, int column) {
-	int i = 0;
-	printf("\nError on line %4d: %s", line+1, lines[line]);
-	for (i; i < column + 20; i++) {
+	int i = 0, k;
+	printf("\n");
+	k = printf("Error on line %d: ", line+1);
+	printf("%s", lines[line]);
+	for (i; i < column + k; i++) {
 		printf(" ");
 	}
 	printf("^\n");
-	printf("Illegal character (%s) detected at column %d\n", illchar, column);
+	printf("Illegal character (%s) detected at column %d\n", illchar, column+1);
 	freeLines();
 	exit(EXIT_FAILURE);
 }
@@ -79,13 +81,14 @@ void LLmessage(int token) {
 
 int main(int argc, char** argv) {
 	linecount = 0, columnnr = 0;
-	
+	printf("Extended Guarded Command Language Compiler.\n");
 	if (argc > 2) {
 		fprintf(stderr, "Usage: %s [filename.c]\n", argv[0]);
 		exit(-1);
   	}
 	if (argc == 2) {
 		file_name = argv[1];
+		printf("Compiling file: %s\n",file_name);
 		readFile(argv[1]);
 		yyin = fopen(argv[1], "r");
 	}

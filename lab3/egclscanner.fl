@@ -43,7 +43,7 @@ or { columnnr += strlen(yytext); return OR_OP;}
 cand { columnnr += strlen(yytext); return CAND_OP;}
 cor { columnnr += strlen(yytext); return COR_OP;}
 
- '(\\'|[^'])*' { columnnr += strlen(yytext); return STRING;}
+'(\\'|[^'])*' { columnnr += strlen(yytext); return STRING;}
 
 \[\] {columnnr += strlen(yytext); return ALTGUARD;}
 
@@ -69,11 +69,11 @@ true {columnnr += strlen(yytext); return BOOLEAN;}
 
 [a-zA-Z](_?)([a-zA-Z0-9]_?)* {columnnr += strlen(yytext); return IDENTIFIER;}
 
-#(.)*\n {columnnr += strlen(yytext); linecount++; /* skip return COMMENT;*/ }
+#(.)*\n {columnnr=0; linecount++; /* skip return COMMENT;*/ }
 
 [ \t]+ { columnnr += strlen(yytext); /* skip return WHITESPACE;*/ }
 <<EOF>> { return EOF; }
-(\n|\r\n) { linecount++; /* skip return EOL; */ }
-[^<<EOF>>A-Za-z0-9\%\^\*\(\)+-/=\<\>';\[\]_:(-\>)(\\'),\. \t\r\n] { printLexError(yytext, linecount, columnnr); }
+(\n|\r\n) { linecount++; columnnr=0; /* skip return EOL; */ }
+. { printLexError(yytext, linecount, columnnr); }
 %%
 
