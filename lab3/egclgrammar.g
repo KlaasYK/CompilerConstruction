@@ -182,7 +182,7 @@ expr	: andexpr expr2
 guardedcommand	: expr THEN_TOK statementset
 				;
 
-guardedcommandset	: guardedcommand [ALTGUARD guardedcommand]?
+guardedcommandset	: guardedcommand [ALTGUARD guardedcommand]*
 					;
 
 identifierarray	: IDENTIFIER [COMMA identifierarray]?
@@ -270,7 +270,7 @@ procedure	: PROCEDURE_TOK IDENTIFIER LPARREN VAR_TOK parameterset? RPARREN SEMIC
 constant_def	: CONSTANT_TOK IDENTIFIER TYPE_OP TYPE COMPARE_OP variable SEMICOLON
 				;
 
-			/* first procuders then functions? */
+/* first procuders then functions? */
 programbody : constant_def* [declaration SEMICOLON]* procedure* function* BEGIN_TOK statementset END_TOK
 			;
 
