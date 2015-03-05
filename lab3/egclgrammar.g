@@ -239,8 +239,16 @@ statementset2	: SEMICOLON statementset
 				| /* epsilon */
 				;
 
-statementset	: statement statementset2
+statementsetV1	: statement statementset2
 				| /* epsilon */
+				;
+
+/* alternative where every line needs to end with a semicolon */
+statementsetV2	: statement SEMICOLON statementset
+				| /* epsilon */
+				;
+
+statementset	: statementsetV1
 				;
 
 function	: FUNCTION_TOK IDENTIFIER LPARREN parameterset? RPARREN THEN_TOK TYPE SEMICOLON statementset END_TOK SEMICOLON
