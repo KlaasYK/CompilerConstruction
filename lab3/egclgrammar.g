@@ -64,6 +64,14 @@ void printLexError(char *illchar, int line, int column) {
 }
 
 void LLmessage(int token) {
+	int i = 0, k;
+	printf("\n");
+	k = printf("Error on line %d: ", linecount+1);
+	printf("%s", lines[linecount]);
+	for (i; i < columnnr + k; i++) {
+		printf(" ");
+	}
+	printf("^\n");
 	switch (token) {
 		case LL_MISSINGEOF:
 		printf("%s:%d: Expected %s, found %s (%s).\n", file_name, linecount+1, LLgetSymbol(EOFILE), LLgetSymbol(LLsymb), yytext);
