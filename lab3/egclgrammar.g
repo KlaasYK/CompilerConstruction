@@ -201,6 +201,7 @@ assignmentcallV1	: ASSIGNMENT_OP expr
 assignmentcallV2	: [COMMA IDENTIFIER]* ASSIGNMENT_OP expr [COMMA expr]*
 					;
 
+/* select assignmentcall V1 or V2 */
 assignmentcall	: assignmentcallV2
 				;
 
