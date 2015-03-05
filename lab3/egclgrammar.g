@@ -179,7 +179,6 @@ expr2	: OR_OP andexpr expr2
 expr	: andexpr expr2
 		;
 
-/* C-like guard? */
 guardedcommand	: expr THEN_TOK statementset
 				;
 
