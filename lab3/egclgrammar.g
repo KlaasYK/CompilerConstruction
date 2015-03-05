@@ -197,7 +197,7 @@ assignmentcallV1	: ASSIGNMENT_OP expr
 					| COMMA IDENTIFIER assignmentcall COMMA expr
 					;
 
-/* newer version of assignmentcall that doesn't make sure yet that the amount of identifers equals the amount of expressions */
+/* newer version of assignmentcall that doesn't make sure yet that the amount of identifers equals the amount of expressions (semantically easier to evaluate) */
 assignmentcallV2	: [COMMA IDENTIFIER]* ASSIGNMENT_OP expr [COMMA expr]*
 					;
 
