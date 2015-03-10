@@ -1,0 +1,79 @@
+%option noyywrap
+%{
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "egclgrammar.h"
+
+extern int linecount;
+extern int columnnr;
+
+extern void printLexError(char *illchar, int line, int column);
+
+%}
+
+%%
+
+;	{ columnnr++; return SEMICOLON; }
+: { columnnr++; return TYPE_OP; }
+, { columnnr++; return COMMA; }
+\. { columnnr++; return DOT; }
+\( { columnnr++; return LPARREN;}
+\) { columnnr++; return RPARREN;}
+-\> { columnnr += 2; return THEN_TOK; }
+
+\+ {columnnr++; return PLUS_OP;}
+\- {columnnr++; return MIN_OP;}
+([\*/\%]|div|mod) { columnnr += strlen(yytext); return MUL_OP;}
+\^ { columnnr += strlen(yytext); return POW_OP;}
+
+\<\> { columnnr += strlen(yytext); return COMPARE_OP;}
+[\<\>] {columnnr += strlen(yytext); return COMPARE_OP; }
+[\<\>]= {columnnr += strlen(yytext); return COMPARE_OP; }
+= { columnnr += strlen(yytext); return COMPARE_OP; }
+
+
+integer {columnnr += strlen(yytext); return TYPE;}
+boolean {columnnr += strlen(yytext); return TYPE;}
+
+not {columnnr += strlen(yytext); return NOT_TOK;}
+and { columnnr += strlen(yytext); return AND_OP;}
+or { columnnr += strlen(yytext); return OR_OP;}
+cand { columnnr += strlen(yytext); return CAND_OP;}
+cor { columnnr += strlen(yytext); return COR_OP;}
+
+'(\\'|[^'])*' { columnnr += strlen(yytext); return STRING;}
+
+\[\] {columnnr += strlen(yytext); return ALTGUARD;}
+
+procedure {columnnr += strlen(yytext); return PROCEDURE_TOK;}
+function { columnnr += strlen(yytext); return FUNCTION_TOK;}
+constant {columnnr += strlen(yytext);  return CONSTANT_TOK;}
+program {columnnr += strlen(yytext);  return PROGRAM_TOK; }
+begin { columnnr += strlen(yytext); return BEGIN_TOK; }
+end  {columnnr += strlen(yytext); return END_TOK; }
+var { columnnr += strlen(yytext); return VAR_TOK; }
+do { columnnr += strlen(yytext); return DOBEGIN_TOK; }
+od {columnnr += strlen(yytext); return DOEND_TOK; }
+if {columnnr += strlen(yytext); return IFBEGIN_TOK; }
+fi {columnnr += strlen(yytext); return IFEND_TOK; }
+print|println {columnnr += strlen(yytext); return PRINT_TOK; }
+read {columnnr += strlen(yytext); return READ_TOK; }
+
+:= {columnnr += strlen(yytext); return ASSIGNMENT_OP; }
+
+false {columnnr += strlen(yytext); return BOOLEAN;}
+true {columnnr += strlen(yytext); return BOOLEAN;}
+[0-9]* { columnnr += strlen(yytext); return NUMBER;}
+
+[a-zA-Z](_?)([a-zA-Z0-9]_?)* {columnnr += strlen(yytext); return IDENTIFIER;}
+
+#(.)*\n {columnnr=0; linecount++; /* skip return COMMENT;*/ }
+
+[ \t]+ { columnnr += strlen(yytext); /* skip return WHITESPACE;*/ }
+<<EOF>> { return EOF; }
+(\n|\r\n) { linecount++; columnnr=0; /* skip return EOL; */ }
+. { printLexError(yytext, linecount, columnnr); }
+%%
+

@@ -1,0 +1,15 @@
+program ExtendedEuclid;
+# Euclid's extended algorithm
+# computes x, y such that x*A + y*B = gcd(A,B)
+
+constant A : integer = 7453478376373655456544364564657835389772;
+constant B : integer = 656546567567746769343490496;
+
+begin
+  var a, b, x, y, u, v : integer;
+  a, b, x, y, u, v := A, B, 1, 0, 0, 1;
+  do b <> 0 -> q, r := a div b, a mod b;
+               a, b, x, y, u, v := b, r, u, v, x - q*u, y - q*v;
+  od;
+  println 'gcd(', A, ',', B,')=', x, '*', A, ' + ', y, '*', B;
+end.

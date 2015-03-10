@@ -1,0 +1,24 @@
+program Euclid;
+# Euclid's algorithm 
+
+constant A : integer = 7453478376373655456544364564657835389772;
+constant B : integer = 656546567567746769343490496;
+
+procedure swap(var a, b : integer);
+  a, b := b, a;
+end;
+
+function gcd(a, b : integer) -> integer;
+  do b <> 0  ->  a := a mod b;
+                 swap(a, b);
+  od;
+  gcd := a;
+end; # function gcd
+
+# the main program starts here
+begin 
+  var g : integer;
+  g := gcd(A, B);
+  print 'gcd(', A, ',', B,')=';
+  println g;
+end.

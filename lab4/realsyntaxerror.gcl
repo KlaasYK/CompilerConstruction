@@ -1,0 +1,5 @@
+program factorial;
+begin
+	println 10
+	println 10
+end.

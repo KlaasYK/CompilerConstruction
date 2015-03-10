@@ -1,0 +1,34 @@
+program booleanops;
+
+begin
+  var Yes, No, yes, no, a0, a1, b0, b1 : boolean;
+
+  Yes :=  true;
+  No := false;
+  
+  println Yes, No;
+
+  yes := 5 div 2 = 2;
+  no := 5 div 2 = 0;
+  println yes, no;
+
+  println Yes = yes, No = no;
+
+  a0 := yes and no;
+  a1 := yes or no;
+  b0 := not a0;
+  b1 := not a1;
+
+  println a0, a1, b0, b1;
+
+  # conditional operators: cand, cor
+  a0 := Yes cor 1 div 0 = 5;
+  a1 := No cand 1 div 0 = 5;
+
+  println a0, a1;
+  
+  a0 := not not a0;
+  
+  a0 := not((a0 and (5+3 = 8)) or false);
+  
+end.
