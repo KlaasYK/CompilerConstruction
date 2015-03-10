@@ -30,4 +30,9 @@ typedef struct Stack {
 	List *top;
 }
 
+Stack symboltable;
+
+void initSymbolTable();
+void insertIdentifier(char *name, NodeType ntype, int etype, Node *paramlist);
+
 /* EOF symboltable.h*/
