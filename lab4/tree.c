@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include "symboltable.h"
-
+#include "tree.h"
 
 
 Bnode makeBinNode(Exp l, Exp r, BinOp op) {
