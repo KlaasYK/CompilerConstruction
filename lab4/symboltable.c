@@ -9,7 +9,7 @@ Node *makeNode(char *name, NodeType ntype, int etype, Node *param) {
 	n = malloc(sizeof(Node));
 	if (n == NULL) {
 		printf("Allocation error!\n");
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 	n->name = name;
 	n->type = ntype;
@@ -21,6 +21,25 @@ Node *makeNode(char *name, NodeType ntype, int etype, Node *param) {
 
 void freeNode(Node *nodeptr) {
 	free(nodeptr);
+}
+
+void initSymbolTable() {
+	List top =  malloc(sizeof(List));
+	if (top == NULL) {
+		printf("Allocation error!\n");
+		exit(EXIT_FAILURE);
+	}
+	/* make the first (global) scope empty */
+	top->first = NULL;
+	top->nextlist = NULL;
+}
+
+void freeSymbolTable() {
+	
+}
+
+void insertIdentifier(char *name, NodeType ntype, int etype, Node *paramlist) {
+	
 }
 
 /* EOF symboltable.c */
