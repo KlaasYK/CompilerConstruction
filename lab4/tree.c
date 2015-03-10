@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include "symboltable.h"
 
 enum UnOp {
     not, min
@@ -8,7 +9,23 @@ enum BinOp {
     plus, min, mul, div, mod, pow, and, or, cand, cor
 }
 
+enum ExpKind {
+    unodeexp, bnodeexp, idexp, funcexp, intexp, boolexp
+}
+
+typedef struct identifier{
+    int type;
+    char* name;
+};
+
 typedef struct Expression {
+
+    /* Bin node, un node, identifier, func, integer, boolean*/
+    union {
+	Unode unode;
+	Bnode bnode;
+
+    };
 } *Exp;
 
 typedef struct UnNode {
@@ -38,13 +55,13 @@ Unode makeUnNode(Exp e, UnOp op) {
 
 void freeExp(Exp e);
 
-void freeBinNode(Bnode bin){
+void freeBinNode(Bnode bin) {
     freeExp(bin->l);
     freeExp(bin->r);
     free(bin);
 }
 
-void freeUnNode(Unode un){
+void freeUnNode(Unode un) {
     freeExp(un->e);
     free(un);
 }
