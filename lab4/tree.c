@@ -1,6 +1,10 @@
 #include <stdlib.h>
 #include "symboltable.h"
 
+enum Boolval {
+    true, false
+}
+
 enum UnOp {
     not, min
 }
@@ -13,18 +17,34 @@ enum ExpKind {
     unodeexp, bnodeexp, idexp, funcexp, intexp, boolexp
 }
 
-typedef struct identifier{
+typedef struct identifier {
     int type;
     char* name;
-};
+} *ID;
+
+typedef struct functioncall {
+    ID id;
+    Exp *params;
+} *FuncCall;
+
+typedef struct integer {
+    int value;
+} *Int;
+
+typedef struct boolean {
+    Boolval value;
+} *Bool;
 
 typedef struct Expression {
+    ExpKind kind;
 
-    /* Bin node, un node, identifier, func, integer, boolean*/
     union {
 	Unode unode;
 	Bnode bnode;
-
+	ID id;
+	FuncCall funcCall;
+	Int intval;
+	Bool boolval;
     };
 } *Exp;
 
