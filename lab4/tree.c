@@ -64,4 +64,5 @@ void freeBinNode(Bnode bin) {
 void freeUnNode(Unode un) {
     freeExp(un->e);
     free(un);
+
 }
