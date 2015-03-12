@@ -117,6 +117,8 @@ void insertIdentifier(char *name, NodeType ntype, int etype, Node *paramlist) {
 Node* getNode(char *name) {
 	Node *n = NULL;
 	List *c = symboltable->top;
+	
+	return n;
 }
 
 NodeType lookupType(char *name) {

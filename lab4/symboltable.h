@@ -1,6 +1,8 @@
 /* Symboltable
  * Stack of linked lists
  */
+#ifndef SYMBOLTABLE_H
+#define SYMBOLTABLE_H
 
 #define BOOLEAN 10
 #define CONST_BOOLEAN 11;
@@ -49,4 +51,5 @@ int lookupEvalType(char *name, NodeType ntype);
 /* return the paramaterlist of an function */
 Node* lookupParams(char *name);
 
-/* EOF symboltable.h*/
+#endif  // SYMBOLTABLE_H
+/* EOF symboltable.h */
