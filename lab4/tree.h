@@ -1,49 +1,57 @@
-enum Boolval {
+#ifndef TREE_H
+#define TREE_H
+#include <stdlib.h>
+#include <stdio.h>
+
+typedef enum {
     true, false
-}
+} BoolVal;
 
-enum UnOp {
-    notop, minop
-}
+typedef enum {
+    notop, negop
+} UnOp;
 
-enum BinOp {
+typedef enum {
     plusop, minop, mulop, divop, modop, powop, andop, orop, candop, corop
-}
+} BinOp;
 
-enum ExpKind {
+typedef enum {
     unodeexp, bnodeexp, idexp, funcexp, intexp, boolexp
-}
+} ExpKind;
 
-typedef identifier *ID;
+typedef struct Expression *ExpTree;
 
-typedef functioncall *FuncCall;
+typedef struct Identifier *ID;
 
-typedef integer *Int;
+typedef struct Functioncall *FuncCall;
 
-typedef boolean *Bool;
+typedef struct Integer *Int;
 
-typedef Expression *Exp;
+typedef struct Boolean *Bool;
 
-typedef UnNode *Unode;
+typedef struct Expression *Exp;
 
-typedefBinNode *Bnode;
+typedef struct UnNode *Unode;
 
-struct identifier {
+typedef struct BinNode *Bnode;
+
+struct Identifier {
     int type;
     char* name;
 };
 
-struct functioncall {
+struct Functioncall {
     ID id;
+    int numParams;
     Exp *params;
 };
 
-struct integer {
+struct Integer {
     char* value;
 };
 
-struct boolean {
-    Boolval value;
+struct Boolean {
+    BoolVal value;
 };
 
 struct Expression {
@@ -66,5 +74,28 @@ struct UnNode {
 
 struct BinNode {
     Exp l, r;
-    Binop operator;
+    BinOp operator;
 };
+
+ID makeID(int type, char* name);
+void freeID(ID id);
+FuncCall makeFuncCall(int type, char* name, int numParams, Exp *params);
+void freeFuncCall(FuncCall fc);
+Int makeInt(char *value);
+void freeInt(Int i);
+Bool makeBool(BoolVal bv);
+void freeBool(Bool b);
+Exp makeUnNodeExp(Unode un);
+Exp makeBinNodeExp(Bnode bin);
+Exp makeIDNodeExp(Bnode bin);
+Exp makeFuncCallExp(FuncCall fc);
+Exp makeIntExp(Int i);
+Exp makeBoolExp(Bool b);
+void freeExp(Exp exp);
+Unode makeUnNode(Exp e, UnOp op);
+void freeUnNode(Unode un);
+Bnode makeBinNode(Exp l, Exp r, BinOp op);
+void freeBinNode(Bnode bin);
+
+#endif // TREE_H
+
