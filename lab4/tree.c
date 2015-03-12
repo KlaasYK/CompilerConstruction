@@ -1,125 +1,144 @@
-#include <stdlib.h>
-#include "symboltable.h"
 #include "tree.h"
-enum Boolval {
-    true, false
+
+ID makeID(int type, char* name) {
+    ID id = malloc(sizeof (struct Identifier));
+    id->name = name;
+    id->type = type;
+    return id;
 }
 
-enum UnOp {
-    notop, minop
+void freeID(ID id) {
+    free(id->name);
+    free(id);
 }
 
-enum BinOp {
-    plusop, minop, mulop, divop, modop, powop, andop, orop, candop, corop
+FuncCall makeFuncCall(int type, char* name, int numParams, Exp *params) {
+    FuncCall fc = malloc(sizeof (struct Functioncall));
+    fc->id = makeID(type, name);
+    fc->numParams = numParams;
+    fc->params = params;
 }
 
-enum ExpKind {
-    unodeexp, bnodeexp, idexp, funcexp, intexp, boolexp
+void freeFuncCall(FuncCall fc) {
+    freeID(fc->id);
+    for (int i = 0; i < fc->numParams; i++) {
+	freeExp(fc->params[i]);
+    }
+    free(fc);
 }
 
-typedef identifier *ID;
-
-typedef functioncall *FuncCall;
-
-typedef integer *Int;
-
-typedef boolean *Bool;
-
-typedef Expression *Exp;
-
-typedef UnNode *Unode;
-
-typedef BinNode *Bnode;
-
-struct identifier {
-    int type;
-    char* name;
-};
-
-struct functioncall {
-    ID id;
-    Exp *params;
-};
-
-struct integer {
-    char* value;
-};
-
-struct boolean {
-    Boolval value;
-};
-
-struct Expression {
-    ExpKind kind;
-
-    union {
-        Unode unode;
-        Bnode bnode;
-        ID id;
-        FuncCall funcCall;
-        Int intval;
-        Bool boolval;
-    } node;
-};
-
-struct UnNode {
-    Exp e;
-    UnOp operator;
-};
-
-struct BinNode {
-    Exp l, r;
-    Binop operator;
-};
-
-ID makeID(int type, char* name){
-    ID id = malloc(sizeof(identifier));
-    
+Int makeInt(char *value) {
+    Int i = malloc(sizeof (struct Integer));
+    i->value = value;
+    return i;
 }
 
+void freeInt(Int i) {
+    free(i->value);
+    free(i);
+}
 
-Exp makeUnNodeExp(Unode un){
-    Exp exp = malloc(sizeof(expression));
+Bool makeBool(BoolVal bv) {
+    Bool b = malloc(sizeof (struct Boolean));
+    b->value = bv;
+    return b;
+}
+
+void freeBool(Bool b) {
+    free(b);
+}
+
+Exp makeUnNodeExp(Unode un) {
+    Exp exp = malloc(sizeof (struct Expression));
     exp->kind = unodeexp;
     exp->node.unode = un;
+    return exp;
 }
-Exp makeBinNodeExp(Bnode bin){
-    Exp exp = malloc(sizeof(expression));
+
+Exp makeBinNodeExp(Bnode bin) {
+    Exp exp = malloc(sizeof (struct Expression));
     exp->kind = bnodeexp;
     exp->node.bnode = bin;
+    return exp;
 }
-Exp makeIDNodeExp(Bnode bin){
-    Exp exp = malloc(sizeof(expression));
+
+Exp makeIDNodeExp(Bnode bin) {
+    Exp exp = malloc(sizeof (struct Expression));
     exp->kind = idexp;
     exp->node.bnode = bin;
+    return exp;
+}
+
+Exp makeFuncCallExp(FuncCall fc) {
+    Exp exp = malloc(sizeof (struct Expression));
+    exp->kind = funcexp;
+    exp->node.funcCall = fc;
+    return exp;
+}
+
+Exp makeIntExp(Int i) {
+    Exp exp = malloc(sizeof (struct Expression));
+    exp->kind = intexp;
+    exp->node.intval = i;
+    return exp;
+}
+
+Exp makeBoolExp(Bool b) {
+    Exp exp = malloc(sizeof (struct Expression));
+    exp->kind = boolexp;
+    exp->node.boolval = b;
+    return exp;
+}
+
+void freeExp(Exp exp) {
+    switch (exp->kind) {
+	case unodeexp:
+	    freeUnNode(exp->node.unode);
+	    break;
+	case bnodeexp:
+	    freeBinNode(exp->node.bnode);
+	    break;
+	case idexp:
+	    freeID(exp->node.id);
+	    break;
+	case funcexp:
+	    freeFuncCall(exp->node.funcCall);
+	    break;
+	case intexp:
+	    freeInt(exp->node.intval);
+	    break;
+	case boolexp:
+	    freeBool(exp->node.boolval);
+	    break;
+	default:
+	    fprintf(stderr, "Undefined kind of expression!");
+	    exit(EXIT_FAILURE);
+    }
+    free(exp);
+}
+
+Unode makeUnNode(Exp e, UnOp op) {
+    Unode un = malloc(sizeof (struct UnNode));
+    un->e = e;
+    un->operator = op;
+    return un;
+}
+
+void freeUnNode(Unode un) {
+    freeExp(un->e);
+    free(un);
 }
 
 Bnode makeBinNode(Exp l, Exp r, BinOp op) {
-    Bnode bin = malloc(sizeof (BinNode));
+    Bnode bin = malloc(sizeof (struct BinNode));
     bin->l = l;
     bin->r = r;
     bin->operator = op;
     return bin;
 }
 
-Unode makeUnNode(Exp e, UnOp op) {
-    Unode un = malloc(sizeof (UnNode));
-    un->e = e;
-    un->operator = op;
-    return un;
-}
-
-Exp makeBinNodeExp(Bnode bin)
-
-void freeExp(Exp e);
-
 void freeBinNode(Bnode bin) {
     freeExp(bin->l);
     freeExp(bin->r);
     free(bin);
-}
-
-void freeUnNode(Unode un) {
-    freeExp(un->e);
-    free(un);
 }
