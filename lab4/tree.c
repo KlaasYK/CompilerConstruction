@@ -1,3 +1,4 @@
+#include <string.h>
 #include "tree.h"
 
 ID makeID(int type, char* name) {
@@ -29,7 +30,10 @@ void freeFuncCall(FuncCall fc) {
 
 Int makeInt(char *value) {
     Int i = malloc(sizeof (struct Integer));
-    i->value = value;
+    int vLength = strlen(value)+1;
+    char *vCopy = malloc(vLength*sizeof(char));
+    memcpy(vCopy, value, vLength*sizeof(char));
+    i->value = vCopy;
     return i;
 }
 
