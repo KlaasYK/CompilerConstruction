@@ -14,43 +14,57 @@ enum ExpKind {
     unodeexp, bnodeexp, idexp, funcexp, intexp, boolexp
 }
 
-typedef struct identifier {
+typedef identifier *ID;
+
+typedef functioncall *FuncCall;
+
+typedef integer *Int;
+
+typedef boolean *Bool;
+
+typedef Expression *Exp;
+
+typedef UnNode *Unode;
+
+typedefBinNode *Bnode;
+
+struct identifier {
     int type;
     char* name;
-} *ID;
+};
 
-typedef struct functioncall {
+struct functioncall {
     ID id;
     Exp *params;
-} *FuncCall;
+};
 
-typedef struct integer {
-    int value;
-} *Int;
+struct integer {
+    char* value;
+};
 
-typedef struct boolean {
+struct boolean {
     Boolval value;
-} *Bool;
+};
 
-typedef struct Expression {
+struct Expression {
     ExpKind kind;
 
     union {
-	Unode unode;
-	Bnode bnode;
-	ID id;
-	FuncCall funcCall;
-	Int intval;
-	Bool boolval;
-    };
-} *Exp;
+        Unode unode;
+        Bnode bnode;
+        ID id;
+        FuncCall funcCall;
+        Int intval;
+        Bool boolval;
+    } node;
+};
 
-typedef struct UnNode {
+struct UnNode {
     Exp e;
     UnOp operator;
-} *Unode;
+};
 
-typedef struct BinNode {
+struct BinNode {
     Exp l, r;
     Binop operator;
-} *Bnode;
+};
