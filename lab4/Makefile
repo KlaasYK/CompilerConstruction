@@ -7,15 +7,16 @@ endif
 GCL = $(subst .gcl,.c99,$(wildcard *.gcl))
 
 
-all: parser scanner
-	gcc -o $(EXE) egclgrammar.o lex.yy.o
+all: parser scanner cfiles tree
+	gcc -g -o $(EXE) egclgrammar.o lex.yy.o tree.o
 parser: egclgrammar.g
 	LLnextgen egclgrammar.g
-	gcc -c egclgrammar.c
 scanner: egclscanner.fl
 	flex egclscanner.fl
-	gcc -c lex.yy.c
-
+cfiles: egclgrammar.c lex.yy.c symboltable.c
+	gcc -c -g  egclgrammar.c lex.yy.c symboltable.c
+tree: tree.c
+	gcc -c -g -std=c99 tree.c
 
 run: $(GCL)
 	
@@ -30,3 +31,5 @@ clean:
 	rm -f egclgrammar.o
 	rm -f gclc
 	rm -f gclc.exe
+	rm -f symboltable.o
+	rm -f tree.o
