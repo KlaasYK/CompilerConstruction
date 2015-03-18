@@ -131,19 +131,35 @@ Node* getNode(char *name) {
 			currentlist = currentlist->nextlist;
 		}
 	}
-	
 	return n;
 }
 
 NodeType lookupType(char *name) {
-	return 0;
+	Node *n = getNode(name);
+	if (n != NULL) {
+		return n->type;
+	}
+	return -1;
+
 }
 
 int lookupEvalType(char *name, NodeType ntype) {
-	return 0;
+	Node *n = getNode(name);
+	if (n != NULL) {
+		if (n->type != ntype) {
+			// identifier of wrong type (function is not a variable! or vice versa)
+			return -1;
+		}
+		return n->evaltype;
+	}
+	return -1;
 }
 
 Node* lookupParams(char *name) {
+	Node *n = getNode(name);
+	if (n != NULL) {
+		return n->parameters;
+	}
 	return NULL;
 }
 /* EOF symboltable.c */
