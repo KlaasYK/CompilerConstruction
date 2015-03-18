@@ -103,14 +103,14 @@ struct PrintableItem {
 
     union {
         char *string;
-        Exp exp;
+        ExpTree exp;
     };
 };
 
 struct ProcedureCall {
     char *name;
     int numParams;
-    Exp *params;
+    ExpTree *params;
 };
 
 struct IfStatement {
@@ -124,7 +124,7 @@ struct DoStatement {
 };
 
 struct GuardedCommand {
-    Exp condition;
+    ExpTree condition;
     int numStmnts;
     Stmnt *stmnts;
 };
@@ -159,10 +159,10 @@ WCall makeWCall(Printable *p);
 void freeWCall(WCall wc);
 
 Printable makeStringPrintable(char *string);
-Printable makeExpPrintable(Exp exp);
+Printable makeExpPrintable(ExpTree exp);
 void freePrintable(Printable p);
 
-ProcCall makeProcCall(ID id, int numParams, Exp *params);
+ProcCall makeProcCall(ID id, int numParams, ExpTree *params);
 void freeProcCall(ProcCall pc);
 
 If makeIf(GCommand *gcs);
@@ -171,6 +171,6 @@ void freeIf(If i);
 Do makeDo(GCommand *gcs);
 void freeDo(Do d);
 
-GCommand makeGCommand(Exp condition, int numStmnts, Stmnt *stmnts);
+GCommand makeGCommand(ExpTree condition, int numStmnts, Stmnt *stmnts);
 void freeGCommand(GCommand gc);
 #endif //TREE_H
