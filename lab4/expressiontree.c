@@ -1,5 +1,5 @@
 #include <string.h>
-#include "tree.h"
+#include "expressiontree.h"
 
 ID makeID(int type, char* name) {
     ID id = malloc(sizeof (struct Identifier));

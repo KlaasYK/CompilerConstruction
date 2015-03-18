@@ -1,5 +1,5 @@
-#ifndef TREE_H
-#define TREE_H
+#ifndef EXPRESSIONTREE_H
+#define EXPRESSIONTREE_H
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -97,5 +97,5 @@ void freeUnNode(Unode un);
 Bnode makeBinNode(Exp l, Exp r, BinOp op);
 void freeBinNode(Bnode bin);
 
-#endif // TREE_H
+#endif // EXPRESSIONTREE_H
 
