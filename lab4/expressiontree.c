@@ -21,6 +21,7 @@ FuncCall makeFuncCall(int type, char* name, int numParams, Exp *params) {
 	fc->id = makeID(type, name);
 	fc->numParams = numParams;
 	fc->params = params;
+	return fc;
 }
 
 void freeFuncCall(FuncCall fc) {

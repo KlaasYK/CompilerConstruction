@@ -8,15 +8,15 @@ GCL = $(subst .gcl,.c99,$(wildcard *.gcl))
 
 
 all: parser scanner cfiles tree
-	gcc -g -o $(EXE) egclgrammar.o lex.yy.o tree.o
+	gcc -g -o $(EXE) egclgrammar.o lex.yy.o tree.o expressiontree.o
 parser: egclgrammar.g
 	LLnextgen egclgrammar.g
 scanner: egclscanner.fl
 	flex egclscanner.fl
 cfiles: egclgrammar.c lex.yy.c symboltable.c
 	gcc -c -g  egclgrammar.c lex.yy.c symboltable.c
-tree: tree.c
-	gcc -c -g -std=c99 tree.c
+tree: tree.c expressiontree.c
+	gcc -c -g -std=c99 expressiontree.c tree.c
 
 run: $(GCL)
 	
