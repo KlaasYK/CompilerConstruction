@@ -14,7 +14,7 @@ void freeID(ID id) {
 }
 
 FuncCall makeFuncCall(int type, char* name, int numParams, Exp *params) {
-    FuncCall fc = malloc(sizeof (struct Functioncall));
+    FuncCall fc = malloc(sizeof (struct FunctionCall));
     fc->id = makeID(type, name);
     fc->numParams = numParams;
     fc->params = params;

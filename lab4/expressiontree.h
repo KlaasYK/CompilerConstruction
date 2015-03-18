@@ -25,7 +25,7 @@ typedef struct Expression *ExpTree;
 
 typedef struct Identifier *ID;
 
-typedef struct Functioncall *FuncCall;
+typedef struct FunctionCall *FuncCall;
 
 typedef struct Integer *Int;
 
@@ -43,7 +43,7 @@ struct Identifier {
     char* name;
 };
 
-struct Functioncall {
+struct FunctionCall {
     ID id;
     int numParams;
     Exp *params;
