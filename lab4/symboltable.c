@@ -39,9 +39,9 @@ void initSymbolTable() {
 void freeList(List *list) {
 	// free all list items
 	while (list->first != NULL) {
-		Node *n = (top->first)->next;
+		Node *n = (list->first)->next;
 		// free the parameters list (if present)
-		Node *param = (top->first)->parameters
+		Node *param = (list->first)->parameters;
 		while (param != NULL) {
 			Node *nextparam = param->next;
 			free(param);
@@ -61,7 +61,7 @@ void freeSymbolTable() {
 	}
 	while (symboltable->top != NULL) {
 		List *top = symboltable->top;
-		List nextlist = top->nextlist;
+		List *nextlist = top->nextlist;
 		freeList(top);
 		symboltable->top = nextlist;
 	}
@@ -113,10 +113,24 @@ void insertIdentifier(char *name, NodeType ntype, int etype, Node *paramlist) {
 	(symboltable->top)->first = n;
 }
 
-/* return the node with the given name */
+/* return the node with the given name or NULL when not found */
 Node* getNode(char *name) {
 	Node *n = NULL;
-	List *c = symboltable->top;
+	List *currentlist = symboltable->top;
+	while (currentlist != NULL) {
+		n = currentlist->first;
+		while(n != NULL) {
+			if (strcmp(n->name, name) == 0 ) {
+				// Found it!
+				continue;
+			}
+			n = n->next;
+		}
+		if (n == NULL) {
+			// Reached end of current list
+			currentlist = currentlist->nextlist;
+		}
+	}
 	
 	return n;
 }
