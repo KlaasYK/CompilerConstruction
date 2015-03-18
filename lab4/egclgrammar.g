@@ -8,6 +8,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "symboltable.h"
+#include "tree.h"
+
 extern FILE * yyin;
 extern char * yytext;
 
