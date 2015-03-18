@@ -11,11 +11,11 @@ typedef enum {
     decStmnt, assStmnt, funcCallStmnt, procCallStmnt, readCallStmnt, writeCallStmnt, ifStmnt, doStmnt
 } StmntKind;
 
-typedef enum{
+typedef enum {
     constant, variable;
 } IDType;
 
-typedef enum{
+typedef enum {
     stringPrint, expPrint
 } PrintKind;
 //ref defs
@@ -40,13 +40,15 @@ typedef struct PrintableItem *Printable;
 
 typedef struct ProcedureCall *ProcCall;
 
-typedef struct IfStatement *IfStmnt;
+typedef struct IfStatement *If;
 
-typedef struct DoStatement *DoStmnt;
+typedef struct DoStatement *Do;
 
+typedef struct GuardedCommand *GCommand;
 
 //struct defs
-struct FunctionDefinition{
+
+struct FunctionDefinition {
     ID id;
     int numParams;
     ID *params;
@@ -54,7 +56,7 @@ struct FunctionDefinition{
     Stmnt *stmnts;
 };
 
-struct ProcedureDefinition{
+struct ProcedureDefinition {
     char *name;
     int numParams;
     ID *params;
@@ -72,43 +74,36 @@ struct Statement {
         ProcCall procCall;
         RCall rCall;
         WCall wCall;
-        IfStmnt ifStmnt;
-        DoStmnt doStmnt;
+        If ifStmnt;
+        Do doStmnt;
     };
 };
 
-struct Declaration{
+struct Declaration {
     ID id;
     IDType idType;
     ExpTree expTree;
 };
 
-struct Assignment{
+struct Assignment {
     ID id;
     ExpTree expTree;
 };
 
-struct ProcedureCall{
-    ID id;
-    int numParams;
-    Exp *params;
-    
-};
-
-struct ReadCall{
+struct ReadCall {
     ID *ids;
 };
 
-struct WriteCall{
+struct WriteCall {
     Printable *items;
 };
 
-struct PrintableItem{
+struct PrintableItem {
     PrintKind kind;
-    
-    union{
+
+    union {
         char *string;
-        Exp exp; 
+        Exp exp;
     };
 };
 
@@ -118,6 +113,64 @@ struct ProcedureCall {
     Exp *params;
 };
 
+struct IfStatement {
+    int numGCommands;
+    GCommand *gCommands;
+};
+
+struct DoStatement {
+    int numGCommands;
+    GCommand *gCommands;
+};
+
+struct GuardedCommand {
+    Exp condition;
+    int numStmnts;
+    Stmnt *stmnts;
+};
 // func list
 
+FuncDef makeFuncDef(ID id, int numParams, ID *params, int numStmnts, Stmnt *stmnts);
+void freeFuncDef(FuncDef fd);
+
+ProcDef makeProcDef(char *name, int numParams, ID *params, int numStmnts, Stmnt *stmnts);
+void freeProcDef(ProcDef pd);
+
+Stmnt makeDecStmnt(Dec d);
+Stmnt makeAssStmnt(Ass a);
+Stmnt makeFuncCallStmnt(FuncCall fc);
+Stmnt makeProcCallStmnt(ProcCall pc);
+Stmnt makeRCallStmnt(RCall rc);
+Stmnt makeWCallStmnt(WCall wc);
+Stmnt makeIfStmnt(If i);
+Stmnt makeDoStmnt(Do d);
+void freeStmnt(Stmnt s);
+
+Dec makeDec(ID id, IDType idType, ExpTree expTree);
+void freeDec(Dec d);
+
+Ass makeAss(ID id, ExpTree expTree);
+void freeAss(Ass a);
+
+RCall makeRCall(ID *ids);
+void freeRCall(RCall rc);
+
+WCall makeWCall(Printable *p);
+freeWCall(WCall wc);
+
+Printable makeStringPrintable(char *string);
+Printable makeExpPrintable(Exp exp);
+void freePrintable(Printable p);
+
+ProcCall makeProcCall(ID id, int numParams, Exp *params);
+void freeProcCall(ProcCall pc);
+
+If makeIf(GCommand *gcs);
+void freeIf(If i);
+
+Do makeDo(GCommand *gcs);
+void freeDo(Do d);
+
+GCommand makeGCommand(Exp condition, int numStmnts, Stmnt *stmnts);
+void freeGCommand(GCommand gc);
 #endif //TREE_H
