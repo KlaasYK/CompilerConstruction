@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+//enums
 typedef enum {
     true, false
 } BoolVal;
@@ -19,6 +20,7 @@ typedef enum {
     unodeexp, bnodeexp, idexp, funcexp, intexp, boolexp
 } ExpKind;
 
+//ref defs
 typedef struct Expression *ExpTree;
 
 typedef struct Identifier *ID;
@@ -35,6 +37,7 @@ typedef struct UnNode *Unode;
 
 typedef struct BinNode *Bnode;
 
+//struct defs
 struct Identifier {
     int type;
     char* name;
@@ -77,14 +80,19 @@ struct BinNode {
     BinOp operator;
 };
 
+// func list
 ID makeID(int type, char* name);
 void freeID(ID id);
+
 FuncCall makeFuncCall(int type, char* name, int numParams, Exp *params);
 void freeFuncCall(FuncCall fc);
+
 Int makeInt(char *value);
 void freeInt(Int i);
+
 Bool makeBool(BoolVal bv);
 void freeBool(Bool b);
+
 Exp makeUnNodeExp(Unode un);
 Exp makeBinNodeExp(Bnode bin);
 Exp makeIDNodeExp(Bnode bin);
@@ -92,8 +100,10 @@ Exp makeFuncCallExp(FuncCall fc);
 Exp makeIntExp(Int i);
 Exp makeBoolExp(Bool b);
 void freeExp(Exp exp);
+
 Unode makeUnNode(Exp e, UnOp op);
 void freeUnNode(Unode un);
+
 Bnode makeBinNode(Exp l, Exp r, BinOp op);
 void freeBinNode(Bnode bin);
 
