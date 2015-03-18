@@ -91,10 +91,12 @@ struct Assignment {
 };
 
 struct ReadCall {
+    int numids;
     ID *ids;
 };
 
 struct WriteCall {
+    int numitems;
     Printable *items;
 };
 
@@ -152,23 +154,23 @@ void freeDec(Dec d);
 Ass makeAss(ID id, ExpTree expTree);
 void freeAss(Ass a);
 
-RCall makeRCall(ID *ids);
+RCall makeRCall(int numids, ID *ids);
 void freeRCall(RCall rc);
 
-WCall makeWCall(Printable *p);
+WCall makeWCall(int numitems, Printable *p);
 void freeWCall(WCall wc);
 
 Printable makeStringPrintable(char *string);
 Printable makeExpPrintable(ExpTree exp);
 void freePrintable(Printable p);
 
-ProcCall makeProcCall(ID id, int numParams, ExpTree *params);
+ProcCall makeProcCall(char *name, int numParams, ExpTree *params);
 void freeProcCall(ProcCall pc);
 
-If makeIf(GCommand *gcs);
+If makeIf(int numGCommands, GCommand *gcs);
 void freeIf(If i);
 
-Do makeDo(GCommand *gcs);
+Do makeDo(int numGCommands, GCommand *gcs);
 void freeDo(Do d);
 
 GCommand makeGCommand(ExpTree condition, int numStmnts, Stmnt *stmnts);
