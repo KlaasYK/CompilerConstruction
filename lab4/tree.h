@@ -12,7 +12,7 @@ typedef enum {
 } StmntKind;
 
 typedef enum {
-    constant, variable;
+    constant, variable
 } IDType;
 
 typedef enum {
