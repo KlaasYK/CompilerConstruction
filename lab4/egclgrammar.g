@@ -117,6 +117,7 @@ int main(int argc, char** argv) {
 	printf("Name: %s\n", programname);
 	printf("Name length: %d\n", namelength);
 	printf("Parsing ended with: %s\n", parsetree);
+	free(programname);
 
 	if (argc == 2) {
 		fclose(yyin);
@@ -288,8 +289,8 @@ constant_def	: CONSTANT_TOK IDENTIFIER TYPE_OP TYPE COMPARE_OP variable SEMICOLO
 programbody : constant_def* [declaration SEMICOLON]* procedure* function* BEGIN_TOK statementset END_TOK
 			;
 
-header		: PROGRAM_TOK IDENTIFIER {programname = yytext; namelength = strlen(yytext);} SEMICOLON 
+header		: PROGRAM_TOK IDENTIFIER {namelength = strlen(yytext); programname = strdup(yytext); /* the token needs to be freeëd */} SEMICOLON 
 			;
 
-start		: header programbody DOT {parsetree = yytext;}
+start		: header programbody DOT {parsetree = yytext; /* this is wrong */}
 			; 
