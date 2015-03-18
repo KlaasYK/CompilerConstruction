@@ -10,7 +10,8 @@
 #include <string.h>
 
 #include "symboltable.h"
-#include "tree.h"
+
+/* #include "tree.h" */
 
 extern FILE * yyin;
 extern char * yytext;
@@ -24,9 +25,10 @@ int columnnr;
 int linecount;
 
 /* the parse tree */
-char *parsetree;
 char *programname;
-int namelength;
+
+/* temporary storage for identifier names */
+char *lastidentifier;
 
 void readFile(char *filename) {
 	FILE * fin = fopen(filename, "r");
@@ -115,9 +117,12 @@ int main(int argc, char** argv) {
 	parser();
 	
 	printf("Name: %s\n", programname);
-	printf("Name length: %d\n", namelength);
-	printf("Parsing ended with: %s\n", parsetree);
+	
+	/* test region for symbol table */
+	
 	free(programname);
+	
+	/* end test region for symbol table */
 
 	if (argc == 2) {
 		fclose(yyin);
@@ -239,7 +244,7 @@ call	:	functioncall
 		|	assignmentcall
 		;
 
-declaration : VAR_TOK identifierarray TYPE_OP TYPE
+declaration : VAR_TOK identifierarray {/*lastidentifier = strdup(yytext); TODO: do something with this value*/} TYPE_OP TYPE
 			;
 
 statement	: declaration
@@ -288,9 +293,9 @@ constant_def	: CONSTANT_TOK IDENTIFIER TYPE_OP TYPE COMPARE_OP variable SEMICOLO
 /* first procuders then functions? */
 programbody : constant_def* [declaration SEMICOLON]* procedure* function* BEGIN_TOK statementset END_TOK
 			;
-
-header		: PROGRAM_TOK IDENTIFIER {namelength = strlen(yytext); programname = strdup(yytext); /* the token needs to be freeëd */} SEMICOLON 
+			
+header		: PROGRAM_TOK  IDENTIFIER {programname = strdup(yytext); /* the token is freeed in freeNode (normaly) */} SEMICOLON 
 			;
 
-start		: header programbody DOT {parsetree = yytext; /* this is wrong */}
+start		: header programbody DOT
 			; 

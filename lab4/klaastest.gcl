@@ -1,0 +1,5 @@
+program dummy;
+
+begin
+ var kaas : boolean;
+end.
