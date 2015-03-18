@@ -20,6 +20,15 @@ Node *makeNode(char *name, NodeType ntype, int etype, Node *param) {
 }
 
 void freeNode(Node *nodeptr) {
+	// free the parameters list (if present)
+	Node *param = nodeptr->parameters;
+	while (param != NULL) {
+		Node *nextparam = param->next;
+		free(param);
+		param = nextparam;
+	}
+	// Free the name here
+	free(nodeptr->name);
 	free(nodeptr);
 }
 
@@ -40,14 +49,7 @@ void freeList(List *list) {
 	// free all list items
 	while (list->first != NULL) {
 		Node *n = (list->first)->next;
-		// free the parameters list (if present)
-		Node *param = (list->first)->parameters;
-		while (param != NULL) {
-			Node *nextparam = param->next;
-			free(param);
-			param = nextparam;
-		}
-		free(list->first);
+		freeNode(list->first);
 		list->first = n;
 	}
 	// free the list itself
