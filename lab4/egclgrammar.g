@@ -23,6 +23,11 @@ int linesread;
 int columnnr;
 int linecount;
 
+/* the parse tree */
+char *parsetree;
+char *programname;
+int namelength;
+
 void readFile(char *filename) {
 	FILE * fin = fopen(filename, "r");
 	int i = 0;
@@ -106,7 +111,12 @@ int main(int argc, char** argv) {
 		yyin = fopen(argv[1], "r");
 	}
 	
+	
 	parser();
+	
+	printf("Name: %s\n", programname);
+	printf("Name length: %d\n", namelength);
+	printf("Parsing ended with: %s\n", parsetree);
 
 	if (argc == 2) {
 		fclose(yyin);
@@ -278,8 +288,8 @@ constant_def	: CONSTANT_TOK IDENTIFIER TYPE_OP TYPE COMPARE_OP variable SEMICOLO
 programbody : constant_def* [declaration SEMICOLON]* procedure* function* BEGIN_TOK statementset END_TOK
 			;
 
-header		: PROGRAM_TOK IDENTIFIER SEMICOLON 
+header		: PROGRAM_TOK IDENTIFIER {programname = yytext; namelength = strlen(yytext);} SEMICOLON 
 			;
 
-start		: header programbody DOT
+start		: header programbody DOT {parsetree = yytext;}
 			; 
