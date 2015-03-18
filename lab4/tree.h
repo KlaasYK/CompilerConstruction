@@ -156,7 +156,7 @@ RCall makeRCall(ID *ids);
 void freeRCall(RCall rc);
 
 WCall makeWCall(Printable *p);
-freeWCall(WCall wc);
+void freeWCall(WCall wc);
 
 Printable makeStringPrintable(char *string);
 Printable makeExpPrintable(Exp exp);
