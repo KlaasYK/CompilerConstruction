@@ -1,5 +1,5 @@
 program dummy;
 
 begin
- var kaas : boolean;
+ var kaasislekker : boolean;
 end.

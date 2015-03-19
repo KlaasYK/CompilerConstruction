@@ -4,6 +4,42 @@
 
 #include "symboltable.h"
 
+Stack *symboltable = NULL;
+
+
+void printList(List *list, int level) {
+	Node *n = list->first;
+	while (n != NULL) {
+		int i;
+		for(i = 0; i < level; i++) {
+			printf(" ");
+		}
+		printf("%s : %d", n->name, n->evaltype);
+		printf("\n");
+		n = n->next;
+	}
+}
+
+void printSymbolTable() {
+	int level = 0;
+	if (symboltable == NULL) {
+		printf("Symboltable not initialised!\n");
+		exit(EXIT_FAILURE);
+	}
+	List *k = symboltable->top;
+	while (k != NULL) {
+		List *nextlist = k->nextlist;
+		printList(k, 2 * level);
+		k = nextlist;
+		level++;
+	}
+}
+
+int stringToEvalType(char *typestring) {
+	if (strcmp(typestring, "boolean") == 0 ) return BOOLEAN_TYPE;
+	return -1;
+}
+
 Node *makeNode(char *name, NodeType ntype, int etype, Node *param) {
 	Node *n;
 	n = malloc(sizeof(Node));

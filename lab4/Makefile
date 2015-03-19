@@ -8,7 +8,7 @@ GCL = $(subst .gcl,.c99,$(wildcard *.gcl))
 
 
 all: parser scanner cfiles tree
-	gcc -g -o $(EXE) egclgrammar.o lex.yy.o tree.o expressiontree.o
+	gcc -g -o $(EXE) egclgrammar.o lex.yy.o symboltable.o tree.o expressiontree.o
 parser: egclgrammar.g
 	LLnextgen egclgrammar.g
 scanner: egclscanner.fl

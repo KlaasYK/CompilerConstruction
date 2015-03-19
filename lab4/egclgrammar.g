@@ -26,6 +26,7 @@ int linecount;
 
 /* the parse tree */
 char *programname;
+char *lastidentifier;
 
 /* temporary storage for identifier names */
 char *lastidentifier;
@@ -113,14 +114,19 @@ int main(int argc, char** argv) {
 		yyin = fopen(argv[1], "r");
 	}
 	
+	initSymbolTable();
 	
 	parser();
 	
 	printf("Name: %s\n", programname);
 	
+	printf("SymbolTable:\n");
+	printSymbolTable();
+	
 	/* test region for symbol table */
 	
 	free(programname);
+	/* free(lastidentifier); /* (not doing this,because it is stored in nodes) */
 	
 	/* end test region for symbol table */
 
@@ -131,6 +137,7 @@ int main(int argc, char** argv) {
 
 	printf("Parsing succesfull\n");
 	
+	freeSymbolTable();
 	freeLines();
 	
 	return EXIT_SUCCESS;
@@ -205,7 +212,7 @@ guardedcommand	: expr THEN_TOK statementset
 guardedcommandset	: guardedcommand [ALTGUARD guardedcommand]*
 					;
 
-identifierarray	: IDENTIFIER [COMMA identifierarray]?
+identifierarray	: IDENTIFIER {lastidentifier = strdup(yytext); /* TODO: add a list USE LEXEME IN SCANNER if yytext fails! */  } [COMMA identifierarray]?
 				;
 
 functioncall	: LPARREN identifierarray RPARREN
@@ -244,7 +251,13 @@ call	:	functioncall
 		|	assignmentcall
 		;
 
-declaration : VAR_TOK identifierarray {/*lastidentifier = strdup(yytext); TODO: do something with this value*/} TYPE_OP TYPE
+declaration : VAR_TOK identifierarray TYPE_OP TYPE {
+	printf("%s : %s\n", lastidentifier, yytext);
+	printf("stringToEvalType: %d\n", stringToEvalType(yytext) ); /* use LEXEME in SCANNER if neccesary */
+	insertIdentifier(lastidentifier, VARIABLE, stringToEvalType(yytext), NULL);
+	/* TODO: check if the  identifier exists already*/
+	
+	}
 			;
 
 statement	: declaration

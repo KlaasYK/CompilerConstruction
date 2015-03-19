@@ -34,7 +34,11 @@ typedef struct Stack {
 	List *top;
 } Stack;
 
-Stack *symboltable = NULL;
+extern Stack *symboltable;
+
+int stringToEvalType(char *typestring);
+
+void printSymbolTable();
 
 /* initialise the symbol table */
 void initSymbolTable();
