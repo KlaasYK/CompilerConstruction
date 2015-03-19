@@ -2,7 +2,7 @@
 #include "expressiontree.h"
 #include "tree.h"
 
-Prog makeProg(char *name, int numConstDefs, Dec* constDefs, int numVarDefs, Dec* varDefs, int numProcDefs, ProcDef* procDefs, int numFuncDefs, FuncDef* funcDefs, int numBodyStmnts, Stmnt bodyStmnts){
+Prog makeProg(char *name, int numConstDefs, Dec* constDefs, int numVarDefs, Dec* varDefs, int numProcDefs, ProcDef* procDefs, int numFuncDefs, FuncDef* funcDefs, int numBodyStmnts, Stmnt *bodyStmnts){
 	Prog p = malloc(sizeof(struct Program));
 	int nLength = strlen(name) + 1;
 	char *nCopy = malloc(nLength * sizeof (char));
@@ -86,7 +86,7 @@ void freeProcDef(ProcDef pd) {
 	free(pd);
 }
 
-Param makeParam(Id id, Call call){
+Param makeParam(ID id, Call call){
 	Param p = malloc(sizeof(struct Parameter));
 	p->id = id;
 	p->call = call;

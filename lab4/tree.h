@@ -19,7 +19,7 @@ typedef enum {
     stringPrint, expPrint
 } PrintKind;
 
-type enum {
+typedef enum {
     byRef, byVal
 } Call;
 //ref defs
@@ -67,13 +67,13 @@ struct Program {
     int numFuncDefs;
     FuncDef *funcDefs;
     int numBodyStmnts;
-    Stmnt bodyStmnts;
+    Stmnt *bodyStmnts;
 };
 
 struct FunctionDefinition {
     ID id;
     int numParams;
-    ID *params;
+    Param *params;
     int numStmnts;
     Stmnt *stmnts;
 };
@@ -81,7 +81,7 @@ struct FunctionDefinition {
 struct ProcedureDefinition {
     char *name;
     int numParams;
-    ID *params;
+    Param *params;
     int numStmnts;
     Stmnt *stmnts;
 };
@@ -159,7 +159,7 @@ struct GuardedCommand {
 };
 // func list
 
-Prog makeProg(char *name, int numConstDefs, Dec *constDefs, int numVarDefs, Dec *varDefs, int numProcDefs, ProcDef *procDefs, int numFuncDefs, FuncDef *funcDefs, int numBodyStmnts, Stmnt bodyStmnts);
+Prog makeProg(char *name, int numConstDefs, Dec *constDefs, int numVarDefs, Dec *varDefs, int numProcDefs, ProcDef *procDefs, int numFuncDefs, FuncDef *funcDefs, int numBodyStmnts, Stmnt *bodyStmnts);
 void freeProg(Prog p);
 
 FuncDef makeFuncDef(ID id, int numParams, Param *params, int numStmnts, Stmnt *stmnts);
@@ -168,7 +168,7 @@ void freeFuncDef(FuncDef fd);
 ProcDef makeProcDef(char *name, int numParams, Param *params, int numStmnts, Stmnt *stmnts);
 void freeProcDef(ProcDef pd);
 
-Param makeParam(Id id, Call call);
+Param makeParam(ID id, Call call);
 void freeParam(Param p);
 
 Stmnt makeDecStmnt(Dec d);
