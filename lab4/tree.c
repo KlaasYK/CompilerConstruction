@@ -18,6 +18,7 @@ Prog makeProg(char *name, int numConstDefs, Dec* constDefs, int numVarDefs, Dec*
 	p->funcDefs = funcDefs;
 	p->numBodyStmnts = numBodyStmnts;
 	p->bodyStmnts = bodyStmnts;
+	return p;
 }
 
 void freeProg(Prog p){
@@ -40,7 +41,7 @@ void freeProg(Prog p){
 	free(p);
 }
 
-FuncDef makeFuncDef(ID id, int numParams, ID *params, int numStmnts, Stmnt *stmnts) {
+FuncDef makeFuncDef(ID id, int numParams, Param *params, int numStmnts, Stmnt *stmnts) {
 	FuncDef fd = malloc(sizeof (struct FunctionDefinition));
 	fd->id = id;
 	fd->numParams = numParams;
@@ -53,7 +54,7 @@ FuncDef makeFuncDef(ID id, int numParams, ID *params, int numStmnts, Stmnt *stmn
 void freeFuncDef(FuncDef fd) {
 	freeID(fd->id);
 	for (int i = 0; i < fd->numParams; i++) {
-		freeID(fd->params[i]);
+		freeParam(fd->params[i]);
 	}
 	for (int i = 0; i < fd->numStmnts; i++) {
 		freeStmnt(fd->stmnts[i]);
@@ -61,7 +62,7 @@ void freeFuncDef(FuncDef fd) {
 	free(fd);
 }
 
-ProcDef makeProcDef(char *name, int numParams, ID *params, int numStmnts, Stmnt *stmnts) {
+ProcDef makeProcDef(char *name, int numParams, Param *params, int numStmnts, Stmnt *stmnts) {
 	ProcDef pd = malloc(sizeof (struct ProcedureDefinition));
 	int nLength = strlen(name) + 1;
 	char *nCopy = malloc(nLength * sizeof (char));
@@ -77,12 +78,24 @@ ProcDef makeProcDef(char *name, int numParams, ID *params, int numStmnts, Stmnt 
 void freeProcDef(ProcDef pd) {
 	free(pd->name);
 	for (int i = 0; i < pd->numParams; i++) {
-		freeID(pd->params[i]);
+		freeParam(pd->params[i]);
 	}
 	for (int i = 0; i < pd->numStmnts; i++) {
 		freeStmnt(pd->stmnts[i]);
 	}
 	free(pd);
+}
+
+Param makeParam(Id id, Call call){
+	Param p = malloc(sizeof(struct Parameter));
+	p->id = id;
+	p->call = call;
+	return p;
+}
+
+void freeParam(Param p){
+	freeID(p->id);
+	free(p);
 }
 
 Stmnt makeDecStmnt(Dec d) {

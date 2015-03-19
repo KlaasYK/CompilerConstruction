@@ -18,6 +18,10 @@ typedef enum {
 typedef enum {
     stringPrint, expPrint
 } PrintKind;
+
+type enum {
+    byRef, byVal
+} Call;
 //ref defs
 
 typedef struct Program *Prog;
@@ -25,6 +29,8 @@ typedef struct Program *Prog;
 typedef struct FunctionDefinition *FuncDef;
 
 typedef struct ProcedureDefinition *ProcDef;
+
+typedef struct Parameter *Param;
 
 typedef struct Statement *Stmnt;
 
@@ -78,6 +84,11 @@ struct ProcedureDefinition {
     ID *params;
     int numStmnts;
     Stmnt *stmnts;
+};
+
+struct Parameter{
+    ID id;
+    Call call;
 };
 
 struct Statement {
@@ -151,11 +162,14 @@ struct GuardedCommand {
 Prog makeProg(char *name, int numConstDefs, Dec *constDefs, int numVarDefs, Dec *varDefs, int numProcDefs, ProcDef *procDefs, int numFuncDefs, FuncDef *funcDefs, int numBodyStmnts, Stmnt bodyStmnts);
 void freeProg(Prog p);
 
-FuncDef makeFuncDef(ID id, int numParams, ID *params, int numStmnts, Stmnt *stmnts);
+FuncDef makeFuncDef(ID id, int numParams, Param *params, int numStmnts, Stmnt *stmnts);
 void freeFuncDef(FuncDef fd);
 
-ProcDef makeProcDef(char *name, int numParams, ID *params, int numStmnts, Stmnt *stmnts);
+ProcDef makeProcDef(char *name, int numParams, Param *params, int numStmnts, Stmnt *stmnts);
 void freeProcDef(ProcDef pd);
+
+Param makeParam(Id id, Call call);
+void freeParam(Param p);
 
 Stmnt makeDecStmnt(Dec d);
 Stmnt makeAssStmnt(Ass a);
