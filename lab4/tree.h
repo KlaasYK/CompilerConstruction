@@ -20,6 +20,8 @@ typedef enum {
 } PrintKind;
 //ref defs
 
+typedef struct Program *Prog;
+
 typedef struct FunctionDefinition *FuncDef;
 
 typedef struct ProcedureDefinition *ProcDef;
@@ -47,6 +49,19 @@ typedef struct DoStatement *Do;
 typedef struct GuardedCommand *GCommand;
 
 //struct defs
+
+struct Program {
+    int numConstDefs;
+    Dec *constDefs;
+    int numVarDefs;
+    Dec *varDefs;
+    int numProcDefs;
+    ProcDef *procDefs;
+    int numFuncDefs;
+    FuncDef *funcDefs;
+    int numBodyStmnts;
+    Stmnt bodyStmnts
+};
 
 struct FunctionDefinition {
     ID id;
@@ -131,6 +146,9 @@ struct GuardedCommand {
     Stmnt *stmnts;
 };
 // func list
+
+Prog makeProg(int numConstDefs, Dec *constDefs, int numVarDefs, Dec *varDefs, int numProcDefs, ProcDef *procDefs, int numFuncDefs, FuncDef *funcDefs, int numBodyStmnts, Stmnt bodyStmnts);
+void freeProg(Prog p);
 
 FuncDef makeFuncDef(ID id, int numParams, ID *params, int numStmnts, Stmnt *stmnts);
 void freeFuncDef(FuncDef fd);
