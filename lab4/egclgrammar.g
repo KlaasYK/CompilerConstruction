@@ -11,7 +11,11 @@
 
 #include "symboltable.h"
 
-/* #include "tree.h" */
+#include "tree.h"
+
+/* different typechecking errors */
+#define DUPLICATE 256
+#define WRONGTYPE 257
 
 extern FILE * yyin;
 extern char * yytext;
@@ -72,6 +76,7 @@ void printLexError(char *illchar, int line, int column) {
 	printf("^\n");
 	printf("Illegal character (%s) detected at column %d\n", illchar, column+1);
 	freeLines();
+	freeSymbolTable();
 	exit(EXIT_FAILURE);
 }
 
@@ -97,6 +102,24 @@ void LLmessage(int token) {
 		break;
 	}
 	freeLines();
+	freeSymbolTable();
+	exit(EXIT_FAILURE);
+}
+
+void printTypeError(char *identifier, int ErrorType) {
+	int i = 0, k;
+	printf("\n");
+	k = printf("Error on line %d: ", linecount+1);
+	printf("%s", lines[linecount]);
+	for (i; i < columnnr + k; i++) {
+		printf(" ");
+	}
+	printf("^\n");
+	switch (ErrorType) {
+		case DUPLICATE: printf("Duplicate identifier (%s) detected at column %d\n", identifier, columnnr+1);
+	}
+	freeLines();
+	freeSymbolTable();
 	exit(EXIT_FAILURE);
 }
 
@@ -118,15 +141,14 @@ int main(int argc, char** argv) {
 	
 	parser();
 	
-	printf("Name: %s\n", programname);
+	printf("Program Name: %s\n", programname);
 	
-	printf("SymbolTable:\n");
+	printf("\nSymbolTable:\n");
 	printSymbolTable();
-	
+	printf("\n");
 	/* test region for symbol table */
 	
 	free(programname);
-	/* free(lastidentifier); /* (not doing this,because it is stored in nodes) */
 	
 	/* end test region for symbol table */
 
@@ -252,10 +274,13 @@ call	:	functioncall
 		;
 
 declaration : VAR_TOK identifierarray TYPE_OP TYPE {
-	printf("%s : %s\n", lastidentifier, yytext);
-	printf("stringToEvalType: %d\n", stringToEvalType(yytext) ); /* use LEXEME in SCANNER if neccesary */
-	insertIdentifier(lastidentifier, VARIABLE, stringToEvalType(yytext), NULL);
-	/* TODO: check if the  identifier exists already*/
+	/* check if the  identifier exists already */
+	if (!existsInTop(lastidentifier)) {
+		insertIdentifier(lastidentifier, VARIABLE, stringToEvalType(yytext), NULL);
+	} else {
+		printTypeError(lastidentifier, DUPLICATE);
+	}
+	
 	
 	}
 			;
@@ -304,7 +329,7 @@ constant_def	: CONSTANT_TOK IDENTIFIER TYPE_OP TYPE COMPARE_OP variable SEMICOLO
 				;
 
 /* first procuders then functions? */
-programbody : constant_def* [declaration SEMICOLON]* procedure* function* BEGIN_TOK statementset END_TOK
+programbody : constant_def* [declaration SEMICOLON]* procedure* function* BEGIN_TOK {putBlock(); /* add a new frame of reference */} statementset END_TOK {/* popBlock(); TODO: activate this after degbugging */}
 			;
 			
 header		: PROGRAM_TOK  IDENTIFIER {programname = strdup(yytext); /* the token is freeed in freeNode (normaly) */} SEMICOLON 
