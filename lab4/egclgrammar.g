@@ -42,10 +42,11 @@ void readFile(char *filename) {
 	ssize_t read = 0;
 	/* TODO: remove hardcoded limit */
 	lines = malloc(1000 * sizeof(char*)); 
-	
-	while ( getline( &(lines[i]), &len, fin) != -1 ) {
+	int guard = getline( &(lines[i]), &len, fin);
+	while ( guard != -1 ) {
 		i++;
 		linesread++;
+		guard = getline( &(lines[i]), &len, fin);
 	}
 	linesread++;
 	fclose(fin);
