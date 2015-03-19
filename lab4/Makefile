@@ -33,3 +33,4 @@ clean:
 	rm -f gclc.exe
 	rm -f symboltable.o
 	rm -f tree.o
+	rm -f expressiontree.o
