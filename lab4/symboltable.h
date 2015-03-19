@@ -5,9 +5,11 @@
 #define __SYMBOLTABLE_H
 
 #define BOOLEAN_TYPE 10
-#define CONST_BOOLEAN_TYPE 11;
+#define CONST_BOOLEAN_TYPE 11
+#define REF_BOOLEAN_TYPE 12
 #define INTEGER_TYPE 20
-#define CONST_INTEGER_TYPE 21;
+#define CONST_INTEGER_TYPE 21
+#define REF_INTEGER_TYPE 22
 #define VOID_TYPE 30
 
 typedef enum { VARIABLE, METHOD } NodeType;
@@ -36,9 +38,13 @@ typedef struct Stack {
 
 extern Stack *symboltable;
 
+/* convert input type string to integer for faster comparisson */
 int stringToEvalType(char *typestring);
 
 void printSymbolTable();
+
+/* returns whetere the current name is found in the top of the symboltable */
+int existsInTop(char *name);
 
 /* initialise the symbol table */
 void initSymbolTable();

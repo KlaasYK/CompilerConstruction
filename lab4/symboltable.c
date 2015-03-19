@@ -1,11 +1,33 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "symboltable.h"
 
 Stack *symboltable = NULL;
 
+int existsInTop(char *name) {
+	Node *n = symboltable->top->first;
+	while (n != NULL) {
+		if (strcmp(name, n->name) == 0) return 1;
+		n = n->next;
+	}
+	return 0;
+}
+
+
+char *getTypeString(int typeval) {
+	switch(typeval) {
+		case BOOLEAN_TYPE: return "boolean";
+		case CONST_BOOLEAN_TYPE: return "constant boolean";
+		case REF_BOOLEAN_TYPE: return "boolean as reference";
+		case INTEGER_TYPE: return "integer";
+		case CONST_INTEGER_TYPE: return "constant integer";
+		case REF_INTEGER_TYPE: return "integer reference";
+		case VOID_TYPE: return "void";
+	}
+}
 
 void printList(List *list, int level) {
 	Node *n = list->first;
@@ -14,7 +36,7 @@ void printList(List *list, int level) {
 		for(i = 0; i < level; i++) {
 			printf(" ");
 		}
-		printf("%s : %d", n->name, n->evaltype);
+		printf("%s : %s", n->name, getTypeString(n->evaltype));
 		printf("\n");
 		n = n->next;
 	}
@@ -37,6 +59,8 @@ void printSymbolTable() {
 
 int stringToEvalType(char *typestring) {
 	if (strcmp(typestring, "boolean") == 0 ) return BOOLEAN_TYPE;
+	if (strcmp(typestring, "integer") == 0 ) return INTEGER_TYPE;
+	if (strcmp(typestring, "void") == 0 ) return VOID_TYPE;
 	return -1;
 }
 

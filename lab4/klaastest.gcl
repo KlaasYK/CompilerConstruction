@@ -1,5 +1,9 @@
 program dummy;
 
+var dummyvar : integer;
+
 begin
  var kaasislekker : boolean;
+ var dummyvar : boolean;
+ var kaasislekker : integer;
 end.
