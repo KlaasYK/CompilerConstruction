@@ -35,6 +35,13 @@ char *lastidentifier;
 /* temporary storage for identifier names */
 char *lastidentifier;
 
+typedef struct TempINode {
+	char *name;
+	struct TempINode *next;
+} INode;
+
+INode *tempidentifierlist;
+
 void readFile(char *filename) {
 	FILE * fin = fopen(filename, "r");
 	linesread = 0;
@@ -298,8 +305,7 @@ declaration : VAR_TOK identifierarray TYPE_OP TYPE {
 		printTypeError(lastidentifier, DUPLICATE);
 	}
 	
-	
-	}
+}
 			;
 
 statement	: declaration
