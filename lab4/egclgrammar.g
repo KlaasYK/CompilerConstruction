@@ -37,16 +37,15 @@ char *lastidentifier;
 
 void readFile(char *filename) {
 	FILE * fin = fopen(filename, "r");
-	int i = 0;
+	linesread = 0;
 	size_t len = 0;
 	ssize_t read = 0;
 	/* TODO: remove hardcoded limit */
-	lines = malloc(1000 * sizeof(char*)); 
-	int guard = getline( &(lines[i]), &len, fin);
+	lines = calloc(1000, sizeof(char*)); /* calloc, prevents unconditional jumps */
+	int guard = getline( &(lines[linesread]), &len, fin);
 	while ( guard != -1 ) {
-		i++;
 		linesread++;
-		guard = getline( &(lines[i]), &len, fin);
+		guard = getline( &(lines[linesread]), &len, fin);
 	}
 	linesread++;
 	fclose(fin);
@@ -66,6 +65,14 @@ void freeLines() {
 	yylex_destroy();
 }
 
+/* debug function used for cleaning up temporary variables */
+void utilCleanUp() {
+	if (programname != NULL) {
+		free(programname);
+	}
+}
+
+
 void printLexError(char *illchar, int line, int column) {
 	int i = 0, k;
 	printf("\n");
@@ -76,6 +83,7 @@ void printLexError(char *illchar, int line, int column) {
 	}
 	printf("^\n");
 	printf("Illegal character (%s) detected at column %d\n", illchar, column+1);
+	utilCleanUp();
 	freeLines();
 	freeSymbolTable();
 	exit(EXIT_FAILURE);
@@ -102,10 +110,12 @@ void LLmessage(int token) {
 		printf("Expected %s, found %s (%s).\n", LLgetSymbol(token), LLgetSymbol(LLsymb), yytext);
 		break;
 	}
+	utilCleanUp();
 	freeLines();
 	freeSymbolTable();
 	exit(EXIT_FAILURE);
 }
+
 
 void printTypeError(char *identifier, int ErrorType) {
 	int i = 0, k;
@@ -119,6 +129,11 @@ void printTypeError(char *identifier, int ErrorType) {
 	switch (ErrorType) {
 		case DUPLICATE: printf("Duplicate identifier (%s) detected at column %d\n", identifier, columnnr+1);
 	}
+	
+	free(identifier);
+	
+	utilCleanUp();
+	
 	freeLines();
 	freeSymbolTable();
 	exit(EXIT_FAILURE);
@@ -126,6 +141,7 @@ void printTypeError(char *identifier, int ErrorType) {
 
 int main(int argc, char** argv) {
 	linecount = 0, columnnr = 0;
+	programname = NULL;
 	printf("Extended Guarded Command Language Compiler.\n");
 	if (argc > 2) {
 		fprintf(stderr, "Usage: %s [filename.c]\n", argv[0]);
