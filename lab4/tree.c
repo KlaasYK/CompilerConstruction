@@ -2,6 +2,44 @@
 #include "expressiontree.h"
 #include "tree.h"
 
+Prog makeProg(char *name, int numConstDefs, Dec* constDefs, int numVarDefs, Dec* varDefs, int numProcDefs, ProcDef* procDefs, int numFuncDefs, FuncDef* funcDefs, int numBodyStmnts, Stmnt bodyStmnts){
+	Prog p = malloc(sizeof(struct Program));
+	int nLength = strlen(name) + 1;
+	char *nCopy = malloc(nLength * sizeof (char));
+	memcpy(nCopy, name, nLength * sizeof (char));
+	p->name = nCopy;
+	p->numConstDefs = numConstDefs;
+	p->constDefs = constDefs;
+	p->numVarDefs = numVarDefs;
+	p->varDefs = varDefs;
+	p->numProcDefs = numProcDefs;
+	p->procDefs = procDefs;
+	p->numFuncDefs = numFuncDefs;
+	p->funcDefs = funcDefs;
+	p->numBodyStmnts = numBodyStmnts;
+	p->bodyStmnts = bodyStmnts;
+}
+
+void freeProg(Prog p){
+	free(p->name);
+	for (int i = 0; i < p->numConstDefs; i++) {
+		freeDec(p->constDefs[i]);
+	}
+	for (int i = 0; i < p->numVarDefs; i++) {
+		freeDec(p->varDefs[i]);
+	}
+	for (int i = 0; i < p->numProcDefs; i++) {
+		freeProcDef(p->procDefs[i]);
+	}
+	for (int i = 0; i < p->numFuncDefs; i++) {
+		freeFuncDef(p->funcDefs[i]);
+	}
+	for (int i = 0; i < p->numBodyStmnts; i++) {
+		freeStmnt(p->bodyStmnts[i]);
+	}
+	free(p);
+}
+
 FuncDef makeFuncDef(ID id, int numParams, ID *params, int numStmnts, Stmnt *stmnts) {
 	FuncDef fd = malloc(sizeof (struct FunctionDefinition));
 	fd->id = id;

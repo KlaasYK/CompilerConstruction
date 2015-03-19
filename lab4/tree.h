@@ -51,6 +51,7 @@ typedef struct GuardedCommand *GCommand;
 //struct defs
 
 struct Program {
+    char *name;
     int numConstDefs;
     Dec *constDefs;
     int numVarDefs;
@@ -60,7 +61,7 @@ struct Program {
     int numFuncDefs;
     FuncDef *funcDefs;
     int numBodyStmnts;
-    Stmnt bodyStmnts
+    Stmnt bodyStmnts;
 };
 
 struct FunctionDefinition {
@@ -147,7 +148,7 @@ struct GuardedCommand {
 };
 // func list
 
-Prog makeProg(int numConstDefs, Dec *constDefs, int numVarDefs, Dec *varDefs, int numProcDefs, ProcDef *procDefs, int numFuncDefs, FuncDef *funcDefs, int numBodyStmnts, Stmnt bodyStmnts);
+Prog makeProg(char *name, int numConstDefs, Dec *constDefs, int numVarDefs, Dec *varDefs, int numProcDefs, ProcDef *procDefs, int numFuncDefs, FuncDef *funcDefs, int numBodyStmnts, Stmnt bodyStmnts);
 void freeProg(Prog p);
 
 FuncDef makeFuncDef(ID id, int numParams, ID *params, int numStmnts, Stmnt *stmnts);
