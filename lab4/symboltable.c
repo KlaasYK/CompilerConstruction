@@ -50,9 +50,8 @@ void printSymbolTable() {
 	}
 	List *k = symboltable->top;
 	while (k != NULL) {
-		List *nextlist = k->nextlist;
 		printList(k, 2 * level);
-		k = nextlist;
+		k = k->nextlist;
 		level++;
 	}
 }

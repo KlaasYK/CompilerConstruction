@@ -30,12 +30,38 @@ int linecount;
 
 /* the parse tree */
 char *programname;
+
+/* temporary storage for identifier names when declaring more  */
 char *lastidentifier;
 
-/* temporary storage for identifier names */
-char *lastidentifier;
+typedef struct TempINode {
+	char *name;
+	struct TempINode *next;
+} INode;
+
+INode *tempidentifierlist;
+
+void freeTempList() {
+	INode *n = tempidentifierlist;
+	tempidentifierlist = NULL;
+	while (n != NULL) {
+		INode *next = n->next;
+		free(n->name);
+		free(n);
+		n = next;
+	}
+}
+
+/* adds an identifier to the temp list */
+void addTempList(char *name) {
+	INode *new = malloc(sizeof(struct TempINode));
+	new->name = name;
+	new->next = tempidentifierlist;
+	tempidentifierlist = new;
+}
 
 Prog program;
+
 
 void readFile(char *filename) {
 	FILE * fin = fopen(filename, "r");
@@ -71,6 +97,9 @@ void freeLines() {
 void utilCleanUp() {
 	if (programname != NULL) {
 		free(programname);
+	}
+	if (tempidentifierlist != NULL) {
+		freeTempList();
 	}
 }
 
@@ -142,8 +171,12 @@ void printTypeError(char *identifier, int ErrorType) {
 }
 
 int main(int argc, char** argv) {
+	// initialise global vars to NULL/0
 	linecount = 0, columnnr = 0;
+	
 	programname = NULL;
+	tempidentifierlist = NULL;
+	
 	printf("Extended Guarded Command Language Compiler.\n");
 	if (argc > 2) {
 		fprintf(stderr, "Usage: %s [filename.c]\n", argv[0]);
@@ -160,14 +193,14 @@ int main(int argc, char** argv) {
 	
 	parser();
 	
+	/* test region for symbol table */
 	printf("Program Name: %s\n", programname);
 	
 	printf("\nSymbolTable:\n");
 	printSymbolTable();
 	printf("\n");
-	/* test region for symbol table */
 	
-	free(programname);
+
 	
 	/* end test region for symbol table */
 
@@ -178,6 +211,7 @@ int main(int argc, char** argv) {
 
 	printf("Parsing succesfull\n");
 	
+	utilCleanUp();
 	freeSymbolTable();
 	freeLines();
 	
@@ -418,6 +452,19 @@ declaration :
 						printTypeError(lastidentifier, DUPLICATE);
 					}
 				}
+declaration : VAR_TOK identifierarray TYPE_OP TYPE {
+	INode *n = tempidentifierlist;
+	while (n != NULL) {
+		/* check if the  identifier exists already */
+		if ( !existsInTop(n->name) ) {
+			insertIdentifier(strdup(n->name), VARIABLE, stringToEvalType(yytext), NULL);
+		} else {
+			printTypeError(n->name, DUPLICATE);
+		}
+		n = n->next;
+	}
+	freeTempList();
+}
 			;
 
 statement	: 

@@ -36,8 +36,6 @@ typedef struct Stack {
 	List *top;
 } Stack;
 
-extern Stack *symboltable;
-
 /* convert input type string to integer for faster comparisson */
 int stringToEvalType(char *typestring);
 
