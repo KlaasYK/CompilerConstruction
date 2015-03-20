@@ -214,7 +214,7 @@ void freeStmnt(Stmnt s) {
 	free(s);
 }
 
-Dec makeExpDec(ID id, IDType idType) {
+Dec makeExpUninitDec(ID id, IDType idType) {
 	Dec d = malloc(sizeof (struct Declaration));
 	d->id = id;
 	d->idType = idType;

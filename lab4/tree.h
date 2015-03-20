@@ -186,7 +186,7 @@ Stmnt makeIfStmnt(If i);
 Stmnt makeDoStmnt(Do d);
 void freeStmnt(Stmnt s);
 
-Dec makeExpDec(ID id, IDType idType);
+Dec makeExpUninitDec(ID id, IDType idType);
 Dec makeExpDec(ID id, IDType idType, ExpTree expTree);
 Dec makeStringDec(ID id, IDType idType, char *str);
 void freeDec(Dec d);
