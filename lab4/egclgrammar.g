@@ -27,7 +27,7 @@ extern FILE * yyin;
 extern char * yytext;
 
 char **lines;
-char * file_name;
+char *file_name;
 int linesread;
 
 /* to keep track of errors */
@@ -201,9 +201,7 @@ int main(int argc, char** argv) {
 	
 	parser();
 	
-	/* test region for symbol table */
-	printf("Program Name: %s\n", programname);
-	
+	/* test region for symbol table */	
 	printf("\nSymbolTable:\n");
 	printSymbolTable();
 	printf("\n");
@@ -524,7 +522,9 @@ variable<ExpTree>(ExpTree exp) :
 			exp = makeBoolExp(makeBool(bv));
 		}
 	| 
-		NUMBER
+		NUMBER{
+			exp = makeIntExp(makeInt(strdup(yytext)));
+		}
 	| 
 		STRING
 ]{
@@ -642,7 +642,9 @@ programbody<Prog>(int numConstDefs, Dec *constDefs, int numVarDefs, Dec *varDefs
 				}
 				constDefs[numConstDefs-1] = cd;
 			}
-		]* 
+		]*{
+			printf("Num of const defs: %d\n", numConstDefs);
+		}
 		[
 			declaration 
 			SEMICOLON
@@ -678,8 +680,11 @@ start		:
 		}
 		DOT{
 			printf("Program name: %s\n", program->name);
-			printf("Print string: %s\n", program->bodyStmnts[0]->wCall->items[0]->string);
-			printf("boolval: %s\n", (program->constDefs[0]->expTree->node.boolval->value == true)?"true":"false");
+			if(strcmp(file_name, "riktest.gcl") == 0){
+				printf("Print string: %s\n", program->bodyStmnts[0]->wCall->items[0]->string);
+				printf("boolval: %s\n", (program->constDefs[0]->expTree->node.boolval->value == true)?"true":"false");
+				printf("intval: %s\n", program->constDefs[1]->expTree->node.intval->value);
+			}
 			freeProg(program);
 		}
 ; 
