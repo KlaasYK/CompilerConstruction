@@ -16,7 +16,7 @@ typedef enum {
 } IDType;
 
 typedef enum {
-    stringPrint, expPrint
+    stringKind, expKind
 } PrintKind;
 
 typedef enum {
