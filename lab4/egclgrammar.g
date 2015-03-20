@@ -17,6 +17,12 @@
 #define DUPLICATE 256
 #define WRONGTYPE 257
 
+typedef struct Stmnts{
+	int numStmnts;
+	Stmnt *stmnts;
+	
+}*Stmnts;
+
 extern FILE * yyin;
 extern char * yytext;
 
@@ -28,8 +34,11 @@ int linesread;
 int columnnr;
 int linecount;
 
-/* the parse tree */
+/* the program name */
 char *programname;
+
+/* the parse tree */
+Prog program;
 
 /* temporary storage for identifier names when declaring more  */
 char *lastidentifier;
@@ -60,7 +69,6 @@ void addTempList(char *name) {
 	tempidentifierlist = new;
 }
 
-Prog program;
 
 
 void readFile(char *filename) {
@@ -338,10 +346,10 @@ expr	:
 		;
 
 guardedcommand	: 
-					expr 
-					THEN_TOK 
-					statementset
-				;
+		expr 
+		THEN_TOK 
+		statementset<LLdiscard>
+;
 
 guardedcommandset	: 
 						guardedcommand 
@@ -410,20 +418,37 @@ ifstatement	:
 				IFEND_TOK
 			;
 
-printable	: 
-				STRING
-			| 
-				expr
-			;
+printable<Printable> : 
+		STRING{
+			Printable p = makeStringPrintable(strdup(yytext));
+			LLretval = p;
+		}
+	| 
+		expr{
+			Printable p = NULL;
+			LLretval = p;
+		}
+;
 
-printcall	: 
-				PRINT_TOK 
-				printable 
-				[
-					COMMA 
-					printable
-				]*
-			;
+printcall<WCall>(int numitems, Printable *ps) : 
+		PRINT_TOK 
+		printable<p>{
+			numitems = 1;
+			ps = malloc(sizeof(Printable));
+			ps[0] = p;
+		}
+		[
+			COMMA 
+			printable<p>{
+				numitems++;
+				realloc(ps, numitems*sizeof(Printable));
+				ps[numitems-1] = p;
+			}
+		]*{
+			WCall wc = makeWCall(numitems, ps);
+			LLretval = wc;
+		}
+;
 
 readcall	: 
 				READ_TOK 
@@ -459,20 +484,26 @@ declaration :
 				}
 			;
 
-statement	: 
-				declaration
-			| 
-				IDENTIFIER 
-				call
-			| 
-				printcall
-			| 
-				readcall
-			| 
-				dostatement
-			|
-				ifstatement
-			;
+statement<Stmnt>(Stmnt stmnt) : 
+[
+		declaration
+	| 
+		IDENTIFIER 
+		call
+	| 
+		printcall<wc>(0, NULL){
+			stmnt = makeWCallStmnt(wc);
+		}
+	| 
+		readcall
+	| 
+		dostatement
+	|
+		ifstatement
+]{
+	LLretval = stmnt;
+}
+;
 
 parameterset 	: 
 					identifierarray 
@@ -480,41 +511,79 @@ parameterset 	:
 					TYPE
 				;
 
-variable		: 
-					BOOLEAN
-				| 
-					NUMBER
-				| 
-					STRING
-				;
+variable<ExpTree>(ExpTree exp) : 
+[
+		BOOLEAN{
+			char *bool = strdup(yytext);
+			BoolVal bv;
+			if(strcmp(bool, "true") == 0){
+				bv = true;
+			}else if(strcmp(bool, "false") == 0){
+				bv = false;
+			}
+			exp = makeBoolExp(makeBool(bv));
+		}
+	| 
+		NUMBER
+	| 
+		STRING
+]{
+	LLretval = exp;
+}
+;
 			
 /* can the last statement in a block end with a semicolon? internet says of a certain version of gcl that a statement has the rule: S -> S;S | ...*/
-statementset2	: 
-					SEMICOLON 
-					statementset
-				| 
-					/* epsilon */
-				;
+statementset2<Stmnts> : 
+		SEMICOLON 
+		statementset<ss>{
+			LLretval = ss;
+		}
+	| 
+		/* epsilon */{
+			Stmnts ss = malloc(sizeof(struct Stmnts));
+			ss->numStmnts = 0;
+			ss->stmnts = NULL;
+			LLretval = ss;
+		}
+;
 
-statementsetV1	: 
-					statement 
-					statementset2
-				| 
-					/* epsilon */
-				;
+statementsetV1<Stmnts>(Stmnt stmnt) : 
+		statement<s>(NULL){
+			stmnt = s;
+		}
+		statementset2<ss>{
+			ss->numStmnts++;
+			if(ss->numStmnts == 1){
+				ss->stmnts = malloc(ss->numStmnts*sizeof(Stmnt));
+			}else{
+				realloc(ss->stmnts, ss->numStmnts*sizeof(Stmnt));
+			}
+			ss->stmnts[ss->numStmnts-1] = stmnt;
+			LLretval = ss;
+		}
+	| 
+		/* epsilon */{
+			Stmnts ss = malloc(sizeof(struct Stmnts));
+			ss->numStmnts = 0;
+			ss->stmnts = NULL;
+			LLretval = ss;
+		}
+;
 
 /* alternative where every line needs to end with a semicolon */
-statementsetV2	: statement 
-					SEMICOLON 
-					statementset
-				| 
-					/* epsilon */
-				;
+statementsetV2	: statement<LLdiscard>(NULL)
+		SEMICOLON 
+		statementset
+	| 
+		/* epsilon */
+;
 
 /* select statementset V1 or V2 */
-statementset	: 
-					statementsetV1
-				;
+statementset<Stmnts>: 
+		statementsetV1<ss>(NULL){
+			LLretval = ss;
+		}
+;
 
 function	: 
 				FUNCTION_TOK 
@@ -524,7 +593,7 @@ function	:
 				RPARREN 
 				THEN_TOK TYPE 
 				SEMICOLON 
-				statementset 
+				statementset<LLdiscard>
 				END_TOK 
 				SEMICOLON
 			;
@@ -537,51 +606,80 @@ procedure	:
 				parameterset? 
 				RPARREN 
 				SEMICOLON 
-				statementset 
+				statementset<LLdiscard>
 				END_TOK 
 				SEMICOLON
 			;
 
-constant_def	: 
-					CONSTANT_TOK
-					IDENTIFIER 
-					TYPE_OP 
-					TYPE 
-					COMPARE_OP 
-					variable 
-					SEMICOLON
-				;
+constantdef<Dec>(int type, char *name, ExpTree exp)	: 
+		CONSTANT_TOK
+		IDENTIFIER{
+			name = strdup(yytext);
+		}
+		TYPE_OP 
+		TYPE{
+			type = stringToEvalType(strdup(yytext));
+		}
+		COMPARE_OP 
+		variable<e>(NULL){
+			exp = e;
+		}
+		SEMICOLON{
+			Dec d = makeDec(makeID(type, name), constant, e);
+			LLretval = d;
+		}
+;
 
 /* first procuders then functions? */
-programbody<Prog>	: 
-						constant_def* 
-						[
-							declaration 
-							SEMICOLON
-						]* 
-						procedure* 
-						function* 
-						BEGIN_TOK {
-							putBlock(); /* add a new frame of reference */
-						} 
-						statementset 
-						END_TOK {
-							/* popBlock(); TODO: activate this after degbugging */
-						}
-					;
+programbody<Prog>(int numConstDefs, Dec *constDefs, int numVarDefs, Dec *varDefs, int numProcDefs, ProcDef *procDefs, int numFuncDefs, FuncDef *funcDefs, int numBodyStmnts, Stmnt *bodyStmnts)	: 
+		[
+			constantdef<cd>(0, NULL, NULL){
+				numConstDefs++;
+				if(numConstDefs == 1){
+					constDefs = malloc(numConstDefs*sizeof(Dec));
+				}else{
+					realloc(constDefs, numConstDefs*sizeof(Dec));
+				}
+				constDefs[numConstDefs-1] = cd;
+			}
+		]* 
+		[
+			declaration 
+			SEMICOLON
+		]* 
+		procedure* 
+		function* 
+		BEGIN_TOK {
+			//putBlock(); /* add a new frame of reference */
+		} 
+		statementset<bss>{
+			numBodyStmnts = bss->numStmnts;
+			printf("Num of bodystmnts: %d\n", bss->numStmnts);
+			bodyStmnts = bss->stmnts;
+		}
+		END_TOK {
+			/* popBlock(); TODO: activate this after degbugging */
+			LLretval = makeProg(programname, numConstDefs, constDefs, numVarDefs, varDefs, numProcDefs, procDefs, numFuncDefs, funcDefs, numBodyStmnts, bodyStmnts);
+		}
+;
 			
 header		: 
-				PROGRAM_TOK
-				IDENTIFIER {
-					programname = strdup(yytext); /* the token is freeed in freeNode (normaly) */
-				} 
-				SEMICOLON 
-			;
+		PROGRAM_TOK
+		IDENTIFIER {
+			programname = strdup(yytext); /* the token is freeed in freeNode (normaly) */
+		} 
+		SEMICOLON 
+;
 
 start		: 
-				header 
-				programbody<prog>{
-					program  = prog;
-				}
-				DOT
-			; 
+		header 
+		programbody<prog>(0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL){
+			program  = prog;
+		}
+		DOT{
+			printf("Program name: %s\n", program->name);
+			printf("Print string: %s\n", program->bodyStmnts[0]->wCall->items[0]->string);
+			printf("boolval: %s\n", (program->constDefs[0]->expTree->node.boolval->value == true)?"true":"false");
+			freeProg(program);
+		}
+; 
