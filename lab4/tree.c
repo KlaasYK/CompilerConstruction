@@ -214,17 +214,40 @@ void freeStmnt(Stmnt s) {
 	free(s);
 }
 
-Dec makeDec(ID id, IDType idType, ExpTree expTree) {
+Dec makeExpDec(ID id, IDType idType, ExpTree expTree) {
 	Dec d = malloc(sizeof (struct Declaration));
 	d->id = id;
 	d->idType = idType;
+	d->decType = expKind;
 	d->expTree = expTree;
+	return d;
+}
+
+Dec makeExpDec(ID id, IDType idType, char *str) {
+	Dec d = malloc(sizeof (struct Declaration));
+	d->id = id;
+	d->idType = idType;
+	d->decType = stringKind;
+	int sLength = strlen(string) + 1;
+	char *sCopy = malloc(sLength * sizeof (char));
+	memcpy(sCopy, str, sLength * sizeof (char));
+	d->str = sCopy;
 	return d;
 }
 
 void freeDec(Dec d) {
 	freeID(d->id);
-	freeExp(d->expTree);
+	swich(d->decType){
+		case expKind:
+			freeExp(d->expTree);
+			break;
+		case stringKind:
+			free(d->str);
+			break;
+		default:
+			fprintf(stderr, "Undefined kind of statement!");
+			exit(EXIT_FAILURE);
+	}
 	free(d);
 }
 

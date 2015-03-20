@@ -109,7 +109,11 @@ struct Statement {
 struct Declaration {
     ID id;
     IDType idType;
-    ExpTree expTree;
+    PrintKind decType;
+    union{
+        ExpTree expTree;
+        char *str;
+    };
 };
 
 struct Assignment {
@@ -181,7 +185,8 @@ Stmnt makeIfStmnt(If i);
 Stmnt makeDoStmnt(Do d);
 void freeStmnt(Stmnt s);
 
-Dec makeDec(ID id, IDType idType, ExpTree expTree);
+Dec makeExpDec(ID id, IDType idType, ExpTree expTree);
+Dec makeStringDec(ID id, IDType idType, char *str);
 void freeDec(Dec d);
 
 Ass makeAss(ID id, ExpTree expTree);
