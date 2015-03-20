@@ -29,6 +29,9 @@ void freeFuncCall(FuncCall fc) {
 	for (int i = 0; i < fc->numParams; i++) {
 		freeExp(fc->params[i]);
 	}
+	if(fc->numParams>0){
+		free(fc->params);
+	}
 	free(fc);
 }
 
