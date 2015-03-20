@@ -2,8 +2,8 @@
 #include "expressiontree.h"
 #include "tree.h"
 
-Prog makeProg(char *name, int numConstDefs, Dec* constDefs, int numVarDefs, Dec* varDefs, int numProcDefs, ProcDef* procDefs, int numFuncDefs, FuncDef* funcDefs, int numBodyStmnts, Stmnt *bodyStmnts){
-	Prog p = malloc(sizeof(struct Program));
+Prog makeProg(char *name, int numConstDefs, Dec* constDefs, int numVarDefs, Dec* varDefs, int numProcDefs, ProcDef* procDefs, int numFuncDefs, FuncDef* funcDefs, int numBodyStmnts, Stmnt *bodyStmnts) {
+	Prog p = malloc(sizeof (struct Program));
 	int nLength = strlen(name) + 1;
 	char *nCopy = malloc(nLength * sizeof (char));
 	memcpy(nCopy, name, nLength * sizeof (char));
@@ -21,22 +21,37 @@ Prog makeProg(char *name, int numConstDefs, Dec* constDefs, int numVarDefs, Dec*
 	return p;
 }
 
-void freeProg(Prog p){
+void freeProg(Prog p) {
 	free(p->name);
 	for (int i = 0; i < p->numConstDefs; i++) {
 		freeDec(p->constDefs[i]);
 	}
+	if (p->numConstDefs > 0) {
+		free(p->constDefs);
+	}
 	for (int i = 0; i < p->numVarDefs; i++) {
 		freeDec(p->varDefs[i]);
+	}
+	if (p->numVarDefs > 0) {
+		free(p->varDefs);
 	}
 	for (int i = 0; i < p->numProcDefs; i++) {
 		freeProcDef(p->procDefs[i]);
 	}
+	if (p->numProcDefs > 0) {
+		free(p->procDefs);
+	}
 	for (int i = 0; i < p->numFuncDefs; i++) {
 		freeFuncDef(p->funcDefs[i]);
 	}
+	if (p->numFuncDefs > 0) {
+		free(p->funcDefs);
+	}
 	for (int i = 0; i < p->numBodyStmnts; i++) {
 		freeStmnt(p->bodyStmnts[i]);
+	}
+	if (p->numBodyStmnts > 0) {
+		free(p->bodyStmnts);
 	}
 	free(p);
 }
@@ -56,8 +71,14 @@ void freeFuncDef(FuncDef fd) {
 	for (int i = 0; i < fd->numParams; i++) {
 		freeParam(fd->params[i]);
 	}
+	if (fd->numParams > 0) {
+		free(fd->params);
+	}
 	for (int i = 0; i < fd->numStmnts; i++) {
 		freeStmnt(fd->stmnts[i]);
+	}
+	if (fd->numStmnts > 0) {
+		free(fd->stmnts);
 	}
 	free(fd);
 }
@@ -80,20 +101,26 @@ void freeProcDef(ProcDef pd) {
 	for (int i = 0; i < pd->numParams; i++) {
 		freeParam(pd->params[i]);
 	}
+	if (pd->numParams > 0) {
+		free(pd->params);
+	}
 	for (int i = 0; i < pd->numStmnts; i++) {
 		freeStmnt(pd->stmnts[i]);
+	}
+	if (pd->numStmnts > 0) {
+		free(pd->stmnts);
 	}
 	free(pd);
 }
 
-Param makeParam(ID id, Call call){
-	Param p = malloc(sizeof(struct Parameter));
+Param makeParam(ID id, Call call) {
+	Param p = malloc(sizeof (struct Parameter));
 	p->id = id;
 	p->call = call;
 	return p;
 }
 
-void freeParam(Param p){
+void freeParam(Param p) {
 	freeID(p->id);
 	free(p);
 }
@@ -109,6 +136,7 @@ Stmnt makeAssStmnt(Ass a) {
 	Stmnt s = malloc(sizeof (struct Statement));
 	s->kind = assStmnt;
 	s->assignment = a;
+	return s;
 }
 
 Stmnt makeFuncCallStmnt(FuncCall fc) {
@@ -224,6 +252,9 @@ void freeRCall(RCall rc) {
 	for (int i = 0; i < rc->numids; i++) {
 		freeID(rc->ids[i]);
 	}
+	if (rc->numids > 0) {
+		free(rc->ids);
+	}
 	free(rc);
 }
 
@@ -237,6 +268,9 @@ WCall makeWCall(int numitems, Printable *p) {
 void freeWCall(WCall wc) {
 	for (int i = 0; i < wc->numitems; i++) {
 		freePrintable(wc->items[i]);
+	}
+	if (wc->numitems > 0) {
+		free(wc->items);
 	}
 	free(wc);
 }
@@ -289,6 +323,9 @@ void freeProcCall(ProcCall pc) {
 	for (int i = 0; i < pc->numParams; i++) {
 		freeExp(pc->params[i]);
 	}
+	if (pc->numParams > 0) {
+		free(pc->params);
+	}
 	free(pc);
 }
 
@@ -302,6 +339,9 @@ If makeIf(int numGCommands, GCommand *gcs) {
 void freeIf(If i) {
 	for (int j = 0; j < i->numGCommands; j++) {
 		freeGCommand(i->gCommands[j]);
+	}
+	if (i->numGCommands > 0) {
+		free(i->gCommands);
 	}
 	free(i);
 }
@@ -317,6 +357,9 @@ void freeDo(Do d) {
 	for (int i = 0; i < d->numGCommands; i++) {
 		freeGCommand(d->gCommands[i]);
 	}
+	if (d->numGCommands > 0) {
+		free(d->gCommands);
+	}
 	free(d);
 }
 
@@ -329,8 +372,12 @@ GCommand makeGCommand(Exp condition, int numStmnts, Stmnt *stmnts) {
 }
 
 void freeGCommand(GCommand gc) {
+	freeExp(gc->condition);
 	for (int i = 0; i < gc->numStmnts; i++) {
 		freeStmnt(gc->stmnts[i]);
+	}
+	if (gc->numStmnts > 0) {
+		free(gc->stmnts);
 	}
 	free(gc);
 }
