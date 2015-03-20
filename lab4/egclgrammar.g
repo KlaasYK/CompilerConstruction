@@ -60,6 +60,8 @@ void addTempList(char *name) {
 	tempidentifierlist = new;
 }
 
+Prog program;
+
 
 void readFile(char *filename) {
 	FILE * fin = fopen(filename, "r");
@@ -383,11 +385,11 @@ constant_def	: CONSTANT_TOK IDENTIFIER TYPE_OP TYPE COMPARE_OP variable SEMICOLO
 				;
 
 /* first procuders then functions? */
-programbody : constant_def* [declaration SEMICOLON]* procedure* function* BEGIN_TOK {putBlock(); /* add a new frame of reference */} statementset END_TOK {/* popBlock(); TODO: activate this after degbugging */}
+programbody<int>(int testint) : constant_def* [declaration SEMICOLON]* procedure* function* BEGIN_TOK {putBlock(); /* add a new frame of reference */} statementset END_TOK {/* popBlock(); TODO: activate this after degbugging */LLretval = testint + 2;}
 			;
 			
 header		: PROGRAM_TOK  IDENTIFIER {programname = strdup(yytext); /* the token is freeed in freeNode (normaly) */} SEMICOLON 
 			;
 
-start		: header programbody DOT
+start		: header programbody<testint>(5) {printf("Test int value: %d\n", testint);/*program = makeProg(programname, numConstDefs, constDefs, numVarDefs, varDefs, numProcDefs, procDefs, numFuncDefs, funcDefs, numBodyStmnts, bodyStmnts)*/}DOT
 			; 
