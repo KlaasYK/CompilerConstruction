@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <assert.h>
-#include "bigints.c"
+#include "bigints.h"
 
 void operatorHelper(const char *aStr, const char *bStr, void (*f)(Integer *, Integer), char operator){
 	
