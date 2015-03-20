@@ -277,7 +277,7 @@ void freeWCall(WCall wc) {
 
 Printable makeStringPrintable(char *string) {
 	Printable p = malloc(sizeof (struct PrintableItem));
-	p->kind = stringPrint;
+	p->kind = stringKind;
 	int sLength = strlen(string) + 1;
 	char *sCopy = malloc(sLength * sizeof (char));
 	memcpy(sCopy, string, sLength * sizeof (char));
@@ -287,17 +287,17 @@ Printable makeStringPrintable(char *string) {
 
 Printable makeExpPrintable(Exp exp) {
 	Printable p = malloc(sizeof (struct PrintableItem));
-	p->kind = expPrint;
+	p->kind = expKind;
 	p->exp = exp;
 	return p;
 }
 
 void freePrintable(Printable p) {
 	switch (p->kind) {
-		case stringPrint:
+		case stringKind:
 			free(p->string);
 			break;
-		case expPrint:
+		case expKind:
 			freeExp(p->exp);
 			break;
 		default:
