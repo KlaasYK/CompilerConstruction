@@ -1,4 +1,4 @@
 program riktest;
 begin
-    print "hello World!"
-end
+    print 'hello World!'
+end.
