@@ -187,172 +187,362 @@ int main(int argc, char** argv) {
 /* EOF c FILE */
 }
 
-rootexpr	: LPARREN expr RPARREN
-			| IDENTIFIER functioncall?
-			| NUMBER
+rootexpr	: 
+				LPARREN 
+				expr 
+				RPARREN
+			| 
+				IDENTIFIER 
+				functioncall?
+			| 
+				NUMBER
 			;
 
 
-powbase	: MIN_OP powbase
-		| rootexpr
+powbase	: 
+			MIN_OP 
+			powbase
+		| 
+			rootexpr
 		;
 
-factor2	: POW_OP powbase factor2
-		| /* epsilon */
+factor2	: 
+			POW_OP 
+			powbase 
+			factor2
+		| 
+			/* epsilon */
 		;
 
-factor	: powbase factor2 
+factor	: 
+			powbase 
+			factor2 
 		;
 
-term2	: MUL_OP factor term2
-		| /* epsilon */
+term2	: 
+			MUL_OP 
+			factor 
+			term2
+		| 
+			/* epsilon */
 		;
 
-term	: factor term2
+term	: 
+			factor 
+			term2
 		;
 
-sumexpr2	: PLUS_OP term sumexpr2
-			| MIN_OP term sumexpr2
-			| /* epsilon */
+sumexpr2	: 
+				PLUS_OP 
+				term 
+				sumexpr2
+			| 
+				MIN_OP 
+				term 
+				sumexpr2
+			| 
+				/* epsilon */
 			;
 
-sumexpr	: term sumexpr2
+sumexpr	: 
+			term 
+			sumexpr2
 		;
 
-relexpr2	: COMPARE_OP sumexpr relexpr2
-			| /* epsilon */
+relexpr2	: 
+				COMPARE_OP sumexpr relexpr2
+			| 
+				/* epsilon */
 			;
 
-relexpr : sumexpr relexpr2
-		| BOOLEAN
+relexpr : 
+			sumexpr 
+			relexpr2
+		| 
+			BOOLEAN
 		;
 
-notexpr	: NOT_TOK notexpr
-		| relexpr
+notexpr	: 
+			NOT_TOK 
+			notexpr
+		| 
+			relexpr
 		;
 
-andexpr2	: AND_OP notexpr andexpr2
-			| CAND_OP notexpr andexpr2
-			| /* epsilon */
+andexpr2	: 
+				AND_OP 
+				notexpr 
+				andexpr2
+			| 
+				CAND_OP 
+				notexpr 
+				andexpr2
+			| 
+				/* epsilon */
 			;
 
-andexpr	: notexpr andexpr2 
+andexpr	: 
+			notexpr 
+			andexpr2 
 		;
 			
-expr2	: OR_OP andexpr expr2
-		| COR_OP andexpr expr2
-		| /* epsilon */
+expr2	: 
+			OR_OP 
+			andexpr 
+			expr2
+		| 
+			COR_OP 
+			andexpr 
+			expr2
+		| 
+			/* epsilon */
 		;
 
-expr	: andexpr expr2
+expr	: 
+			andexpr 
+			expr2
 		;
 
-guardedcommand	: expr THEN_TOK statementset
+guardedcommand	: 
+					expr 
+					THEN_TOK 
+					statementset
 				;
 
-guardedcommandset	: guardedcommand [ALTGUARD guardedcommand]*
+guardedcommandset	: 
+						guardedcommand 
+						[
+							ALTGUARD 
+							guardedcommand
+						]*
 					;
 
-identifierarray	: IDENTIFIER {lastidentifier = strdup(yytext); /* TODO: add a list USE LEXEME IN SCANNER if yytext fails! */  } [COMMA identifierarray]?
+identifierarray	: 
+					IDENTIFIER {
+						lastidentifier = strdup(yytext); /* TODO: add a list USE LEXEME IN SCANNER if yytext fails! */  
+					} 
+					[
+						COMMA 
+						identifierarray
+					]?
 				;
 
-functioncall	: LPARREN identifierarray RPARREN
+functioncall	: 
+					LPARREN 
+					identifierarray 
+					RPARREN
 				;
 
 /* original version of assignmentcall that has an equal length for the identifiers and the following expressions (could make semantics very hard to handle) */
-assignmentcallV1	: ASSIGNMENT_OP expr
-					| COMMA IDENTIFIER assignmentcall COMMA expr
+assignmentcallV1	: 
+						ASSIGNMENT_OP 
+						expr
+					| 
+						COMMA 
+						IDENTIFIER 
+						assignmentcall 
+						COMMA 
+						expr
 					;
 
 /* newer version of assignmentcall that doesn't make sure yet that the amount of identifers equals the amount of expressions (semantically easier to evaluate) */
-assignmentcallV2	: [COMMA IDENTIFIER]* ASSIGNMENT_OP expr [COMMA expr]*
+assignmentcallV2	: 
+						[
+							COMMA 
+							IDENTIFIER
+						]* 
+						ASSIGNMENT_OP 
+						expr 
+						[
+							COMMA 
+							expr
+						]*
 					;
 
 /* select assignmentcall V1 or V2 */
-assignmentcall	: assignmentcallV2
+assignmentcall	: 
+					assignmentcallV2
 				;
 
-dostatement	:	DOBEGIN_TOK guardedcommandset DOEND_TOK
+dostatement	:	
+				DOBEGIN_TOK 
+				guardedcommandset
+				DOEND_TOK
 			;
 
-ifstatement	:	IFBEGIN_TOK guardedcommandset IFEND_TOK
+ifstatement	:	
+				IFBEGIN_TOK 
+				guardedcommandset 
+				IFEND_TOK
 			;
 
-printable	: STRING
-			| expr
+printable	: 
+				STRING
+			| 
+				expr
 			;
 
-printcall	: PRINT_TOK printable [COMMA printable]*
+printcall	: 
+				PRINT_TOK 
+				printable 
+				[
+					COMMA 
+					printable
+				]*
 			;
 
-readcall	: READ_TOK IDENTIFIER [COMMA IDENTIFIER]*
+readcall	: 
+				READ_TOK 
+				IDENTIFIER 
+				[
+					COMMA 
+					IDENTIFIER
+				]*
 			;
 
-call	:	functioncall
-		|	assignmentcall
+call	:	
+			functioncall
+		|	
+			assignmentcall
 		;
 
-declaration : VAR_TOK identifierarray TYPE_OP TYPE {
-	/* check if the  identifier exists already */
-	if (!existsInTop(lastidentifier)) {
-		insertIdentifier(lastidentifier, VARIABLE, stringToEvalType(yytext), NULL);
-	} else {
-		printTypeError(lastidentifier, DUPLICATE);
-	}
-	
-	
-	}
+declaration : 
+				VAR_TOK 
+				identifierarray 
+				TYPE_OP 
+				TYPE {
+					/* check if the  identifier exists already */
+					if (!existsInTop(lastidentifier)) {
+						insertIdentifier(lastidentifier, VARIABLE, stringToEvalType(yytext), NULL);
+					} else {
+						printTypeError(lastidentifier, DUPLICATE);
+					}
+				}
 			;
 
-statement	: declaration
-			| IDENTIFIER call
-			| printcall
-			| readcall
-			| dostatement
-			| ifstatement
+statement	: 
+				declaration
+			| 
+				IDENTIFIER 
+				call
+			| 
+				printcall
+			| 
+				readcall
+			| 
+				dostatement
+			|
+				ifstatement
 			;
 
-parameterset 	: identifierarray TYPE_OP TYPE
+parameterset 	: 
+					identifierarray 
+					TYPE_OP 
+					TYPE
 				;
 
-variable		: BOOLEAN
-				| NUMBER
-				| STRING
+variable		: 
+					BOOLEAN
+				| 
+					NUMBER
+				| 
+					STRING
 				;
 			
 /* can the last statement in a block end with a semicolon? internet says of a certain version of gcl that a statement has the rule: S -> S;S | ...*/
-statementset2	: SEMICOLON statementset
-				| /* epsilon */
+statementset2	: 
+					SEMICOLON 
+					statementset
+				| 
+					/* epsilon */
 				;
 
-statementsetV1	: statement statementset2
-				| /* epsilon */
+statementsetV1	: 
+					statement 
+					statementset2
+				| 
+					/* epsilon */
 				;
 
 /* alternative where every line needs to end with a semicolon */
-statementsetV2	: statement SEMICOLON statementset
-				| /* epsilon */
+statementsetV2	: statement 
+					SEMICOLON 
+					statementset
+				| 
+					/* epsilon */
 				;
 
 /* select statementset V1 or V2 */
-statementset	: statementsetV1
+statementset	: 
+					statementsetV1
 				;
 
-function	: FUNCTION_TOK IDENTIFIER LPARREN parameterset? RPARREN THEN_TOK TYPE SEMICOLON statementset END_TOK SEMICOLON
+function	: 
+				FUNCTION_TOK 
+				IDENTIFIER 
+				LPARREN 
+				parameterset? 
+				RPARREN 
+				THEN_TOK TYPE 
+				SEMICOLON 
+				statementset 
+				END_TOK 
+				SEMICOLON
 			;
 
-procedure	: PROCEDURE_TOK IDENTIFIER LPARREN VAR_TOK parameterset? RPARREN SEMICOLON statementset END_TOK SEMICOLON
+procedure	: 
+				PROCEDURE_TOK 
+				IDENTIFIER 
+				LPARREN 
+				VAR_TOK 
+				parameterset? 
+				RPARREN 
+				SEMICOLON 
+				statementset 
+				END_TOK 
+				SEMICOLON
 			;
 
-constant_def	: CONSTANT_TOK IDENTIFIER TYPE_OP TYPE COMPARE_OP variable SEMICOLON
+constant_def	: 
+					CONSTANT_TOK
+					IDENTIFIER 
+					TYPE_OP 
+					TYPE 
+					COMPARE_OP 
+					variable 
+					SEMICOLON
 				;
 
 /* first procuders then functions? */
-programbody<int>(int testint) : constant_def* [declaration SEMICOLON]* procedure* function* BEGIN_TOK {putBlock(); /* add a new frame of reference */} statementset END_TOK {/* popBlock(); TODO: activate this after degbugging */LLretval = testint + 2;}
-			;
+programbody<Prog>	: 
+						constant_def* 
+						[
+							declaration 
+							SEMICOLON
+						]* 
+						procedure* 
+						function* 
+						BEGIN_TOK {
+							putBlock(); /* add a new frame of reference */
+						} 
+						statementset 
+						END_TOK {
+							/* popBlock(); TODO: activate this after degbugging */
+						}
+					;
 			
-header		: PROGRAM_TOK  IDENTIFIER {programname = strdup(yytext); /* the token is freeed in freeNode (normaly) */} SEMICOLON 
+header		: 
+				PROGRAM_TOK
+				IDENTIFIER {
+					programname = strdup(yytext); /* the token is freeed in freeNode (normaly) */
+				} 
+				SEMICOLON 
 			;
 
-start		: header programbody<testint>(5) {printf("Test int value: %d\n", testint);/*program = makeProg(programname, numConstDefs, constDefs, numVarDefs, varDefs, numProcDefs, procDefs, numFuncDefs, funcDefs, numBodyStmnts, bodyStmnts)*/}DOT
+start		: 
+				header 
+				programbody<prog>{
+					program  = prog;
+				}
+				DOT
 			; 
