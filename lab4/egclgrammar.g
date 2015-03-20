@@ -484,7 +484,10 @@ declaration :
 
 statement<Stmnt>(Stmnt stmnt) : 
 [
-		declaration
+		declaration{
+			/*TODO placeholder*/
+			stmnt = makeDecStmnt(makeExpDec(makeID(0, "test"), variable, makeBoolExp(makeBool(true))));
+		}
 	| 
 		IDENTIFIER 
 		call
@@ -509,27 +512,30 @@ parameterset 	:
 					TYPE
 				;
 
-variable<ExpTree>(ExpTree exp) : 
-[
-		BOOLEAN{
-			char *bool = strdup(yytext);
-			BoolVal bv;
-			if(strcmp(bool, "true") == 0){
-				bv = true;
-			}else if(strcmp(bool, "false") == 0){
-				bv = false;
+variable<Dec>(ExpTree exp) : 
+	[
+			BOOLEAN{
+				char *bool = strdup(yytext);
+				BoolVal bv;
+				if(strcmp(bool, "true") == 0){
+					bv = true;
+				}else if(strcmp(bool, "false") == 0){
+					bv = false;
+				}
+				exp = makeBoolExp(makeBool(bv));
 			}
-			exp = makeBoolExp(makeBool(bv));
-		}
+		| 
+			NUMBER{
+				exp = makeIntExp(makeInt(strdup(yytext)));
+			}
+	]{
+		LLretval = makeExpDec(NULL, variable, exp);
+	}
 	| 
-		NUMBER{
-			exp = makeIntExp(makeInt(strdup(yytext)));
+		STRING{
+			LLretval = makeStringDec(NULL, variable, strdup(yytext));
 		}
-	| 
-		STRING
-]{
-	LLretval = exp;
-}
+
 ;
 			
 /* can the last statement in a block end with a semicolon? internet says of a certain version of gcl that a statement has the rule: S -> S;S | ...*/
@@ -611,7 +617,7 @@ procedure	:
 				SEMICOLON
 			;
 
-constantdef<Dec>(int type, char *name, ExpTree exp)	: 
+constantdef<Dec>(int type, char *name, Dec dec)	: 
 		CONSTANT_TOK
 		IDENTIFIER{
 			name = strdup(yytext);
@@ -621,11 +627,12 @@ constantdef<Dec>(int type, char *name, ExpTree exp)	:
 			type = stringToEvalType(strdup(yytext));
 		}
 		COMPARE_OP 
-		variable<e>(NULL){
-			exp = e;
+		variable<d>(NULL){
+			dec = d;
 		}
 		SEMICOLON{
-			Dec d = makeDec(makeID(type, name), constant, e);
+			d->id = makeID(type, name);
+			d->idType = constant;
 			LLretval = d;
 		}
 ;

@@ -1,4 +1,9 @@
 program riktest;
+
+constant A : boolean = true;
+constant B : integer = 5463634634672328653;
+constant C : string = 'Hello World!';
+
 begin
-    print 'hello World!'
+    print 'hello World to you too!'
 end.
