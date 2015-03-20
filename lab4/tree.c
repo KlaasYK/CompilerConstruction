@@ -228,7 +228,7 @@ Dec makeStringDec(ID id, IDType idType, char *str) {
 	d->id = id;
 	d->idType = idType;
 	d->decType = stringKind;
-	int sLength = strlen(string) + 1;
+	int sLength = strlen(str) + 1;
 	char *sCopy = malloc(sLength * sizeof (char));
 	memcpy(sCopy, str, sLength * sizeof (char));
 	d->str = sCopy;
@@ -237,7 +237,7 @@ Dec makeStringDec(ID id, IDType idType, char *str) {
 
 void freeDec(Dec d) {
 	freeID(d->id);
-	swich(d->decType){
+	switch(d->decType){
 		case expKind:
 			freeExp(d->expTree);
 			break;
