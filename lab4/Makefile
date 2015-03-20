@@ -14,7 +14,7 @@ parser: egclgrammar.g
 scanner: egclscanner.fl
 	flex egclscanner.fl
 cfiles: egclgrammar.c lex.yy.c symboltable.c
-	gcc -c -g  egclgrammar.c lex.yy.c symboltable.c
+	gcc -c -g -std=c99 egclgrammar.c lex.yy.c symboltable.c
 tree: tree.c expressiontree.c
 	gcc -c -g -std=c99 expressiontree.c tree.c
 

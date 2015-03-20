@@ -20,8 +20,17 @@
 typedef struct Stmnts{
 	int numStmnts;
 	Stmnt *stmnts;
-	
 }*Stmnts;
+
+typedef struct Decs{
+	int numDecs;
+	Dec *decs;
+}*Decs;
+
+typedef struct IDs{
+	int numIds;
+	ID *ids;
+}*IDs;
 
 extern FILE * yyin;
 extern char * yytext;
@@ -357,19 +366,35 @@ guardedcommandset	:
 						]*
 					;
 
-identifierarray	: 
-					IDENTIFIER {
-						addTempList(strdup(yytext));
-					} 
-					[
-						COMMA 
-						identifierarray
-					]?
-				;
+identifierarray<IDs>(IDs idents)	: 
+		IDENTIFIER {
+			addTempList(strdup(yytext));
+			ID id = makeID(0, strdup(yytext));
+			idents = malloc(sizeof(struct IDs));
+			idents->numIds = 1;
+			idents->ids = malloc(sizeof(ID));
+			idents->ids[0] = id;
+		} 
+		[
+			COMMA 
+			identifierarray<ids>(NULL){
+				int oldNumIds = idents->numIds;
+				idents->numIds += ids->numIds;
+				idents->ids = realloc(idents->ids, idents->numIds*sizeof(ID));
+				for(int i = 0; i + oldNumIds < idents->numIds; i++){
+					idents->ids[i + oldNumIds] = ids->ids[i];
+				}
+				free(ids->ids);
+				free(ids);
+			}
+		]?{
+			LLretval = idents;
+		}
+;
 
 functioncall	: 
 					LPARREN 
-					identifierarray 
+					identifierarray(NULL)/* TODO check validity: can't calls contain expressions? */
 					RPARREN
 				;
 
@@ -439,7 +464,7 @@ printcall<WCall>(int numitems, Printable *ps) :
 			COMMA 
 			printable<p>{
 				numitems++;
-				realloc(ps, numitems*sizeof(Printable));
+				ps = realloc(ps, numitems*sizeof(Printable));
 				ps[numitems-1] = p;
 			}
 		]*{
@@ -463,11 +488,29 @@ call	:
 			assignmentcall
 		;
 
-declaration : 
+declaration<Decs>(IDs idents): 
 				VAR_TOK 
-				identifierarray 
+				identifierarray<ids>(NULL){
+					idents = ids;
+				}
 				TYPE_OP 
 				TYPE {
+					int type = stringToEvalType(strdup(yytext));
+					/* TREE */
+					for(int i = 0; i < idents->numIds; i++){
+						idents->ids[i]->type = type;
+					}
+					Decs d  = malloc(idents->numIds*sizeof(struct Decs));
+					d->numDecs = idents->numIds;
+					d->decs = malloc(d->numDecs*sizeof(Dec));
+					for(int i=0; i < d->numDecs; i++){
+						d->decs[i] = makeExpUninitDec(idents->ids[i], variable);
+					}
+					free(idents->ids);
+					free(idents);
+					LLretval = d;
+					
+					/* SYMBOL TABLE */
 					INode *n = tempidentifierlist;
 					while (n != NULL) {
 						/* check if the  identifier exists already */
@@ -482,18 +525,28 @@ declaration :
 				}
 			;
 
-statement<Stmnt>(Stmnt stmnt) : 
+statement<Stmnts>(Stmnts ss) : 
 [
-		declaration{
+		declaration<ds>(NULL){
 			/*TODO placeholder*/
-			stmnt = makeDecStmnt(makeExpDec(makeID(0, "test"), variable, makeBoolExp(makeBool(true))));
+			ss = malloc(sizeof(struct Stmnts));
+			ss->numStmnts = ds->numDecs;
+			ss->stmnts = malloc(ss->numStmnts*sizeof(Stmnt));
+			for(int i = 0;i < ss->numStmnts; i++){
+				ss->stmnts[i] = makeDecStmnt(ds->decs[i]);
+			}
+			free(ds->decs);
+			free(ds);
 		}
 	| 
 		IDENTIFIER 
 		call
 	| 
 		printcall<wc>(0, NULL){
-			stmnt = makeWCallStmnt(wc);
+			ss = malloc(sizeof(struct Stmnts));
+			ss->numStmnts = 1;
+			ss->stmnts = malloc(ss->numStmnts*sizeof(Stmnt));
+			ss->stmnts[0] = makeWCallStmnt(wc);
 		}
 	| 
 		readcall
@@ -502,12 +555,12 @@ statement<Stmnt>(Stmnt stmnt) :
 	|
 		ifstatement
 ]{
-	LLretval = stmnt;
+	LLretval = ss;
 }
 ;
 
 parameterset 	: 
-					identifierarray 
+					identifierarray(NULL) 
 					TYPE_OP 
 					TYPE
 				;
@@ -553,19 +606,21 @@ statementset2<Stmnts> :
 		}
 ;
 
-statementsetV1<Stmnts>(Stmnt stmnt) : 
-		statement<s>(NULL){
-			stmnt = s;
+statementsetV1<Stmnts>(Stmnts stmnts) : 
+		statement<ss>(NULL){
+			stmnts = ss;
 		}
 		statementset2<ss>{
-			ss->numStmnts++;
-			if(ss->numStmnts == 1){
-				ss->stmnts = malloc(ss->numStmnts*sizeof(Stmnt));
-			}else{
-				realloc(ss->stmnts, ss->numStmnts*sizeof(Stmnt));
+			int oldNumStmnts = stmnts->numStmnts;
+			stmnts->numStmnts += ss->numStmnts;
+			Stmnt *sarr = stmnts->stmnts;
+			stmnts->stmnts = realloc(stmnts->stmnts, stmnts->numStmnts*sizeof(Stmnt));
+			for(int i = 0; i + oldNumStmnts < stmnts->numStmnts; i++){
+				stmnts->stmnts[i + oldNumStmnts] = ss->stmnts[i];
 			}
-			ss->stmnts[ss->numStmnts-1] = stmnt;
-			LLretval = ss;
+			free(ss->stmnts);
+			free(ss);
+			LLretval = stmnts;
 		}
 	| 
 		/* epsilon */{
@@ -645,7 +700,7 @@ programbody<Prog>(int numConstDefs, Dec *constDefs, int numVarDefs, Dec *varDefs
 				if(numConstDefs == 1){
 					constDefs = malloc(numConstDefs*sizeof(Dec));
 				}else{
-					realloc(constDefs, numConstDefs*sizeof(Dec));
+					constDefs = realloc(constDefs, numConstDefs*sizeof(Dec));
 				}
 				constDefs[numConstDefs-1] = cd;
 			}
@@ -653,21 +708,37 @@ programbody<Prog>(int numConstDefs, Dec *constDefs, int numVarDefs, Dec *varDefs
 			printf("Num of const defs: %d\n", numConstDefs);
 		}
 		[
-			declaration 
-			SEMICOLON
-		]* 
+			declaration<vds>(NULL)
+			SEMICOLON{
+				int oldNumVarDefs = numVarDefs;
+				numVarDefs += vds->numDecs;
+				if(oldNumVarDefs == 0){
+					varDefs = malloc(numVarDefs*sizeof(Dec));
+				}else{
+					varDefs = realloc(varDefs, numVarDefs*sizeof(Dec));
+				}
+				for(int i = 0; i + oldNumVarDefs < numVarDefs; i++){
+					varDefs[i + oldNumVarDefs] = vds->decs[i];
+				}
+				free(vds->decs);
+				free(vds);
+			}
+		]* {
+			printf("Num of var defs: %d\n", numVarDefs);
+		}
 		procedure* 
 		function* 
 		BEGIN_TOK {
-			//putBlock(); /* add a new frame of reference */
+			putBlock(); /* add a new frame of reference */
 		} 
 		statementset<bss>{
 			numBodyStmnts = bss->numStmnts;
 			printf("Num of bodystmnts: %d\n", bss->numStmnts);
 			bodyStmnts = bss->stmnts;
+			free(bss);
 		}
 		END_TOK {
-			/* popBlock(); TODO: activate this after degbugging */
+			/* popBlock(); TODO: activate this after debugging */
 			LLretval = makeProg(programname, numConstDefs, constDefs, numVarDefs, varDefs, numProcDefs, procDefs, numFuncDefs, funcDefs, numBodyStmnts, bodyStmnts);
 		}
 ;
@@ -675,7 +746,7 @@ programbody<Prog>(int numConstDefs, Dec *constDefs, int numVarDefs, Dec *varDefs
 header		: 
 		PROGRAM_TOK
 		IDENTIFIER {
-			programname = strdup(yytext); /* the token is freeed in freeNode (normaly) */
+			programname = strdup(yytext); /* the token is freed in freeNode (normally) */
 		} 
 		SEMICOLON 
 ;
@@ -691,7 +762,8 @@ start		:
 				printf("Print string: %s\n", program->bodyStmnts[0]->wCall->items[0]->string);
 				printf("boolval: %s\n", (program->constDefs[0]->expTree->node.boolval->value == true)?"true":"false");
 				printf("intval: %s\n", program->constDefs[1]->expTree->node.intval->value);
+				
+				freeProg(program);
 			}
-			freeProg(program);
 		}
 ; 
