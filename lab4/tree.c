@@ -223,7 +223,7 @@ Dec makeExpDec(ID id, IDType idType, ExpTree expTree) {
 	return d;
 }
 
-Dec makeExpDec(ID id, IDType idType, char *str) {
+Dec makeStringDec(ID id, IDType idType, char *str) {
 	Dec d = malloc(sizeof (struct Declaration));
 	d->id = id;
 	d->idType = idType;
