@@ -353,7 +353,7 @@ guardedcommandset	:
 
 identifierarray	: 
 					IDENTIFIER {
-						lastidentifier = strdup(yytext); /* TODO: add a list USE LEXEME IN SCANNER if yytext fails! */  
+						addTempList(strdup(yytext));
 					} 
 					[
 						COMMA 
@@ -445,26 +445,18 @@ declaration :
 				identifierarray 
 				TYPE_OP 
 				TYPE {
-					/* check if the  identifier exists already */
-					if (!existsInTop(lastidentifier)) {
-						insertIdentifier(lastidentifier, VARIABLE, stringToEvalType(yytext), NULL);
-					} else {
-						printTypeError(lastidentifier, DUPLICATE);
+					INode *n = tempidentifierlist;
+					while (n != NULL) {
+						/* check if the  identifier exists already */
+						if ( !existsInTop(n->name) ) {
+							insertIdentifier(strdup(n->name), VARIABLE, stringToEvalType(yytext), NULL);
+						} else {
+							printTypeError(n->name, DUPLICATE);
+						}
+						n = n->next;
 					}
+					freeTempList();
 				}
-declaration : VAR_TOK identifierarray TYPE_OP TYPE {
-	INode *n = tempidentifierlist;
-	while (n != NULL) {
-		/* check if the  identifier exists already */
-		if ( !existsInTop(n->name) ) {
-			insertIdentifier(strdup(n->name), VARIABLE, stringToEvalType(yytext), NULL);
-		} else {
-			printTypeError(n->name, DUPLICATE);
-		}
-		n = n->next;
-	}
-	freeTempList();
-}
 			;
 
 statement	: 
