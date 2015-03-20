@@ -110,6 +110,7 @@ struct Declaration {
     ID id;
     IDType idType;
     PrintKind decType;
+    BoolVal isInitialized;
     union{
         ExpTree expTree;
         char *str;
@@ -185,6 +186,7 @@ Stmnt makeIfStmnt(If i);
 Stmnt makeDoStmnt(Do d);
 void freeStmnt(Stmnt s);
 
+Dec makeExpDec(ID id, IDType idType);
 Dec makeExpDec(ID id, IDType idType, ExpTree expTree);
 Dec makeStringDec(ID id, IDType idType, char *str);
 void freeDec(Dec d);

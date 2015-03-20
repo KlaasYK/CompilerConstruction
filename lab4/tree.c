@@ -214,11 +214,21 @@ void freeStmnt(Stmnt s) {
 	free(s);
 }
 
+Dec makeExpDec(ID id, IDType idType) {
+	Dec d = malloc(sizeof (struct Declaration));
+	d->id = id;
+	d->idType = idType;
+	d->decType = expKind;
+	d->isInitialized = false;
+	return d;
+}
+
 Dec makeExpDec(ID id, IDType idType, ExpTree expTree) {
 	Dec d = malloc(sizeof (struct Declaration));
 	d->id = id;
 	d->idType = idType;
 	d->decType = expKind;
+	d->isInitialized = true;
 	d->expTree = expTree;
 	return d;
 }
@@ -228,6 +238,7 @@ Dec makeStringDec(ID id, IDType idType, char *str) {
 	d->id = id;
 	d->idType = idType;
 	d->decType = stringKind;
+	d->isInitialized = true;
 	int sLength = strlen(str) + 1;
 	char *sCopy = malloc(sLength * sizeof (char));
 	memcpy(sCopy, str, sLength * sizeof (char));
@@ -237,16 +248,18 @@ Dec makeStringDec(ID id, IDType idType, char *str) {
 
 void freeDec(Dec d) {
 	freeID(d->id);
-	switch(d->decType){
-		case expKind:
-			freeExp(d->expTree);
-			break;
-		case stringKind:
-			free(d->str);
-			break;
-		default:
-			fprintf(stderr, "Undefined kind of statement!");
-			exit(EXIT_FAILURE);
+	if(d->isInitialized = true){
+		switch(d->decType){
+			case expKind:
+				freeExp(d->expTree);
+				break;
+			case stringKind:
+				free(d->str);
+				break;
+			default:
+				fprintf(stderr, "Undefined kind of statement!");
+				exit(EXIT_FAILURE);
+		}
 	}
 	free(d);
 }
