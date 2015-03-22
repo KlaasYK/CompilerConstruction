@@ -445,7 +445,7 @@ assignmentcallV1	:
 						expr
 					;
 
-/* newer version of assignmentcall that doesn't make sure yet that the amount of identifers equals the amount of expressions (semantically easier to evaluate) */
+/* newer version of assignmentcall that doesn't make sure yet that the amount of identifiers equals the amount of expressions (semantically easier to evaluate) */
 assignmentcallV2	: 
 						[
 							COMMA 
@@ -613,10 +613,31 @@ statement<Stmnts>(Stmnts ss) :
 ;
 
 parameterset 	: 
-					identifierarray(NULL) 
-					TYPE_OP 
-					TYPE
-				;
+		/* TODO: check for same name */
+		VAR_TOK
+		IDENTIFIER {
+			//addTempList(strdup(yytext));
+		}
+		[COMMA identifierarray(NULL)]?
+		TYPE_OP
+		TYPE {
+			/* call by ref */
+			/*int tc_type = stringToEvalType(yytext) + 2;
+			INode in = tempidentifierlist;
+			while (in != NULL) {
+				Node *new = makeNode(strdup(in->name))
+				in = in->next;
+			}
+			freeTempList();*/
+		}
+		[COMMA parameterset]?
+	| 
+		IDENTIFIER
+		[COMMA identifierarray(NULL)]?
+		TYPE_OP
+		TYPE
+		[COMMA parameterset]?
+	;
 
 variable<Dec>(ExpTree exp, int type) : 
 	[
