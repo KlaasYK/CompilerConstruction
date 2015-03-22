@@ -7,16 +7,15 @@ endif
 GCL = $(subst .gcl,.c99,$(wildcard *.gcl))
 
 
-all: parser scanner cfiles tree
+all: parser scanner cfiles
 	gcc -g -o $(EXE) egclgrammar.o lex.yy.o symboltable.o tree.o expressiontree.o
 parser: egclgrammar.g
 	LLnextgen egclgrammar.g
 scanner: egclscanner.fl
 	flex egclscanner.fl
 cfiles: egclgrammar.c lex.yy.c symboltable.c
-	gcc -c -g -std=c99 egclgrammar.c lex.yy.c symboltable.c
-tree: tree.c expressiontree.c
-	gcc -c -g -std=c99 expressiontree.c tree.c
+	gcc -c -g -std=gnu99 egclgrammar.c lex.yy.c symboltable.c expressiontree.c tree.c
+
 
 run: $(GCL)
 	
