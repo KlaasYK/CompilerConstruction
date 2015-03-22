@@ -474,7 +474,7 @@ printcall<WCall>(int numitems, Printable *ps) :
 		}
 ;
 
-readcall	: 
+readcall<RCall>	: 
 				READ_TOK 
 				IDENTIFIER 
 				[
@@ -554,7 +554,7 @@ statement<Stmnts>(Stmnts ss) :
 			ss = malloc(sizeof(struct Stmnts));
 			ss->numStmnts = 1;
 			ss->stmnts = malloc(ss->numStmnts*sizeof(Stmnt));
-			ss->stmnts[0] = makeRCallStmnt(rc));
+			ss->stmnts[0] = makeRCallStmnt(rc);
 		}
 	| 
 		dostatement
