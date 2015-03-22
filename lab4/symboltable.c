@@ -183,16 +183,13 @@ Node* getNode(char *name) {
 		while(n != NULL) {
 			if (strcmp(n->name, name) == 0 ) {
 				// Found it!
-				continue;
+				return n;
 			}
 			n = n->next;
 		}
-		if (n == NULL) {
-			// Reached end of current list
-			currentlist = currentlist->nextlist;
-		}
+		currentlist = currentlist->nextlist;
 	}
-	return n;
+	return NULL;
 }
 
 NodeType lookupType(char *name) {

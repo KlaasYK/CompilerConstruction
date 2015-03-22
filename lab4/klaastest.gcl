@@ -1,5 +1,7 @@
 program dummy;
 
+constant kaas : integer = false;
+
 var dummyvar : integer;
 
 begin

@@ -8,5 +8,4 @@ var m, y, z : integer;
 begin
     print 'hello World to you too!';
     var m, y, z : integer;
-    read y, z
 end.

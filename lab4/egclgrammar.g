@@ -168,6 +168,10 @@ void LLmessage(int token) {
 
 void printTypeError(char *identifier, int ErrorType) {
 	int i = 0, k;
+	
+	printf("\n Symboltable:\n");
+	printSymbolTable();
+	
 	printf("\n");
 	k = printf("Error on line %d: ", linecount+1);
 	printf("%s", lines[linecount]);
@@ -177,6 +181,7 @@ void printTypeError(char *identifier, int ErrorType) {
 	printf("^\n");
 	switch (ErrorType) {
 		case DUPLICATE: printf("Duplicate identifier (%s) detected at column %d\n", identifier, columnnr+1);
+		case WRONGTYPE: printf("Value of '%s' is of the wrong type at column %d\n", identifier, columnnr); //TODO: print more info
 	}
 	
 	free(identifier);
@@ -581,13 +586,13 @@ variable<Dec>(ExpTree exp, int type) :
 				}else if(strcmp(bool, "false") == 0){
 					bv = false;
 				}
-				type = BOOLEAN_TYPE;
+				type = CONST_BOOLEAN_TYPE;
 				free(bool);
 				exp = makeBoolExp(makeBool(bv));
 			}
 		| 
 			NUMBER{
-				type = INTEGER_TYPE;
+				type = CONST_INTEGER_TYPE;
 				exp = makeIntExp(makeInt(yytext));
 			}
 	]{
