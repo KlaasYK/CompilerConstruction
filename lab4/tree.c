@@ -4,10 +4,12 @@
 
 Prog makeProg(char *name, int numConstDefs, Dec* constDefs, int numVarDefs, Dec* varDefs, int numProcDefs, ProcDef* procDefs, int numFuncDefs, FuncDef* funcDefs, int numBodyStmnts, Stmnt *bodyStmnts) {
 	Prog p = malloc(sizeof (struct Program));
-	int nLength = strlen(name) + 1;
-	char *nCopy = malloc(nLength * sizeof (char));
-	memcpy(nCopy, name, nLength * sizeof (char));
-	p->name = nCopy;
+	if(name != NULL){
+		int nLength = strlen(name) + 1;
+		char *nCopy = malloc(nLength * sizeof (char));
+		memcpy(nCopy, name, nLength * sizeof (char));
+		p->name = nCopy;
+	}
 	p->numConstDefs = numConstDefs;
 	p->constDefs = constDefs;
 	p->numVarDefs = numVarDefs;
@@ -85,10 +87,12 @@ void freeFuncDef(FuncDef fd) {
 
 ProcDef makeProcDef(char *name, int numParams, Param *params, int numStmnts, Stmnt *stmnts) {
 	ProcDef pd = malloc(sizeof (struct ProcedureDefinition));
-	int nLength = strlen(name) + 1;
-	char *nCopy = malloc(nLength * sizeof (char));
-	memcpy(nCopy, name, nLength * sizeof (char));
-	pd->name = nCopy;
+	if(name != NULL){
+		int nLength = strlen(name) + 1;
+		char *nCopy = malloc(nLength * sizeof (char));
+		memcpy(nCopy, name, nLength * sizeof (char));
+		pd->name = nCopy;
+	}
 	pd->numParams = numParams;
 	pd->params = params;
 	pd->numStmnts = numStmnts;
@@ -239,10 +243,12 @@ Dec makeStringDec(ID id, IDType idType, char *str) {
 	d->idType = idType;
 	d->decType = stringKind;
 	d->isInitialized = true;
-	int sLength = strlen(str) + 1;
-	char *sCopy = malloc(sLength * sizeof (char));
-	memcpy(sCopy, str, sLength * sizeof (char));
-	d->str = sCopy;
+	if(str != NULL){
+		int sLength = strlen(str) + 1;
+		char *sCopy = malloc(sLength * sizeof (char));
+		memcpy(sCopy, str, sLength * sizeof (char));
+		d->str = sCopy;
+	}
 	return d;
 }
 
@@ -314,10 +320,12 @@ void freeWCall(WCall wc) {
 Printable makeStringPrintable(char *string) {
 	Printable p = malloc(sizeof (struct PrintableItem));
 	p->kind = stringKind;
-	int sLength = strlen(string) + 1;
-	char *sCopy = malloc(sLength * sizeof (char));
-	memcpy(sCopy, string, sLength * sizeof (char));
-	p->string = sCopy;
+	if(string != NULL){
+		int sLength = strlen(string) + 1;
+		char *sCopy = malloc(sLength * sizeof (char));
+		memcpy(sCopy, string, sLength * sizeof (char));
+		p->string = sCopy;
+	}
 	return p;
 }
 
@@ -345,10 +353,12 @@ void freePrintable(Printable p) {
 
 ProcCall makeProcCall(char *name, int numParams, Exp *params) {
 	ProcCall pc = malloc(sizeof (struct ProcedureCall));
-	int nLength = strlen(name) + 1;
-	char *nCopy = malloc(nLength * sizeof (char));
-	memcpy(nCopy, name, nLength * sizeof (char));
-	pc->name = nCopy;
+	if(name != NULL){
+		int nLength = strlen(name) + 1;
+		char *nCopy = malloc(nLength * sizeof (char));
+		memcpy(nCopy, name, nLength * sizeof (char));
+		pc->name = nCopy;
+	}
 	pc->numParams = numParams;
 	pc->params = params;
 	return pc;
