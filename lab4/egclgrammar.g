@@ -510,7 +510,10 @@ readcall<RCall>(IDs ids)	:
 						ids->ids = realloc(ids->ids, ids->numIds * sizeof(ID));
 						ids->ids[ids->numIds-1] = makeID(getType(strdup(yytext)), yytext);
 					}
-				]*
+				]*{
+					RCall rc = makeRCall(ids->numIds, ids->ids);
+					LLretval = rc;
+				}
 			;
 
 call	:	
