@@ -17,6 +17,7 @@
 #define DUPLICATE 256
 #define WRONGTYPE 257
 #define UNKNOWN 258
+#define WRITETOCONSTANT 259
 
 typedef struct Stmnts{
 	int numStmnts;
@@ -80,7 +81,19 @@ void addTempList(char *name) {
 	tempidentifierlist = new;
 }
 
-
+int getType(char *name) {
+	NodeType nt = lookupType(name);
+	int type = evalType(name, nt);
+	if(type == -1){
+		// trying to save something that was not declared
+		printTypeError(name, UNKNOWN);
+	}
+	if (type == CONST_BOOLEAN_TYPE || CONST_INTEGER_TYPE) {
+		printTypeError(name, WRITETOCONSTANT);
+	}
+	free(name);
+	return type;
+}
 
 void readFile(char *filename) {
 	FILE * fin = fopen(filename, "r");
@@ -181,9 +194,10 @@ void printTypeError(char *identifier, int ErrorType) {
 	}
 	printf("^\n");
 	switch (ErrorType) {
-		case DUPLICATE: printf("Duplicate identifier (%s) detected at column %d\n", identifier, columnnr+1); break
-		case WRONGTYPE: printf("Value of '%s' is of the wrong type at column %d\n", identifier, columnnr+1); break//TODO: print more info
-		case UNKNOWN: printf("Unknown identifier (%s) detected at column %d\n", identifier, columnnr+1); break
+		case DUPLICATE: printf("Duplicate identifier (%s), at column %d\n", identifier, columnnr+1); break
+		case WRONGTYPE: printf("Value of '%s' is of the wrong type, at column %d\n", identifier, columnnr+1); break//TODO: print more info
+		case UNKNOWN: printf("Unknown identifier (%s), at column %d\n", identifier, columnnr+1); break
+		case WRONGTYPE: printf("Trying to write to '%s' which is a constant, at column %d\n", identifier, columnnr+1); break//TODO: print more info
 	}
 	
 	free(identifier);
@@ -486,12 +500,7 @@ readcall<RCall>(IDs ids)	:
 				IDENTIFIER{
 					ids = malloc(sizeof(struct IDs));
 						ids->numIds = 1;
-						NodeType nt = lookupType(yytext);
-						int type = evalType(yytext, nt);
-						if(type == -1){
-							
-						}
-						ids->ids[0] = makeID(type, yytext);
+						ids->ids[0] = makeID(getType(strdup(yytext)), yytext);
 					makeID
 				}
 				[
