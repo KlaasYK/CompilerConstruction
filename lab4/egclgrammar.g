@@ -867,16 +867,31 @@ procedure	:
 					if (!existsInTop(lastmethodidentifier)) {
 						insertIdentifier(lastmethodidentifier, METHOD, VOID_TYPE, tempparamlist);
 						tempparamlist = NULL;
-						lastmethodidentifier = NULL;
 					} else {
 						freeTempParamList();
 						/* lastmethodidentifier is freeëd in printing... */
 						printTypeError(lastmethodidentifier, DUPLICATE);
 					}
 				}
-				SEMICOLON 
+				SEMICOLON {
+					putBlock();
+					/* insert all the parameters to the symboltable */
+					Node *n = lookupParams(lastmethodidentifier);
+					while (n != NULL) {
+						if (!existsInTop(n->name)) {
+							insertIdentifier(strdup(n->name), n->type, n->evaltype, NULL);
+							n = n->next;
+						} else {
+							/* TODO: make error for incorrect parameters */
+							printTypeError(lastmethodidentifier, DUPLICATE);
+						}
+					}
+				}
 				statementset<LLdiscard>
-				END_TOK 
+				END_TOK {
+					/* popBlock(); TODO: remove popBlock */
+					lastmethodidentifier = NULL;
+				}
 				SEMICOLON
 			;
 

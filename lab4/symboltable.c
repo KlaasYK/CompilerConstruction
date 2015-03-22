@@ -7,6 +7,16 @@
 
 Stack *symboltable = NULL;
 
+int getNumNodes(Node *n) {
+	Node *t = n;
+	int k = 0;
+	while (t != NULL) {
+		k++;
+		t = t->next;
+	}
+	return k;
+}
+
 int existsInTop(char *name) {
 	Node *n = symboltable->top->first;
 	while (n != NULL) {

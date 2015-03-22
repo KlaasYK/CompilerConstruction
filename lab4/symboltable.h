@@ -36,6 +36,8 @@ typedef struct Stack {
 	List *top;
 } Stack;
 
+int getNumNodes(Node *n);
+
 /* convert input type string to integer for faster comparisson */
 int stringToEvalType(char *typestring);
 
