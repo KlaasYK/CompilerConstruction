@@ -613,29 +613,45 @@ statement<Stmnts>(Stmnts ss) :
 ;
 
 parameterset 	: 
-		/* TODO: check for same name */
+		/* TODO: check for same name of parameters */
 		VAR_TOK
 		IDENTIFIER {
-			//addTempList(strdup(yytext));
+			addTempList(strdup(yytext));
 		}
 		[COMMA identifierarray(NULL)]?
 		TYPE_OP
 		TYPE {
 			/* call by ref */
-			/*int tc_type = stringToEvalType(yytext) + 2;
-			INode in = tempidentifierlist;
+			int tc_type = stringToEvalType(yytext) + 2;
+			INode *in = tempidentifierlist;
 			while (in != NULL) {
-				Node *new = makeNode(strdup(in->name))
+				Node *new = makeNode(strdup(in->name), VARIABLE, tc_type, NULL);
+				new->next = tempparamlist;
+				tempparamlist = new;
 				in = in->next;
 			}
-			freeTempList();*/
+			freeTempList();
 		}
 		[COMMA parameterset]?
 	| 
 		IDENTIFIER
+		{
+			addTempList(strdup(yytext));
+		}
 		[COMMA identifierarray(NULL)]?
 		TYPE_OP
-		TYPE
+		TYPE {
+			/* call by value */
+			int tc_type = stringToEvalType(yytext);
+			INode *in = tempidentifierlist;
+			while (in != NULL) {
+				Node *new = makeNode(strdup(in->name), VARIABLE, tc_type, NULL);
+				new->next = tempparamlist;
+				tempparamlist = new;
+				in = in->next;
+			}
+			freeTempList();
+		}
 		[COMMA parameterset]?
 	;
 
@@ -730,7 +746,7 @@ function	:
 					lastmethodidentifier = strdup(yytext);
 				}
 				LPARREN 
-				parameterset? /* TODO: add parameterset */
+				parameterset? 
 				RPARREN 
 				THEN_TOK
 				TYPE 
