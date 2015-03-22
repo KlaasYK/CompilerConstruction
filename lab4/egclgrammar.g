@@ -369,7 +369,7 @@ guardedcommandset	:
 identifierarray<IDs>(IDs idents)	: 
 		IDENTIFIER {
 			addTempList(strdup(yytext));
-			ID id = makeID(0, strdup(yytext));
+			ID id = makeID(0, yytext);
 			idents = malloc(sizeof(struct IDs));
 			idents->numIds = 1;
 			idents->ids = malloc(sizeof(ID));
@@ -443,7 +443,7 @@ ifstatement	:
 
 printable<Printable> : 
 		STRING{
-			Printable p = makeStringPrintable(strdup(yytext));
+			Printable p = makeStringPrintable(yytext);
 			LLretval = p;
 		}
 	| 
@@ -495,7 +495,7 @@ declaration<Decs>(IDs idents):
 				}
 				TYPE_OP 
 				TYPE {
-					int type = stringToEvalType(strdup(yytext));
+					int type = stringToEvalType(yytext);
 					/* TREE */
 					for(int i = 0; i < idents->numIds; i++){
 						idents->ids[i]->type = type;
@@ -575,18 +575,19 @@ variable<Dec>(ExpTree exp) :
 				}else if(strcmp(bool, "false") == 0){
 					bv = false;
 				}
+				free(bool);
 				exp = makeBoolExp(makeBool(bv));
 			}
 		| 
 			NUMBER{
-				exp = makeIntExp(makeInt(strdup(yytext)));
+				exp = makeIntExp(makeInt(yytext));
 			}
 	]{
 		LLretval = makeExpDec(NULL, variable, exp);
 	}
 	| 
 		STRING{
-			LLretval = makeStringDec(NULL, variable, strdup(yytext));
+			LLretval = makeStringDec(NULL, variable, yytext);
 		}
 
 ;
@@ -679,7 +680,7 @@ constantdef<Dec>(int type, char *name, Dec dec)	:
 		}
 		TYPE_OP 
 		TYPE{
-			type = stringToEvalType(strdup(yytext));
+			type = stringToEvalType(yytext);
 		}
 		COMPARE_OP 
 		variable<d>(NULL){
@@ -688,6 +689,7 @@ constantdef<Dec>(int type, char *name, Dec dec)	:
 		SEMICOLON{
 			d->id = makeID(type, name);
 			d->idType = constant;
+			free(name);
 			LLretval = d;
 		}
 ;
