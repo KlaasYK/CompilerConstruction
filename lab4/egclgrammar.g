@@ -81,19 +81,7 @@ void addTempList(char *name) {
 	tempidentifierlist = new;
 }
 
-int getType(char *name) {
-	NodeType nt = lookupType(name);
-	int type = evalType(name, nt);
-	if(type == -1){
-		// trying to save something that was not declared
-		printTypeError(name, UNKNOWN);
-	}
-	if (type == CONST_BOOLEAN_TYPE || CONST_INTEGER_TYPE) {
-		printTypeError(name, WRITETOCONSTANT);
-	}
-	free(name);
-	return type;
-}
+
 
 void readFile(char *filename) {
 	FILE * fin = fopen(filename, "r");
@@ -194,10 +182,10 @@ void printTypeError(char *identifier, int ErrorType) {
 	}
 	printf("^\n");
 	switch (ErrorType) {
-		case DUPLICATE: printf("Duplicate identifier (%s), at column %d\n", identifier, columnnr+1); break
-		case WRONGTYPE: printf("Value of '%s' is of the wrong type, at column %d\n", identifier, columnnr+1); break//TODO: print more info
-		case UNKNOWN: printf("Unknown identifier (%s), at column %d\n", identifier, columnnr+1); break
-		case WRONGTYPE: printf("Trying to write to '%s' which is a constant, at column %d\n", identifier, columnnr+1); break//TODO: print more info
+		case DUPLICATE: printf("Duplicate identifier (%s), at column %d\n", identifier, columnnr+1); break;
+		case WRONGTYPE: printf("Value of '%s' is of the wrong type, at column %d\n", identifier, columnnr+1); break;//TODO: print more info
+		case UNKNOWN: printf("Unknown identifier (%s), at column %d\n", identifier, columnnr+1); break;
+		case WRITETOCONSTANT: printf("Trying to write to '%s' which is a constant, at column %d\n", identifier, columnnr+1); break;//TODO: print more info
 	}
 	
 	free(identifier);
@@ -207,6 +195,20 @@ void printTypeError(char *identifier, int ErrorType) {
 	freeLines();
 	freeSymbolTable();
 	exit(EXIT_FAILURE);
+}
+
+int getType(char *name) {
+	NodeType nt = lookupType(name);
+	int type = lookupEvalType(name, nt);
+	if(type == -1){
+		// trying to save something that was not declared
+		printTypeError(name, UNKNOWN);
+	}
+	if (type == CONST_BOOLEAN_TYPE || type == CONST_INTEGER_TYPE) {
+		printTypeError(name, WRITETOCONSTANT);
+	}
+	free(name);
+	return type;
 }
 
 int main(int argc, char** argv) {
