@@ -479,9 +479,19 @@ printcall<WCall>(int numitems, Printable *ps) :
 		}
 ;
 
-readcall<RCall>	: 
+readcall<RCall>(IDs ids)	: 
 				READ_TOK 
-				IDENTIFIER 
+				IDENTIFIER{
+					ids = malloc(sizeof(struct IDs));
+						ids->numIds = 1;
+						NodeType nt = lookupType(yytext);
+						int type = evalType(yytext, nt);
+						if(type == -1){
+							
+						}
+						ids->ids[0] = makeID(, yytext);
+					makeID
+				}
 				[
 					COMMA 
 					IDENTIFIER
