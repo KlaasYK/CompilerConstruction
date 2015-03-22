@@ -549,7 +549,12 @@ statement<Stmnts>(Stmnts ss) :
 			ss->stmnts[0] = makeWCallStmnt(wc);
 		}
 	| 
-		readcall
+		readcall<rc>{
+			ss = malloc(sizeof(struct Stmnts));
+			ss->numStmnts = 1;
+			ss->stmnts = malloc(ss->numStmnts*sizeof(Stmnt));
+			ss->stmnts[0] = makeRCallStmnt(rc));
+		}
 	| 
 		dostatement
 	|
