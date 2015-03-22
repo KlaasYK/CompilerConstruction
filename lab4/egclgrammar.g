@@ -514,6 +514,7 @@ readcall<RCall>(IDs ids)	:
 					}
 				]*{
 					RCall rc = makeRCall(ids->numIds, ids->ids);
+					free(ids);
 					LLretval = rc;
 				}
 			;
