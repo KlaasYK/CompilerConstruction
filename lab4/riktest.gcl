@@ -5,6 +5,10 @@ constant B : integer = 5463634634672328653;
 #constant C : string = 'Hello World!'; not supported by scanner
 var m, y, z : integer;
 
+procedure k(var k, x, integer);
+	k := 0;
+end;
+
 function sqrt(x : integer) -> integer;
   var k : integer;
   sqrt := 1
