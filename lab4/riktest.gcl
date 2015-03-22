@@ -6,6 +6,8 @@ constant B : integer = 5463634634672328653;
 var m, y, z : integer;
 
 function sqrt() -> integer;
+function sqrt(x : integer) -> integer;
+  var k : integer;
   sqrt := 1
 end;
 
