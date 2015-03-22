@@ -445,26 +445,31 @@ functioncall<FuncCall>(char *name, int type, Exps exps):
 				//TODO error
 			}
 			type = getType(strdup(name));
-			if(type == VOID_TYPE){
-				//TODO error
-			}
-		}
-		expr<e>{
 			exps = malloc(sizeof(struct Exps));
+			exps->numExps = 0;
+			exps->exps = NULL;
+		}
+		[
+		expr<e>{
 			exps->numExps = 1;
 			exps->exps = malloc(exps->numExps*sizeof(Exp));
 			exps->exps[0] = e;
 		}
-		[
-			COMMA 
-			expr<e>{
-				exps->numExps++;
-				exps->exps = malloc(exps->numExps*sizeof(Exp));
-				exps->exps[exps->numExps-1] = e;
-		}
-		]*
+			[
+				COMMA 
+				expr<e>{
+					exps->numExps++;
+					exps->exps = realloc(exps->exps, exps->numExps*sizeof(Exp));
+					exps->exps[exps->numExps-1] = e;
+			}
+			]*
+		]?
 		RPARREN{
+			for(int i = 0;i<exps->numExps;i++){
+				
+			}
 			FuncCall fc = makeFuncCall(type, name, exps->numExps, exps->exps);
+			LLretval = fc;
 			free(exps);
 		}
 ;
