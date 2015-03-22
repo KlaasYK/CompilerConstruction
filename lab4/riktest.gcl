@@ -5,8 +5,12 @@ constant B : integer = 5463634634672328653;
 #constant C : string = 'Hello World!'; not supported by scanner
 var m, y, z : integer;
 
+function sqrt(x : integer) -> integer;
+  sqrt := 1
+end;
+
 begin
     print 'hello World to you too!';
     var m, y, z : integer;
-    read y, z
+    read y, z;
 end.
