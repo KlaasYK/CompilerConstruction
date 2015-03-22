@@ -489,7 +489,7 @@ readcall<RCall>(IDs ids)	:
 						if(type == -1){
 							
 						}
-						ids->ids[0] = makeID(, yytext);
+						ids->ids[0] = makeID(type, yytext);
 					makeID
 				}
 				[
