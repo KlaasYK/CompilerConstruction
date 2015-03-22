@@ -1,9 +1,8 @@
 program dummy;
 
-constant kaas : integer = false;
-
 var dummyvar : integer;
 
 begin
  var kaasislekker : boolean;
+ read kaasislekker;
 end.

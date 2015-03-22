@@ -204,7 +204,7 @@ int getType(char *name) {
 		// trying to save something that was not declared
 		printTypeError(name, UNKNOWN);
 	}
-	if (type == CONST_BOOLEAN_TYPE || CONST_INTEGER_TYPE) {
+	if (type == CONST_BOOLEAN_TYPE || type == CONST_INTEGER_TYPE) {
 		printTypeError(name, WRITETOCONSTANT);
 	}
 	free(name);
