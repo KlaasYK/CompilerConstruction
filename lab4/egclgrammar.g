@@ -572,9 +572,16 @@ call<Stmnts>(char *name) :
 			ss->numStmnts = 1;
 			ss->stmnts = malloc(ss->numStmnts*sizeof(Stmnt));
 			ss->stmnts[0] = makeFuncCallStmnt(fc);
+		LLretval = ss;
 		}
 	|	
-		assignmentcall
+		assignmentcall{
+			Stmnts ss = malloc(sizeof(struct Stmnts));
+			ss->numStmnts = 0;
+			ss->stmnts = NULL;
+		LLretval = ss;
+		}
+		
 ;
 
 declaration<Decs>(IDs idents): 
