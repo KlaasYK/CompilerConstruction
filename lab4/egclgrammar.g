@@ -438,35 +438,44 @@ identifierarray<IDs>(IDs idents)	:
 		}
 ;
 
-functioncall<FuncCall>(char *name, int type, Exps exps): 
+functioncall<FuncCall>(char *name, int type, Exps params): 
 		LPARREN{
 			NodeType nt = lookupType(name);
 			if(nt != METHOD){
 				//TODO error
 			}
 			type = getType(strdup(name));
-			exps = malloc(sizeof(struct Exps));
-			exps->numExps = 0;
-			exps->exps = NULL;
+			params = malloc(sizeof(struct Exps));
+			params->numExps = 0;
+			params->exps = NULL;
 		}
 		[
 		expr<e>{
-			exps->numExps = 1;
-			exps->exps = malloc(exps->numExps*sizeof(Exp));
-			exps->exps[0] = e;
+			params->numExps = 1;
+			params->exps = malloc(params->numExps*sizeof(Exp));
+			params->exps[0] = e;
 		}
 			[
 				COMMA 
 				expr<e>{
-					exps->numExps++;
-					exps->exps = realloc(exps->exps, exps->numExps*sizeof(Exp));
-					exps->exps[exps->numExps-1] = e;
+					params->numExps++;
+					params->exps = realloc(params->exps, params->numExps*sizeof(Exp));
+					params->exps[params->numExps-1] = e;
 			}
 			]*
 		]?
 		RPARREN{
-			for(int i = 0;i<exps->numExps;i++){
-				
+			Node *expectedParams = lookupParams(name);
+			int expectedNumParams = getNumNodes(expectedParams);
+			if(params->numExps != expectedNumParams){
+				//TODO error
+			}
+			for(int i = 0;i<params->numExps;i++){
+				int type = getExpType(params->exps[i]);
+				int expectedType = expectedParams.type;
+				if(type != expectedType){
+					//TODO error
+				}
 			}
 			FuncCall fc = makeFuncCall(type, name, exps->numExps, exps->exps);
 			LLretval = fc;
