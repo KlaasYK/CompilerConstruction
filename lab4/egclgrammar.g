@@ -676,6 +676,8 @@ constantdef<Dec>(int type, char *name, Dec dec)	:
 		CONSTANT_TOK
 		IDENTIFIER{
 			name = strdup(yytext);
+			/* SYMBOL TABLE */
+			addTempList(strdup(yytext));
 		}
 		TYPE_OP 
 		TYPE{
@@ -763,7 +765,8 @@ start		:
 				printf("boolval: %s\n", (program->constDefs[0]->expTree->node.boolval->value == true)?"true":"false");
 				printf("intval: %s\n", program->constDefs[1]->expTree->node.intval->value);
 				
-				freeProg(program);
+				
 			}
+			freeProg(program);
 		}
 ; 
