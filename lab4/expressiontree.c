@@ -3,10 +3,12 @@
 
 ID makeID(int type, char* name) {
 	ID id = malloc(sizeof (struct Identifier));
-	int nLength = strlen(name) + 1;
-	char *nCopy = malloc(nLength * sizeof (char));
-	memcpy(nCopy, name, nLength * sizeof (char));
-	id->name = nCopy;
+	if(name != NULL){
+		int nLength = strlen(name) + 1;
+		char *nCopy = malloc(nLength * sizeof (char));
+		memcpy(nCopy, name, nLength * sizeof (char));
+		id->name = nCopy;
+	}
 	id->type = type;
 	return id;
 }
@@ -37,10 +39,12 @@ void freeFuncCall(FuncCall fc) {
 
 Int makeInt(char *value) {
 	Int i = malloc(sizeof (struct Integer));
-	int vLength = strlen(value) + 1;
-	char *vCopy = malloc(vLength * sizeof (char));
-	memcpy(vCopy, value, vLength * sizeof (char));
-	i->value = vCopy;
+	if(value != NULL){
+		int vLength = strlen(value) + 1;
+		char *vCopy = malloc(vLength * sizeof (char));
+		memcpy(vCopy, value, vLength * sizeof (char));
+		i->value = vCopy;
+	}
 	return i;
 }
 
