@@ -69,6 +69,7 @@ void freeTempList() {
 		n = next;
 	}
 }
+int lastconstanttype;
 
 /* adds an identifier to the temp list */
 void addTempList(char *name) {
@@ -565,7 +566,7 @@ parameterset 	:
 					TYPE
 				;
 
-variable<Dec>(ExpTree exp) : 
+variable<Dec>(ExpTree exp, int type) : 
 	[
 			BOOLEAN{
 				char *bool = strdup(yytext);
@@ -575,19 +576,21 @@ variable<Dec>(ExpTree exp) :
 				}else if(strcmp(bool, "false") == 0){
 					bv = false;
 				}
+				type = BOOLEAN_TYPE;
 				free(bool);
 				exp = makeBoolExp(makeBool(bv));
 			}
 		| 
 			NUMBER{
+				type = INTEGER_TYPE;
 				exp = makeIntExp(makeInt(yytext));
 			}
 	]{
-		LLretval = makeExpDec(NULL, variable, exp);
+		LLretval = makeExpDec(makeID(type, NULL), variable, exp);
 	}
 	| 
 		STRING{
-			LLretval = makeStringDec(NULL, variable, yytext);
+			LLretval = makeStringDec(makeID(0, NULL), variable, yytext);
 		}
 
 ;
@@ -697,13 +700,19 @@ constantdef<Dec>(int type, char *name, Dec dec)	:
 			freeTempList();
 		}
 		COMPARE_OP 
-		variable<d>(NULL){
+		variable<d>(NULL, 0){
 			dec = d;
+			int tc_type = d->id->type;
+			NodeType nt = lookupType(name);
+			int lookuptype = lookupEvalType(name, nt);
+			if (nt != VARIABLE || tc_type != lookuptype ) {
+				//print error
+				printTypeError(name, WRONGTYPE);
+			}
 		}
 		SEMICOLON{
-			d->id = makeID(type, name);
-			d->idType = constant;
-			free(name);
+			dec->id->name = name;
+			dec->idType = constant;
 			LLretval = d;
 		}
 ;
