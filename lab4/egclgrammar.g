@@ -16,6 +16,7 @@
 /* different typechecking errors */
 #define DUPLICATE 256
 #define WRONGTYPE 257
+#define UNKNOWN 258
 
 typedef struct Stmnts{
 	int numStmnts;
@@ -180,8 +181,9 @@ void printTypeError(char *identifier, int ErrorType) {
 	}
 	printf("^\n");
 	switch (ErrorType) {
-		case DUPLICATE: printf("Duplicate identifier (%s) detected at column %d\n", identifier, columnnr+1);
-		case WRONGTYPE: printf("Value of '%s' is of the wrong type at column %d\n", identifier, columnnr); //TODO: print more info
+		case DUPLICATE: printf("Duplicate identifier (%s) detected at column %d\n", identifier, columnnr+1); break
+		case WRONGTYPE: printf("Value of '%s' is of the wrong type at column %d\n", identifier, columnnr+1); break//TODO: print more info
+		case UNKNOWN: printf("Unknown identifier (%s) detected at column %d\n", identifier, columnnr+1); break
 	}
 	
 	free(identifier);
