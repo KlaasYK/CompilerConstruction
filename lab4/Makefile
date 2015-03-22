@@ -30,6 +30,7 @@ clean:
 	rm -f egclgrammar.o
 	rm -f gclc
 	rm -f gclc.exe
+	rm -f gclc.exe.stackdump
 	rm -f symboltable.o
 	rm -f tree.o
 	rm -f expressiontree.o
