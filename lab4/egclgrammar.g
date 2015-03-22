@@ -194,10 +194,10 @@ void printTypeError(char *identifier, int ErrorType) {
 	}
 	printf("^\n");
 	switch (ErrorType) {
-		case DUPLICATE: printf("Duplicate identifier (%s), at column %d\n", identifier, columnnr+1); break
-		case WRONGTYPE: printf("Value of '%s' is of the wrong type, at column %d\n", identifier, columnnr+1); break//TODO: print more info
-		case UNKNOWN: printf("Unknown identifier (%s), at column %d\n", identifier, columnnr+1); break
-		case WRONGTYPE: printf("Trying to write to '%s' which is a constant, at column %d\n", identifier, columnnr+1); break//TODO: print more info
+		case DUPLICATE: printf("Duplicate identifier (%s), at column %d\n", identifier, columnnr+1); break;
+		case WRONGTYPE: printf("Value of '%s' is of the wrong type, at column %d\n", identifier, columnnr+1); break;//TODO: print more info
+		case UNKNOWN: printf("Unknown identifier (%s), at column %d\n", identifier, columnnr+1); break;
+		case WRONGTYPE: printf("Trying to write to '%s' which is a constant, at column %d\n", identifier, columnnr+1); break;//TODO: print more info
 	}
 	
 	free(identifier);
