@@ -499,13 +499,17 @@ readcall<RCall>(IDs ids)	:
 				READ_TOK 
 				IDENTIFIER{
 					ids = malloc(sizeof(struct IDs));
-						ids->numIds = 1;
-						ids->ids[0] = makeID(getType(strdup(yytext)), yytext);
-					makeID
+					ids->numIds = 1;
+					ids->ids = malloc(ids->numIds * sizeof(ID));
+					ids->ids[0] = makeID(getType(strdup(yytext)), yytext);
 				}
 				[
 					COMMA 
-					IDENTIFIER
+					IDENTIFIER{
+						ids->numIds++;
+						ids->ids = realloc(ids->ids, ids->numIds * sizeof(ID));
+						ids->ids[ids->numIds-1] = makeID(getType(strdup(yytext)), yytext);
+					}
 				]*
 			;
 
@@ -576,7 +580,7 @@ statement<Stmnts>(Stmnts ss) :
 			ss->stmnts[0] = makeWCallStmnt(wc);
 		}
 	| 
-		readcall<rc>{
+		readcall<rc>(NULL){
 			ss = malloc(sizeof(struct Stmnts));
 			ss->numStmnts = 1;
 			ss->stmnts = malloc(ss->numStmnts*sizeof(Stmnt));
