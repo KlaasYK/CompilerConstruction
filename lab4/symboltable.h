@@ -39,6 +39,9 @@ typedef struct Stack {
 /* convert input type string to integer for faster comparisson */
 int stringToEvalType(char *typestring);
 
+Node *makeNode(char *name, NodeType ntype, int etype, Node *param);
+void freeNode(Node *n);
+
 void printSymbolTable();
 
 /* returns whetere the current name is found in the top of the symboltable */

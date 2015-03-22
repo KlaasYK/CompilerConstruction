@@ -57,7 +57,7 @@ char *programname;
 Prog program;
 
 /* temporary storage for identifier names when declaring more  */
-char *lastidentifier;
+char *lastmethodidentifier;
 
 typedef struct TempINode {
 	char *name;
@@ -65,6 +65,7 @@ typedef struct TempINode {
 } INode;
 
 INode *tempidentifierlist;
+Node *tempparamlist;
 
 void freeTempList() {
 	INode *n = tempidentifierlist;
@@ -84,6 +85,16 @@ void addTempList(char *name) {
 	new->name = name;
 	new->next = tempidentifierlist;
 	tempidentifierlist = new;
+}
+
+void freeTempParamList() {
+	Node *n = tempparamlist;
+	tempparamlist = NULL;
+	while (n != NULL) {
+		Node *next = n->next;
+		freeNode(n);
+		n = next;
+	}
 }
 
 
@@ -470,7 +481,7 @@ assignmentcallV1	:
 						expr
 					;
 
-/* newer version of assignmentcall that doesn't make sure yet that the amount of identifers equals the amount of expressions (semantically easier to evaluate) */
+/* newer version of assignmentcall that doesn't make sure yet that the amount of identifiers equals the amount of expressions (semantically easier to evaluate) */
 assignmentcallV2	: 
 						[
 							COMMA 
@@ -647,10 +658,31 @@ statement<Stmnts>(Stmnts ss, char *name) :
 ;
 
 parameterset 	: 
-					identifierarray(NULL) 
-					TYPE_OP 
-					TYPE
-				;
+		/* TODO: check for same name */
+		VAR_TOK
+		IDENTIFIER {
+			//addTempList(strdup(yytext));
+		}
+		[COMMA identifierarray(NULL)]?
+		TYPE_OP
+		TYPE {
+			/* call by ref */
+			/*int tc_type = stringToEvalType(yytext) + 2;
+			INode in = tempidentifierlist;
+			while (in != NULL) {
+				Node *new = makeNode(strdup(in->name))
+				in = in->next;
+			}
+			freeTempList();*/
+		}
+		[COMMA parameterset]?
+	| 
+		IDENTIFIER
+		[COMMA identifierarray(NULL)]?
+		TYPE_OP
+		TYPE
+		[COMMA parameterset]?
+	;
 
 variable<Dec>(ExpTree exp, int type) : 
 	[
@@ -739,10 +771,28 @@ statementset<Stmnts>:
 function	: 
 				FUNCTION_TOK 
 				IDENTIFIER 
+				{
+					lastmethodidentifier = strdup(yytext);
+				}
 				LPARREN 
-				parameterset? 
+				parameterset? /* TODO: add parameterset */
 				RPARREN 
-				THEN_TOK TYPE 
+				THEN_TOK
+				TYPE 
+				{
+					int tc_type = stringToEvalType(yytext);
+					
+					if (!existsInTop(lastmethodidentifier)) {
+						insertIdentifier(lastmethodidentifier, METHOD, tc_type, tempparamlist);
+						tempparamlist = NULL;
+						lastmethodidentifier = NULL;
+					} else {
+						freeTempParamList();
+						/* lastmethodidentifier is freeëd in printing... */
+						printTypeError(lastmethodidentifier, DUPLICATE);
+					}
+					
+				}
 				SEMICOLON 
 				statementset<LLdiscard>
 				END_TOK 
@@ -752,10 +802,23 @@ function	:
 procedure	: 
 				PROCEDURE_TOK 
 				IDENTIFIER 
+				{
+					lastmethodidentifier = strdup(yytext);
+				}
 				LPARREN 
-				VAR_TOK 
-				parameterset? 
+				parameterset? /* TODO: add parameterset */
 				RPARREN 
+				{
+					if (!existsInTop(lastmethodidentifier)) {
+						insertIdentifier(lastmethodidentifier, METHOD, VOID_TYPE, tempparamlist);
+						tempparamlist = NULL;
+						lastmethodidentifier = NULL;
+					} else {
+						freeTempParamList();
+						/* lastmethodidentifier is freeëd in printing... */
+						printTypeError(lastmethodidentifier, DUPLICATE);
+					}
+				}
 				SEMICOLON 
 				statementset<LLdiscard>
 				END_TOK 
