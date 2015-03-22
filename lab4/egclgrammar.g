@@ -34,6 +34,11 @@ typedef struct IDs{
 	ID *ids;
 }*IDs;
 
+typedef struct Exps{
+	int numExps;
+	ExpTree *exps;
+}*Exps;
+
 extern FILE * yyin;
 extern char * yytext;
 
@@ -271,13 +276,17 @@ int main(int argc, char** argv) {
 /* EOF c FILE */
 }
 
-rootexpr	: 
+rootexpr(char *name)	: 
 				LPARREN 
 				expr 
 				RPARREN
 			| 
-				IDENTIFIER 
-				functioncall?
+				IDENTIFIER{
+					name = strdup(yytext);
+				}
+				[
+					functioncall<fc>(name, 0, NULL)
+				]?
 			| 
 				NUMBER
 			;
@@ -287,7 +296,7 @@ powbase	:
 			MIN_OP 
 			powbase
 		| 
-			rootexpr
+			rootexpr(NULL)
 		;
 
 factor2	: 
@@ -382,9 +391,11 @@ expr2	:
 			/* epsilon */
 		;
 
-expr	: 
+expr<ExpTree> : 
 			andexpr 
-			expr2
+			expr2{
+				LLretval = makeBoolExp(makeBool(true));//TODO remove dummy
+			}
 		;
 
 guardedcommand	: 
@@ -427,11 +438,36 @@ identifierarray<IDs>(IDs idents)	:
 		}
 ;
 
-functioncall	: 
-					LPARREN 
-					identifierarray(NULL)/* TODO check validity: can't calls contain expressions? */
-					RPARREN
-				;
+functioncall<FuncCall>(char *name, int type, Exps exps): 
+		LPARREN{
+			NodeType nt = lookupType(name);
+			if(nt != METHOD){
+				//TODO error
+			}
+			type = getType(strdup(name));
+			if(type == VOID_TYPE){
+				//TODO error
+			}
+		}
+		expr<e>{
+			exps = malloc(sizeof(struct Exps));
+			exps->numExps = 1;
+			exps->exps = malloc(exps->numExps*sizeof(Exp));
+			exps->exps[0] = e;
+		}
+		[
+			COMMA 
+			expr<e>{
+				exps->numExps++;
+				exps->exps = malloc(exps->numExps*sizeof(Exp));
+				exps->exps[exps->numExps-1] = e;
+		}
+		]*
+		RPARREN{
+			FuncCall fc = makeFuncCall(type, name, exps->numExps, exps->exps);
+			free(exps);
+		}
+;
 
 /* original version of assignmentcall that has an equal length for the identifiers and the following expressions (could make semantics very hard to handle) */
 assignmentcallV1	: 
@@ -530,11 +566,16 @@ readcall<RCall>(IDs ids)	:
 				}
 			;
 
-call	:	
-			functioncall
-		|	
-			assignmentcall
-		;
+call<Stmnts>(char *name) :	
+		functioncall<fc>(name, 0, NULL){
+			Stmnts ss = malloc(sizeof(struct Stmnts));
+			ss->numStmnts = 1;
+			ss->stmnts = malloc(ss->numStmnts*sizeof(Stmnt));
+			ss->stmnts[0] = makeFuncCallStmnt(fc);
+		}
+	|	
+		assignmentcall
+;
 
 declaration<Decs>(IDs idents): 
 				VAR_TOK 
@@ -573,7 +614,7 @@ declaration<Decs>(IDs idents):
 				}
 			;
 
-statement<Stmnts>(Stmnts ss) : 
+statement<Stmnts>(Stmnts ss, char *name) : 
 [
 		declaration<ds>(NULL){
 			/*TODO placeholder*/
@@ -587,8 +628,12 @@ statement<Stmnts>(Stmnts ss) :
 			free(ds);
 		}
 	| 
-		IDENTIFIER 
-		call
+		IDENTIFIER{
+			name = strdup(yytext);
+		}
+		call<stmnts>(name){
+			ss = stmnts;
+		}
 	| 
 		printcall<wc>(0, NULL){
 			ss = malloc(sizeof(struct Stmnts));
@@ -700,7 +745,7 @@ statementset2<Stmnts> :
 ;
 
 statementsetV1<Stmnts>(Stmnts stmnts) : 
-		statement<ss>(NULL){
+		statement<ss>(NULL, NULL){
 			stmnts = ss;
 		}
 		statementset2<ss>{
@@ -725,7 +770,7 @@ statementsetV1<Stmnts>(Stmnts stmnts) :
 ;
 
 /* alternative where every line needs to end with a semicolon */
-statementsetV2	: statement<LLdiscard>(NULL)
+statementsetV2	: statement<LLdiscard>(NULL, NULL)
 		SEMICOLON 
 		statementset
 	| 
@@ -910,6 +955,6 @@ start		:
 				
 				
 			}
-			freeProg(program);
+			//freeProg(program);
 		}
 ; 
