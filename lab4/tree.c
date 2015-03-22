@@ -248,7 +248,7 @@ Dec makeStringDec(ID id, IDType idType, char *str) {
 
 void freeDec(Dec d) {
 	freeID(d->id);
-	if(d->isInitialized = true){
+	if(d->isInitialized == true){
 		switch(d->decType){
 			case expKind:
 				freeExp(d->expTree);
