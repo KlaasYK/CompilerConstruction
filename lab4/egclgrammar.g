@@ -682,10 +682,24 @@ constantdef<Dec>(int type, char *name, Dec dec)	:
 		CONSTANT_TOK
 		IDENTIFIER{
 			name = strdup(yytext);
+			/* SYMBOL TABLE */
+			addTempList(strdup(yytext));
 		}
 		TYPE_OP 
 		TYPE{
 			type = stringToEvalType(yytext);
+			INode *n = tempidentifierlist;
+			while (n != NULL) {
+				/* check if the  identifier exists already */
+				if ( !existsInTop(n->name) ) {
+					// type+1 for constants
+					insertIdentifier(strdup(n->name), VARIABLE, type+1, NULL);
+				} else {
+					printTypeError(n->name, DUPLICATE);
+				}
+				n = n->next;
+			}
+			freeTempList();
 		}
 		COMPARE_OP 
 		variable<d>(NULL){
@@ -770,7 +784,8 @@ start		:
 				printf("boolval: %s\n", (program->constDefs[0]->expTree->node.boolval->value == true)?"true":"false");
 				printf("intval: %s\n", program->constDefs[1]->expTree->node.intval->value);
 				
-				freeProg(program);
+				
 			}
+			freeProg(program);
 		}
 ; 
