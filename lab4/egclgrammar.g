@@ -847,7 +847,7 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 						stmnts->stmnts[i]->assignment->expTree = exps->exps[i];
 					}
 					else {
-						freeTempList();
+						/* the list is freeëd in error */
 						printTypeError(strdup(n->name),WRONGTYPE);
 					}
 				}
@@ -864,7 +864,7 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 						stmnts->stmnts[i]->assignment->expTree = exps->exps[0];
 					}
 					else {
-						freeTempList();
+						
 						printTypeError(strdup(n->name),WRONGTYPE);
 					}
 				}
@@ -1379,6 +1379,6 @@ start		:
 				
 				
 			}
-			//freeProg(program);
+			freeProg(program);
 		}
 ; 

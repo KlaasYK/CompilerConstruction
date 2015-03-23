@@ -8,4 +8,6 @@ var b : boolean;
 
 begin
  a, b := a, B;
+ a := a + A;
+ b := b and B;
 end.
