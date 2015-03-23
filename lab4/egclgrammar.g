@@ -1290,7 +1290,7 @@ function<FuncDef>(int numparams, Param *p, int numStmnts, Stmnt *stmnts)	:
 				END_TOK 
 				{
 					popBlock();
-					LLretval = makeFuncDef(makeID(getType(strdup(ss)), lastmethodidentifier),numparams, p, ss->numStmnts, ss->stmnts);
+					LLretval = makeFuncDef(makeID(getType(strdup(lastmethodidentifier)), lastmethodidentifier),numparams, p, ss->numStmnts, ss->stmnts);
 					free(lastmethodidentifier);
 					lastmethodidentifier = NULL;
 					free(ss);
