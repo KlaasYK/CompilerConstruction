@@ -1,15 +1,15 @@
 Program: state /wml with memory leak
-boolean.gcl: chrash
-eculid.gcl: parses /wml
-euclid2.gcl: parses /wml
-extended.gcl: unknown identifier (expected) /wml
-hello.gcl: parses
-lexerror.gcl: illegal char (expected) /wml
-mult.gcl: parses /wml
-random.gcl: parses /wml
-realsyntaxerror.gcl: syntaxerror (expected) /wml
-sqrt.gcl: parses /wml
-syntaxerror.gcl: parses (expected) /wml
+boolean.gcl: parses /wml definitely lost
+eculid.gcl: parses /wml definitely lost
+euclid2.gcl: parses /wml definitely/indirect lost
+extended.gcl: unknown identifier (expected) /wml definitely lost/still reachable
+hello.gcl: parses :D
+lexerror.gcl: illegal char (expected) /wml still reachable
+mult.gcl: parses /wml definitely lost
+random.gcl: parses /wml definitely lost
+realsyntaxerror.gcl: syntaxerror (expected) /wml still reachable
+sqrt.gcl: parses /wml definitely lost/indirect
+syntaxerror.gcl: parses (expected) /wml definitely lost
 
 
  
