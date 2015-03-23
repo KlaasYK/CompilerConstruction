@@ -4,6 +4,7 @@
 
 Prog makeProg(char *name, int numConstDefs, Dec* constDefs, int numVarDefs, Dec* varDefs, int numProcDefs, ProcDef* procDefs, int numFuncDefs, FuncDef* funcDefs, int numBodyStmnts, Stmnt *bodyStmnts) {
 	Prog p = malloc(sizeof (struct Program));
+	p->name = NULL;
 	if (name != NULL) {
 		int nLength = strlen(name) + 1;
 		char *nCopy = malloc(nLength * sizeof (char));
@@ -91,6 +92,7 @@ void freeFuncDef(FuncDef fd) {
 
 ProcDef makeProcDef(char *name, int numParams, Param *params, int numStmnts, Stmnt *stmnts) {
 	ProcDef pd = malloc(sizeof (struct ProcedureDefinition));
+	pd->name = NULL;
 	if (name != NULL) {
 		int nLength = strlen(name) + 1;
 		char *nCopy = malloc(nLength * sizeof (char));
@@ -243,6 +245,7 @@ Dec makeStringDec(ID id, IDType idType, char *str) {
 	d->idType = idType;
 	d->decType = stringKind;
 	d->isInitialized = true;
+	d->str = NULL;
 	if (str != NULL) {
 		int sLength = strlen(str) + 1;
 		char *sCopy = malloc(sLength * sizeof (char));
@@ -329,6 +332,7 @@ void freeWCall(WCall wc) {
 Printable makeStringPrintable(char *string) {
 	Printable p = malloc(sizeof (struct PrintableItem));
 	p->kind = stringKind;
+	p->string = NULL;
 	if (string != NULL) {
 		int sLength = strlen(string) + 1;
 		char *sCopy = malloc(sLength * sizeof (char));

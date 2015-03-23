@@ -4,6 +4,7 @@
 
 ID makeID(int type, char* name) {
 	ID id = malloc(sizeof (struct Identifier));
+	id->name = NULL;
 	if (name != NULL) {
 		int nLength = strlen(name) + 1;
 		char *nCopy = malloc(nLength * sizeof (char));
@@ -44,6 +45,7 @@ void freeFuncCall(FuncCall fc) {
 
 Int makeInt(char *value) {
 	Int i = malloc(sizeof (struct Integer));
+	i->value = NULL;
 	if (value != NULL) {
 		int vLength = strlen(value) + 1;
 		char *vCopy = malloc(vLength * sizeof (char));
