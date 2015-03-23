@@ -215,7 +215,7 @@ void printTypeError(char *identifier, int ErrorType) {
 		case REFERENCETOCONSTANT: printf("In function '%s' a constant was used as reference parameter\n", identifier);break;
 		case PROCISOFUNC: printf("Procedure '%s' is used as function, at column %d\n", identifier, columnnr+1);break;
 		case ASSMISMATCH: printf("The number of variables is unequal to the number of assigned expressions\n");break;
-		case VARIABLEASKED: printf("Function '%s' found in stead of variable, at column %d\n", identifier, columnnr+1);break;
+		case VARIABLEASKED: printf("Function or procedure '%s' found in stead of variable, at column %d\n", identifier, columnnr+1);break;
 	}
 	
 	free(identifier);
@@ -311,7 +311,7 @@ rootexpr<Exp>(char *name, int isFunc)	:
 					}
 				]?{
 					if(!isFunc){
-						LLretval = makeIDNodeExp(makeID(getType(strdup(yytext)), yytext));
+						LLretval = makeIDNodeExp(makeID(getType(strdup(name)), name));
 					}
 				}
 			| 
@@ -330,6 +330,9 @@ rootexpr<Exp>(char *name, int isFunc)	:
 powbase<Exp> : 
 			MIN_OP 
 			powbase<e>{
+				if((getExpType(e)/10)*10 != INTEGER_TYPE){
+					printTypeError(strdup(yytext), WRONGTYPE);
+				}
 				LLretval = makeUnNodeExp(makeUnNode(e, negop));
 			}
 		| 
@@ -343,12 +346,14 @@ factor2<Exp> :
 		powbase<l>
 		factor2<e>{
 			if(e == NULL){
-				LLretval = l;
+				LLretval = makeBinNodeExp(makeBinNode(NULL, l, powop));
 			}else{
 				e->node.bnode->l = l;
-				LLretval = e;
+				if((getExpType(l)/10)*10 != INTEGER_TYPE || (getExpType(e->node.bnode->r)/10)*10 != INTEGER_TYPE){
+					printTypeError(strdup(yytext), WRONGTYPE);
+				}
+				LLretval = makeBinNodeExp(makeBinNode(NULL, e, powop));
 			}
-			LLretval = makeBinNodeExp(makeBinNode(NULL, e, powop));
 		}
 	| 
 		/* epsilon */{
@@ -363,6 +368,9 @@ factor<Exp> :
 				LLretval = l;
 			}else{
 				e->node.bnode->l = l;
+				if((getExpType(l)/10)*10 != INTEGER_TYPE || (getExpType(e->node.bnode->r)/10)*10 != INTEGER_TYPE){
+					printTypeError(strdup(yytext), WRONGTYPE);
+				}
 				LLretval = e;
 			}
 		} 
@@ -391,12 +399,14 @@ term2<Exp>(BinOp mulOp)	:
 		factor<l>
 		term2<e>(0){
 			if(e == NULL){
-				LLretval = l;
+				LLretval = makeBinNodeExp(makeBinNode(NULL, l, mulOp));
 			}else{
 				e->node.bnode->l = l;
-				LLretval = e;
+				if((getExpType(l)/10)*10 != INTEGER_TYPE || (getExpType(e->node.bnode->r)/10)*10 != INTEGER_TYPE){
+					printTypeError(strdup(yytext), WRONGTYPE);
+				}
+				LLretval = makeBinNodeExp(makeBinNode(NULL, e, mulOp));
 			}
-			LLretval = makeBinNodeExp(makeBinNode(NULL, e, mulOp));
 		}
 	| 
 		/* epsilon */{
@@ -411,34 +421,42 @@ term<Exp>	:
 				LLretval = l;
 			}else{
 				e->node.bnode->l = l;
+				if((getExpType(l)/10)*10 != INTEGER_TYPE || (getExpType(e->node.bnode->r)/10)*10 != INTEGER_TYPE){
+					printTypeError(strdup(yytext), WRONGTYPE);
+				}
 				LLretval = e;
 			}
 		}
 ;
 
 sumexpr2<Exp> : 
-		PLUS_OP 
+		PLUS_OP {
+		}
 		term<l>
 		sumexpr2<e>{
 			if(e == NULL){
-				LLretval = l;
+				LLretval = makeBinNodeExp(makeBinNode(NULL, l, plusop));
 			}else{
 				e->node.bnode->l = l;
-				LLretval = e;
+				if((getExpType(l)/10)*10 != INTEGER_TYPE || (getExpType(e->node.bnode->r)/10)*10 != INTEGER_TYPE){
+					printTypeError(strdup(yytext), WRONGTYPE);
+				}
+				LLretval = makeBinNodeExp(makeBinNode(NULL, e, plusop));
 			}
-			LLretval = makeBinNodeExp(makeBinNode(NULL, e, plusop));
 		}
 	| 
 		MIN_OP 
 		term<l>
 		sumexpr2<e>{
 			if(e == NULL){
-				LLretval = l;
+				LLretval = makeBinNodeExp(makeBinNode(NULL, l, minop));
 			}else{
 				e->node.bnode->l = l;
-				LLretval = e;
+				if((getExpType(l)/10)*10 != INTEGER_TYPE || (getExpType(e->node.bnode->r)/10)*10 != INTEGER_TYPE){
+					printTypeError(strdup(yytext), WRONGTYPE);
+				}
+				LLretval = makeBinNodeExp(makeBinNode(NULL, e, minop));
 			}
-			LLretval = makeBinNodeExp(makeBinNode(NULL, e, minop));
 		}
 	| 
 		/* epsilon */{
@@ -453,6 +471,9 @@ sumexpr<Exp> :
 				LLretval = l;
 			}else{
 				e->node.bnode->l = l;
+				if((getExpType(l)/10)*10 != INTEGER_TYPE || (getExpType(e->node.bnode->r)/10)*10 != INTEGER_TYPE){
+					printTypeError(strdup(yytext), WRONGTYPE);
+				}
 				LLretval = e;
 			}
 		}
@@ -478,12 +499,25 @@ relexpr2<Exp>(BinOp compOp)	:
 		sumexpr<l>
 		relexpr2<e>(0){
 			if(e == NULL){
-				LLretval = l;
+				LLretval = makeBinNodeExp(makeBinNode(NULL, l, compOp));
 			}else{
 				e->node.bnode->l = l;
-				LLretval = e;
+				switch(e->node.bnode->operator){
+					case gtop:
+					case ltop:
+						if((getExpType(l)/10)*10 != INTEGER_TYPE || (getExpType(e->node.bnode->r)/10)*10 != INTEGER_TYPE){
+							printTypeError(strdup(yytext), WRONGTYPE);
+						}	
+						break;
+					case neqop:
+					case eqop:
+						if(getExpType(l) == -1 || getExpType(e->node.bnode->r) == -1 || (getExpType(l)/10)*10 != (getExpType(e->node.bnode->r)/10)*10){
+							printTypeError(strdup(yytext), WRONGTYPE);
+						}
+						break;
+				}
+				LLretval = makeBinNodeExp(makeBinNode(NULL, e, compOp));
 			}
-			LLretval = makeBinNodeExp(makeBinNode(NULL, e, compOp));
 		}
 	| 
 		/* epsilon */{
@@ -498,6 +532,20 @@ relexpr<Exp> :
 				LLretval = l;
 			}else{
 				e->node.bnode->l = l;
+				switch(e->node.bnode->operator){
+					case gtop:
+					case ltop:
+						if((getExpType(l)/10)*10 != INTEGER_TYPE || (getExpType(e->node.bnode->r)/10)*10 != INTEGER_TYPE){
+							printTypeError(strdup(yytext), WRONGTYPE);
+						}	
+						break;
+					case neqop:
+					case eqop:
+						if(getExpType(l) == -1 || getExpType(e->node.bnode->r) == -1 || (getExpType(l)/10)*10 != (getExpType(e->node.bnode->r)/10)*10){
+							printTypeError(strdup(yytext), WRONGTYPE);
+						}
+						break;
+				}
 				LLretval = e;
 			}
 		}
@@ -506,6 +554,9 @@ relexpr<Exp> :
 notexpr<Exp> : 
 		NOT_TOK 
 		notexpr<e>{
+			if((getExpType(e)/10)*10 != BOOLEAN_TYPE){
+				printTypeError(strdup(yytext), WRONGTYPE);
+			}
 			LLretval = makeUnNodeExp(makeUnNode(e, notop));
 		}
 	| 
@@ -519,24 +570,28 @@ andexpr2<Exp> :
 		notexpr<l>
 		andexpr2<e>{
 			if(e == NULL){
-				LLretval = l;
+				LLretval = makeBinNodeExp(makeBinNode(NULL, l, andop));
 			}else{
 				e->node.bnode->l = l;
-				LLretval = e;
+				if((getExpType(l)/10)*10 != BOOLEAN_TYPE || (getExpType(e->node.bnode->r)/10)*10 != BOOLEAN_TYPE){
+					printTypeError(strdup(yytext), WRONGTYPE);
+				}
+				LLretval = makeBinNodeExp(makeBinNode(NULL, e, andop));
 			}
-			LLretval = makeBinNodeExp(makeBinNode(NULL, e, andop));
 		}
 	| 
 		CAND_OP 
 		notexpr<l> 
 		andexpr2<e>{
 			if(e == NULL){
-				LLretval = l;
+				LLretval = makeBinNodeExp(makeBinNode(NULL, l, candop));
 			}else{
 				e->node.bnode->l = l;
-				LLretval = e;
+				if((getExpType(l)/10)*10 != BOOLEAN_TYPE || (getExpType(e->node.bnode->r)/10)*10 != BOOLEAN_TYPE){
+					printTypeError(strdup(yytext), WRONGTYPE);
+				}
+				LLretval = makeBinNodeExp(makeBinNode(NULL, e, candop));
 			}
-			LLretval = makeBinNodeExp(makeBinNode(NULL, e, candop));
 		}
 	| 
 		/* epsilon */{
@@ -551,6 +606,9 @@ andexpr<Exp>:
 				LLretval = l;
 			}else{
 				e->node.bnode->l = l;
+				if((getExpType(l)/10)*10 != BOOLEAN_TYPE || (getExpType(e->node.bnode->r)/10)*10 != BOOLEAN_TYPE){
+					printTypeError(strdup(yytext), WRONGTYPE);
+				}
 				LLretval = e;
 			}
 		}
@@ -561,24 +619,28 @@ expr2<Exp>:
 		andexpr<l>
 		expr2<e>{
 			if(e == NULL){
-				LLretval = l;
+				LLretval = makeBinNodeExp(makeBinNode(NULL, l, orop));
 			}else{
 				e->node.bnode->l = l;
-				LLretval = e;
+				if((getExpType(l)/10)*10 != BOOLEAN_TYPE || (getExpType(e->node.bnode->r)/10)*10 != BOOLEAN_TYPE){
+					printTypeError(strdup(yytext), WRONGTYPE);
+				}
+				LLretval = makeBinNodeExp(makeBinNode(NULL, e, orop));
 			}
-			LLretval = makeBinNodeExp(makeBinNode(NULL, e, orop));
 		}
 	| 
 		COR_OP 
 		andexpr<l>
 		expr2<e>{
 			if(e == NULL){
-				LLretval = l;
+				LLretval = makeBinNodeExp(makeBinNode(NULL, l, corop));
 			}else{
 				e->node.bnode->l = l;
-				LLretval = e;
+				if((getExpType(l)/10)*10 != BOOLEAN_TYPE || (getExpType(e->node.bnode->r)/10)*10 != BOOLEAN_TYPE){
+					printTypeError(strdup(yytext), WRONGTYPE);
+				}
+				LLretval = makeBinNodeExp(makeBinNode(NULL, e, corop));
 			}
-			LLretval = makeBinNodeExp(makeBinNode(NULL, e, corop));
 		}
 	| 
 		/* epsilon */{
@@ -593,6 +655,9 @@ expr<ExpTree> :
 				LLretval = l;
 			}else{
 				e->node.bnode->l = l;
+				if((getExpType(l)/10)*10 != BOOLEAN_TYPE || (getExpType(e->node.bnode->r)/10)*10 != BOOLEAN_TYPE){
+					printTypeError(strdup(yytext), WRONGTYPE);
+				}
 				LLretval = e;
 			}
 		}
@@ -703,6 +768,7 @@ assignmentcallV1<Stmnts>(char *name):
 /* newer version of assignmentcall that doesn't make sure yet that the amount of identifiers equals the amount of expressions (semantically easier to evaluate) */
 assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	: 
 		{
+			//TODO typecheck name (watch out for return type of functions!)
 			stmnts = malloc(sizeof(struct Stmnts));
 			stmnts->numStmnts = 1;
 			stmnts->stmnts = malloc(stmnts->numStmnts*sizeof(Stmnt));
@@ -711,6 +777,7 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 		[
 			COMMA 
 			IDENTIFIER{
+				//TODO typecheck IDENTIFIER (watch out for return type of functions!)
 				stmnts->numStmnts++;
 				stmnts->stmnts = realloc(stmnts->stmnts, stmnts->numStmnts*sizeof(Stmnt));
 				stmnts->stmnts[stmnts->numStmnts-1] = makeAssStmnt(makeAss(makeID(getType(strdup(yytext)), yytext), NULL, linecount));
@@ -1104,7 +1171,7 @@ procedure	:
 						tempparamlist = NULL;
 					} else {
 						freeTempParamList();
-						/* lastmethodidentifier is freeëd in printing... */
+						/* lastmethodidentifier is freed in printing... */
 						printTypeError(lastmethodidentifier, DUPLICATE);
 					}
 				}
@@ -1116,9 +1183,11 @@ procedure	:
 						if (!existsInTop(n->name) && !isMethod(n->name) ) {
 							insertIdentifier(strdup(n->name), n->type, n->evaltype, NULL);
 							n = n->next;
+						} else if(isMethod(n->name)){
+							printTypeError(n->name, VARIABLEASKED);
 						} else {
 							/* TODO: make error for incorrect parameters */
-							printTypeError(lastmethodidentifier, DUPLICATE);
+							printTypeError(n->name, DUPLICATE);
 						}
 					}
 				}
