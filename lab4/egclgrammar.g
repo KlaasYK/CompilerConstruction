@@ -1453,19 +1453,21 @@ programbody<Prog>(int numConstDefs, Dec *constDefs, int numVarDefs, Dec *varDefs
 			printf("Num of var defs: %d\n", numVarDefs);
 		}
 		[
-		procedure<procdef>(0,NULL,0,NULL)
-		{
-			int oldNumProcDefs = numProcDefs;
-				numProcDefs++;
-				if(oldNumProcDefs == 0){
-					procDefs = malloc(numProcDefs*sizeof(ProcDef));
-				}else{
-					procDefs = realloc(procDefs, numProcDefs*sizeof(ProcDef));
-				}
-				procDefs[oldNumProcDefs] = procdef;
+			procedure<procdef>(0,NULL,0,NULL){
+				int oldNumProcDefs = numProcDefs;
+					numProcDefs++;
+					if(oldNumProcDefs == 0){
+						procDefs = malloc(numProcDefs*sizeof(ProcDef));
+					}else{
+						procDefs = realloc(procDefs, numProcDefs*sizeof(ProcDef));
+					}
+					procDefs[oldNumProcDefs] = procdef;
+			}
+		]* {
+			printf("Num of proc defs: %d\n", numProcDefs);
 		}
-		]* 
-		[function<funcdef>(0,NULL,0,NULL){
+		[
+			function<funcdef>(0,NULL,0,NULL){
 				int oldNumFuncDefs = numFuncDefs;
 				numFuncDefs++;
 				if(oldNumFuncDefs == 0){
@@ -1474,7 +1476,10 @@ programbody<Prog>(int numConstDefs, Dec *constDefs, int numVarDefs, Dec *varDefs
 					funcDefs = realloc(funcDefs, numFuncDefs*sizeof(FuncDef));
 				}
 				funcDefs[oldNumFuncDefs] = funcdef;
-		}]* 
+			}
+		]* {
+			printf("Num of func defs: %d\n", numFuncDefs);
+		}
 		BEGIN_TOK {
 			putBlock(); /* add a new frame of reference */
 		} 
