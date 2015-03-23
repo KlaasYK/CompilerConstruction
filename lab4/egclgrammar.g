@@ -720,8 +720,9 @@ guardedcommand<GCommand>(ExpTree exp)	:
 			}
 		}
 		THEN_TOK 
-		statementset<Stmnts> {
-			LLretval = makeGCommand(exp, Stmnts->numStmnts, Stmnts->stmnts);
+		statementset<stmnts> {
+			LLretval = makeGCommand(exp, stmnts->numStmnts, stmnts->stmnts);
+			free(stmnts);
 			
 		}
 ;
