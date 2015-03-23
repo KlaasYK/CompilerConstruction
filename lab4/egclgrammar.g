@@ -59,6 +59,8 @@ char **lines;
 char *file_name;
 int linesread;
 
+int error;
+
 /* to keep track of errors */
 int columnnr;
 int linecount;
@@ -172,6 +174,7 @@ void printLexError(char *illchar, int line, int column) {
 	freeLines();
 	freeSymbolTable();
 	exit(EXIT_FAILURE);*/
+	error = 1;
 }
 
 void LLmessage(int token) {
@@ -199,6 +202,7 @@ void LLmessage(int token) {
 	freeLines();
 	freeSymbolTable();
 	exit(EXIT_FAILURE);*/
+	error = 1;
 }
 
 
@@ -206,8 +210,8 @@ void printTypeError(char *identifier, int ErrorType) {
 	int i = 0, k;
 	
 	/* print symbol table for debug reasons */
-	printf("\nSymboltable:\n");
-	printSymbolTable();
+	//printf("\nSymboltable:\n");
+	//printSymbolTable();
 	
 	printf("\n");
 	k = printf("Error on line %d: ", linecount+1);
@@ -237,6 +241,7 @@ void printTypeError(char *identifier, int ErrorType) {
 	freeLines();
 	freeSymbolTable();
 	exit(EXIT_FAILURE);*/
+	error = 1;
 }
 
 int getType(char *name) {
@@ -269,7 +274,7 @@ int getTypeConst(char *name) {
 int main(int argc, char** argv) {
 	// initialise global vars to NULL/0
 	linecount = 0, columnnr = 0;
-	
+	error = 0;
 	programname = NULL;
 	tempidentifierlist = NULL;
 	
@@ -299,9 +304,12 @@ int main(int argc, char** argv) {
 		fclose(yyin);
 		yyin = NULL;
 	}
-
-	printf("Parsing succesfull\n");
-
+	if (error) {
+		printf("Parser failed!\n");
+	} else {
+		printf("Parsing succesfull\n");
+	}
+	
 	utilCleanUp();
 	freeProg(program);
 	freeSymbolTable();
