@@ -1115,7 +1115,16 @@ parameterset 	:
 		IDENTIFIER {
 			addTempList(strdup(yytext));
 		}
-		[COMMA identifierarray(NULL)]?
+		[
+			COMMA 
+			identifierarray<ids>(NULL){
+				for(int i=0;i<ids->numIds;i++){
+					freeID(ids->ids[i]);
+				}
+				free(ids->ids);
+				free(ids);//not used
+			}
+		]?
 		TYPE_OP
 		TYPE {
 			/* call by ref */
@@ -1129,13 +1138,25 @@ parameterset 	:
 			}
 			freeTempList();
 		}
-		[COMMA parameterset]?
+		[
+			COMMA 
+			parameterset
+		]?
 	| 
 		IDENTIFIER
 		{
 			addTempList(strdup(yytext));
 		}
-		[COMMA identifierarray(NULL)]?
+		[
+			COMMA 
+			identifierarray<ids>(NULL){
+				for(int i=0;i<ids->numIds;i++){
+					freeID(ids->ids[i]);
+				}
+				free(ids->ids);
+				free(ids);//not used
+			}
+		]?
 		TYPE_OP
 		TYPE {
 			/* call by value */
@@ -1149,7 +1170,10 @@ parameterset 	:
 			}
 			freeTempList();
 		}
-		[COMMA parameterset]?
+		[
+			COMMA 
+			parameterset
+		]?
 	;
 
 variable<Dec>(ExpTree exp, int type) : 
