@@ -4,7 +4,7 @@
 
 ID makeID(int type, char* name) {
 	ID id = malloc(sizeof (struct Identifier));
-	if(name != NULL){
+	if (name != NULL) {
 		int nLength = strlen(name) + 1;
 		char *nCopy = malloc(nLength * sizeof (char));
 		memcpy(nCopy, name, nLength * sizeof (char));
@@ -15,8 +15,10 @@ ID makeID(int type, char* name) {
 }
 
 void freeID(ID id) {
-	free(id->name);
-	free(id);
+	if (id != NULL) {
+		free(id->name);
+		free(id);
+	}
 }
 
 FuncCall makeFuncCall(int type, char* name, int numParams, Exp *params) {
@@ -28,19 +30,21 @@ FuncCall makeFuncCall(int type, char* name, int numParams, Exp *params) {
 }
 
 void freeFuncCall(FuncCall fc) {
-	freeID(fc->id);
-	for (int i = 0; i < fc->numParams; i++) {
-		freeExp(fc->params[i]);
+	if (fc != NULL) {
+		freeID(fc->id);
+		for (int i = 0; i < fc->numParams; i++) {
+			freeExp(fc->params[i]);
+		}
+		if (fc->numParams > 0) {
+			free(fc->params);
+		}
+		free(fc);
 	}
-	if(fc->numParams>0){
-		free(fc->params);
-	}
-	free(fc);
 }
 
 Int makeInt(char *value) {
 	Int i = malloc(sizeof (struct Integer));
-	if(value != NULL){
+	if (value != NULL) {
 		int vLength = strlen(value) + 1;
 		char *vCopy = malloc(vLength * sizeof (char));
 		memcpy(vCopy, value, vLength * sizeof (char));
@@ -50,8 +54,10 @@ Int makeInt(char *value) {
 }
 
 void freeInt(Int i) {
-	free(i->value);
-	free(i);
+	if (i != NULL) {
+		free(i->value);
+		free(i);
+	}
 }
 
 Bool makeBool(BoolVal bv) {
@@ -61,7 +67,9 @@ Bool makeBool(BoolVal bv) {
 }
 
 void freeBool(Bool b) {
-	free(b);
+	if (b != NULL) {
+		free(b);
+	}
 }
 
 Exp makeUnNodeExp(Unode un) {
@@ -107,45 +115,47 @@ Exp makeBoolExp(Bool b) {
 }
 
 void freeExp(Exp exp) {
-	switch (exp->kind) {
-		case unodeexp:
-			freeUnNode(exp->node.unode);
-			break;
-		case bnodeexp:
-			freeBinNode(exp->node.bnode);
-			break;
-		case idexp:
-			freeID(exp->node.id);
-			break;
-		case funcexp:
-			freeFuncCall(exp->node.funcCall);
-			break;
-		case intexp:
-			freeInt(exp->node.intval);
-			break;
-		case boolexp:
-			freeBool(exp->node.boolval);
-			break;
-		default:
-			fprintf(stderr, "Undefined kind of expression!");
-			exit(EXIT_FAILURE);
+	if (exp != NULL) {
+		switch (exp->kind) {
+			case unodeexp:
+				freeUnNode(exp->node.unode);
+				break;
+			case bnodeexp:
+				freeBinNode(exp->node.bnode);
+				break;
+			case idexp:
+				freeID(exp->node.id);
+				break;
+			case funcexp:
+				freeFuncCall(exp->node.funcCall);
+				break;
+			case intexp:
+				freeInt(exp->node.intval);
+				break;
+			case boolexp:
+				freeBool(exp->node.boolval);
+				break;
+			default:
+				fprintf(stderr, "Undefined kind of expression!");
+				exit(EXIT_FAILURE);
+		}
+		free(exp);
 	}
-	free(exp);
 }
 
-int getExpType(Exp e){
+int getExpType(Exp e) {
 	switch (e->kind) {
-		case unodeexp: ;
+		case unodeexp:;
 			int type = getExpType(e->node.unode->e);
-			switch(e->node.unode->operator){
+			switch (e->node.unode->operator) {
 				case notop:
-					if(type == -1 || (type/10)*10 != BOOLEAN_TYPE){
+					if (type == -1 || (type / 10)*10 != BOOLEAN_TYPE) {
 						return -1;
 					}
 					return type;
 					break;
 				case negop:
-					if(type == -1 || (type/10)*10 != INTEGER_TYPE){
+					if (type == -1 || (type / 10)*10 != INTEGER_TYPE) {
 						return -1;
 					}
 					return type;
@@ -155,17 +165,17 @@ int getExpType(Exp e){
 					exit(EXIT_FAILURE);
 			}
 			break;
-		case bnodeexp: ;
+		case bnodeexp:;
 			int lType = getExpType(e->node.bnode->l);
 			int rType = getExpType(e->node.bnode->r);
-			switch(e->node.bnode->operator){
+			switch (e->node.bnode->operator) {
 				case plusop:
 				case minop:
 				case mulop:
 				case divop:
 				case modop:
 				case powop:
-					if(lType == -1 || rType == -1 || (lType/10)*10 != INTEGER_TYPE || (rType/10)*10 != INTEGER_TYPE){
+					if (lType == -1 || rType == -1 || (lType / 10)*10 != INTEGER_TYPE || (rType / 10)*10 != INTEGER_TYPE) {
 						return -1;
 					}
 					return INTEGER_TYPE;
@@ -174,7 +184,7 @@ int getExpType(Exp e){
 				case ltop:
 				case geop:
 				case leop:
-					if(lType == -1 || rType == -1 || (lType/10)*10 != INTEGER_TYPE || (rType/10)*10 != INTEGER_TYPE){
+					if (lType == -1 || rType == -1 || (lType / 10)*10 != INTEGER_TYPE || (rType / 10)*10 != INTEGER_TYPE) {
 						return -1;
 					}
 					return BOOLEAN_TYPE;
@@ -183,14 +193,14 @@ int getExpType(Exp e){
 				case orop:
 				case candop:
 				case corop:
-					if(lType == -1 || rType == -1 || (lType/10)*10 != BOOLEAN_TYPE || (rType/10)*10 != BOOLEAN_TYPE){
+					if (lType == -1 || rType == -1 || (lType / 10)*10 != BOOLEAN_TYPE || (rType / 10)*10 != BOOLEAN_TYPE) {
 						return -1;
 					}
 					return BOOLEAN_TYPE;
 					break;
 				case neqop:
 				case eqop:
-					if(lType == -1 || rType == -1 || (lType/10)*10 != (rType/10)*10){
+					if (lType == -1 || rType == -1 || (lType / 10)*10 != (rType / 10)*10) {
 						return -1;
 					}
 					return BOOLEAN_TYPE;
@@ -215,7 +225,7 @@ int getExpType(Exp e){
 		default:
 			fprintf(stderr, "Undefined kind of expression!");
 			exit(EXIT_FAILURE);
-		
+
 	}
 }
 
@@ -227,8 +237,10 @@ Unode makeUnNode(Exp e, UnOp op) {
 }
 
 void freeUnNode(Unode un) {
-	freeExp(un->e);
-	free(un);
+	if (un != NULL) {
+		freeExp(un->e);
+		free(un);
+	}
 }
 
 Bnode makeBinNode(Exp l, Exp r, BinOp op) {
@@ -240,7 +252,9 @@ Bnode makeBinNode(Exp l, Exp r, BinOp op) {
 }
 
 void freeBinNode(Bnode bin) {
-	freeExp(bin->l);
-	freeExp(bin->r);
-	free(bin);
+	if (bin != NULL) {
+		freeExp(bin->l);
+		freeExp(bin->r);
+		free(bin);
+	}
 }
