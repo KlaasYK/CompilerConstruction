@@ -240,7 +240,6 @@ void printTypeError(char *identifier, int ErrorType) {
 }
 
 int getType(char *name) {
-	printf("test start\n");
 	NodeType nt = lookupType(name);
 	int type = lookupEvalType(name, nt);
 	if(type == -1){
@@ -251,7 +250,6 @@ int getType(char *name) {
 	}else {
 		free(name);
 	}
-	printf("test end\n");
 	return type;
 }
 
