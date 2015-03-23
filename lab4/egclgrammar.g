@@ -22,6 +22,7 @@
 #define PARAMMISMATCH1 261
 #define PARAMMISMATCH2 262
 #define REFERENCETOCONSTANT 263
+#define PROCISOFUNC 264	
 
 typedef struct Stmnts{
 	int numStmnts;
@@ -210,6 +211,7 @@ void printTypeError(char *identifier, int ErrorType) {
 		case PARAMMISMATCH1: printf("The number of parameters for function '%s' differs from what was previously defined\n", identifier);break;
 		case PARAMMISMATCH2: printf("One of the parameters for function '%s' has a type mismatch\n", identifier);break;
 		case REFERENCETOCONSTANT: printf("In function '%s' a constant was used as reference parameter\n", identifier);break;
+		case PROCISOFUNC: printf("Procedure '%s' is used as function, at column %d\n", identifier, columnnr+1);break;
 	}
 	
 	free(identifier);
@@ -284,128 +286,313 @@ int main(int argc, char** argv) {
 /* EOF c FILE */
 }
 
-rootexpr(char *name)	: 
+rootexpr<Exp>(char *name, int isFunc)	: 
 				LPARREN 
-				expr 
+				expr<e>{
+					LLretval = e;
+				}
 				RPARREN
 			| 
 				IDENTIFIER{
 					name = strdup(yytext);
+					isFunc = 0;
 				}
 				[
-					functioncall<fc>(name, 0, NULL)
-				]?
+					functioncall<fc>(name, 0, NULL){
+						isFunc = 1;
+						if(lookupEvalType(name, lookupType(name))== VOID_TYPE){
+							//TODO error
+						}
+						LLretval = makeFuncCallExp(fc);
+					}
+				]?{
+					if(!isFunc){
+						LLretval = makeIDNodeExp(makeID(getType(strdup(yytext)), yytext));
+					}
+				}
 			| 
-				NUMBER
+				NUMBER{
+					LLretval = makeIntExp(makeInt(yytext));
+				}
 			|
-				BOOLEAN
+				BOOLEAN{
+					char *bool = strdup(yytext);
+					LLretval = makeBoolExp(makeBool(strcmp(bool, "true")==0?true:false));
+					free(bool);
+				}
 			;
 
 
-powbase	: 
+powbase<Exp> : 
 			MIN_OP 
-			powbase
+			powbase<e>{
+				LLretval = makeUnNodeExp(makeUnNode(e, negop));
+			}
 		| 
-			rootexpr(NULL)
+			rootexpr<e>(NULL,0){
+			LLretval = e;
+		}
 		;
 
-factor2	: 
-			POW_OP 
-			powbase 
-			factor2
-		| 
-			/* epsilon */
-		;
+factor2<Exp> : 
+		POW_OP 
+		powbase<l>
+		factor2<e>{
+			if(e == NULL){
+				LLretval = l;
+			}else{
+				e->node.bnode->l = l;
+				LLretval = e;
+			}
+			LLretval = makeBinNodeExp(makeBinNode(NULL, e, powop));
+		}
+	| 
+		/* epsilon */{
+			LLretval = NULL;
+		}
+;
 
-factor	: 
-			powbase 
-			factor2 
-		;
+factor<Exp> : 
+		powbase<l>
+		factor2<e>{
+			if(e == NULL){
+				LLretval = l;
+			}else{
+				e->node.bnode->l = l;
+				LLretval = e;
+			}
+		} 
+;
 
-term2	: 
-			MUL_OP 
-			factor 
-			term2
-		| 
-			/* epsilon */
-		;
+term2<Exp>(BinOp mulOp)	: 
+		MUL_OP {
+			char *mulOpText = strdup(yytext);
+			if(strcmp(mulOpText, "*") == 0){
+				mulOp = mulop;
+			}
+			else if(strcmp(mulOpText, "/") == 0){
+				mulOp = divop;
+			}
+			else if(strcmp(mulOpText, "div") == 0){
+				mulOp = divop;
+			}
+			else if(strcmp(mulOpText, "%") == 0){
+				mulOp = modop;
+			}
+			else if(strcmp(mulOpText, "mod") == 0){
+				mulOp = modop;
+			}
+			free(mulOpText);
+		}
+		factor<l>
+		term2<e>(0){
+			if(e == NULL){
+				LLretval = l;
+			}else{
+				e->node.bnode->l = l;
+				LLretval = e;
+			}
+			LLretval = makeBinNodeExp(makeBinNode(NULL, e, mulOp));
+		}
+	| 
+		/* epsilon */{
+			LLretval = NULL;
+		}
+;
 
-term	: 
-			factor 
-			term2
-		;
+term<Exp>	: 
+		factor<l>
+		term2<e>(0){
+			if(e == NULL){
+				LLretval = l;
+			}else{
+				e->node.bnode->l = l;
+				LLretval = e;
+			}
+		}
+;
 
-sumexpr2	: 
-				PLUS_OP 
-				term 
-				sumexpr2
-			| 
-				MIN_OP 
-				term 
-				sumexpr2
-			| 
-				/* epsilon */
-			;
+sumexpr2<Exp> : 
+		PLUS_OP 
+		term<l>
+		sumexpr2<e>{
+			if(e == NULL){
+				LLretval = l;
+			}else{
+				e->node.bnode->l = l;
+				LLretval = e;
+			}
+			LLretval = makeBinNodeExp(makeBinNode(NULL, e, plusop));
+		}
+	| 
+		MIN_OP 
+		term<l>
+		sumexpr2<e>{
+			if(e == NULL){
+				LLretval = l;
+			}else{
+				e->node.bnode->l = l;
+				LLretval = e;
+			}
+			LLretval = makeBinNodeExp(makeBinNode(NULL, e, minop));
+		}
+	| 
+		/* epsilon */{
+			LLretval = NULL;
+		}
+;
 
-sumexpr	: 
-			term 
-			sumexpr2
-		;
+sumexpr<Exp> : 
+		term<l>
+		sumexpr2<e>{
+			if(e == NULL){
+				LLretval = l;
+			}else{
+				e->node.bnode->l = l;
+				LLretval = e;
+			}
+		}
+;
 
-relexpr2	: 
-				COMPARE_OP sumexpr relexpr2
-			| 
-				/* epsilon */
-			;
+relexpr2<Exp>(BinOp compOp)	: 
+		COMPARE_OP{
+			char *compOpText = strdup(yytext);
+			if(strcmp(compOpText, "<>") == 0){
+				compOp = neqop;
+			}
+			else if(strcmp(compOpText, "=") == 0){
+				compOp = eqop;
+			}
+			else if(strcmp(compOpText, ">") == 0){
+				compOp = gtop;
+			}
+			else if(strcmp(compOpText, "<") == 0){
+				compOp = ltop;
+			}
+			free(compOpText);
+		}
+		sumexpr<l>
+		relexpr2<e>(0){
+			if(e == NULL){
+				LLretval = l;
+			}else{
+				e->node.bnode->l = l;
+				LLretval = e;
+			}
+			LLretval = makeBinNodeExp(makeBinNode(NULL, e, compOp));
+		}
+	| 
+		/* epsilon */{
+			LLretval = NULL;
+		}
+;
 
-relexpr : 
-			sumexpr 
-			relexpr2
-		;
+relexpr<Exp> : 
+		sumexpr<l> 
+		relexpr2<e>(0){
+			if(e == NULL){
+				LLretval = l;
+			}else{
+				e->node.bnode->l = l;
+				LLretval = e;
+			}
+		}
+;
 
-notexpr	: 
-			NOT_TOK 
-			notexpr
-		| 
-			relexpr
-		;
+notexpr<Exp> : 
+		NOT_TOK 
+		notexpr<e>{
+			LLretval = makeUnNodeExp(makeUnNode(e, notop));
+		}
+	| 
+		relexpr<e>{
+			LLretval = e;
+		}
+;
 
-andexpr2	: 
-				AND_OP 
-				notexpr 
-				andexpr2
-			| 
-				CAND_OP 
-				notexpr 
-				andexpr2
-			| 
-				/* epsilon */
-			;
+andexpr2<Exp> : 
+		AND_OP 
+		notexpr<l>
+		andexpr2<e>{
+			if(e == NULL){
+				LLretval = l;
+			}else{
+				e->node.bnode->l = l;
+				LLretval = e;
+			}
+			LLretval = makeBinNodeExp(makeBinNode(NULL, e, andop));
+		}
+	| 
+		CAND_OP 
+		notexpr<l> 
+		andexpr2<e>{
+			if(e == NULL){
+				LLretval = l;
+			}else{
+				e->node.bnode->l = l;
+				LLretval = e;
+			}
+			LLretval = makeBinNodeExp(makeBinNode(NULL, e, candop));
+		}
+	| 
+		/* epsilon */{
+			LLretval = NULL;
+		}
+;
 
-andexpr	: 
-			notexpr 
-			andexpr2 
-		;
+andexpr<Exp>: 
+		notexpr<l>
+		andexpr2<e>{
+			if(e == NULL){
+				LLretval = l;
+			}else{
+				e->node.bnode->l = l;
+				LLretval = e;
+			}
+		}
+;
 			
-expr2	: 
-			OR_OP 
-			andexpr 
-			expr2
-		| 
-			COR_OP 
-			andexpr 
-			expr2
-		| 
-			/* epsilon */
-		;
+expr2<Exp>: 
+		OR_OP
+		andexpr<l>
+		expr2<e>{
+			if(e == NULL){
+				LLretval = l;
+			}else{
+				e->node.bnode->l = l;
+				LLretval = e;
+			}
+			LLretval = makeBinNodeExp(makeBinNode(NULL, e, orop));
+		}
+	| 
+		COR_OP 
+		andexpr<l>
+		expr2<e>{
+			if(e == NULL){
+				LLretval = l;
+			}else{
+				e->node.bnode->l = l;
+				LLretval = e;
+			}
+			LLretval = makeBinNodeExp(makeBinNode(NULL, e, corop));
+		}
+	| 
+		/* epsilon */{
+			LLretval = NULL;
+		}
+;
 
 expr<ExpTree> : 
-			andexpr 
-			expr2{
-				char *name = strdup("helloWorld");
-				LLretval = makeIDNodeExp(makeID(20, name));//TODO remove dummy
+		andexpr<l>
+		expr2<e>{
+			if(e == NULL){
+				LLretval = l;
+			}else{
+				e->node.bnode->l = l;
+				LLretval = e;
 			}
-		;
+		}
+;
 
 guardedcommand	: 
 		expr 
