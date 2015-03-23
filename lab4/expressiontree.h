@@ -13,7 +13,7 @@ typedef enum {
 } UnOp;
 
 typedef enum {
-    plusop, minop, mulop, divop, modop, powop, andop, orop, candop, corop, neqop, eqop, gtop, ltop
+    plusop, minop, mulop, divop, modop, powop, andop, orop, candop, corop, neqop, eqop, gtop, ltop, geop, leop
 } BinOp;
 
 typedef enum {

@@ -521,8 +521,14 @@ relexpr2<Exp>(Exp left, Exp *exp, BinOp compOp)	:
 			else if(strcmp(compOpText, ">") == 0){
 				compOp = gtop;
 			}
+			else if(strcmp(compOpText, ">=") == 0){
+				compOp = geop;
+			}
 			else if(strcmp(compOpText, "<") == 0){
 				compOp = ltop;
+			}
+			else if(strcmp(compOpText, "<=") == 0){
+				compOp = leop;
 			}
 			free(compOpText);
 		}
