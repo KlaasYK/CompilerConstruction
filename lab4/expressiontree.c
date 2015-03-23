@@ -165,11 +165,17 @@ int getExpType(Exp e){
 				case divop:
 				case modop:
 				case powop:
+					if(lType == -1 || rType == -1 || (lType/10)*10 != INTEGER_TYPE || (rType/10)*10 != INTEGER_TYPE){
+						return -1;
+					}
+					return INTEGER_TYPE;
+					break;
 				case gtop:
 				case ltop:
 					if(lType == -1 || rType == -1 || (lType/10)*10 != INTEGER_TYPE || (rType/10)*10 != INTEGER_TYPE){
 						return -1;
 					}
+					return BOOLEAN_TYPE;
 					break;
 				case andop:
 				case orop:
@@ -178,12 +184,14 @@ int getExpType(Exp e){
 					if(lType == -1 || rType == -1 || (lType/10)*10 != BOOLEAN_TYPE || (rType/10)*10 != BOOLEAN_TYPE){
 						return -1;
 					}
+					return BOOLEAN_TYPE;
 					break;
 				case neqop:
 				case eqop:
 					if(lType == -1 || rType == -1 || (lType/10)*10 != (rType/10)*10){
 						return -1;
 					}
+					return BOOLEAN_TYPE;
 					break;
 				default:
 					fprintf(stderr, "Undefined kind of binary operator!");
