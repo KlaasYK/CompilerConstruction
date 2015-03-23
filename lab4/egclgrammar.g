@@ -815,7 +815,6 @@ functioncall<FuncCall>(char *name, int type, Exps params):
 			FuncCall fc = makeFuncCall(type, name, params->numExps, params->exps);
 			LLretval = fc;
 			free(params);
-			free(name);
 		}
 ;
 
@@ -1271,6 +1270,7 @@ function<FuncDef>(int numparams, Param *p, int numStmnts, Stmnt *stmnts)	:
 							} else {
 								p[i] = makeParam(makeID(n->evaltype,strdup(n->name)), byVal);
 							}
+							i++;
 							n = n->next;
 						} else if(isMethod(n->name)){
 							printTypeError(n->name, VARIABLEASKED);
@@ -1283,7 +1283,7 @@ function<FuncDef>(int numparams, Param *p, int numStmnts, Stmnt *stmnts)	:
 				END_TOK 
 				{
 					popBlock();
-					LLretval = makeFuncDef(makeID(getType(lastmethodidentifier), lastmethodidentifier),numparams, p, stmntsret->numStmnts, stmntsret->stmnts);
+					LLretval = makeFuncDef(makeID(getType(strdup(lastmethodidentifier)), strdup(lastmethodidentifier)),numparams, p, stmntsret->numStmnts, stmntsret->stmnts);
 					free(lastmethodidentifier);
 					lastmethodidentifier = NULL;
 				}
@@ -1324,6 +1324,7 @@ procedure<ProcDef>(int numparams, Param *p, int numStmnts, Stmnt *stmnts)	:
 							} else {
 								p[i] = makeParam(makeID(n->evaltype,strdup(n->name)), byVal);
 							}
+							i++;
 							n = n->next;
 						} else if(isMethod(n->name)){
 							printTypeError(n->name, VARIABLEASKED);
@@ -1335,7 +1336,7 @@ procedure<ProcDef>(int numparams, Param *p, int numStmnts, Stmnt *stmnts)	:
 				statementset<stmntsret>
 				END_TOK {
 					popBlock();
-					LLretval = makeProcDef(lastmethodidentifier,numparams, p, stmntsret->numStmnts, stmntsret->stmnts);
+					LLretval = makeProcDef(strdup(lastmethodidentifier),numparams, p, stmntsret->numStmnts, stmntsret->stmnts);
 					free(lastmethodidentifier);
 					lastmethodidentifier = NULL;
 				}
