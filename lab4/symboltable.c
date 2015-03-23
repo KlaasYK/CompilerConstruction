@@ -7,6 +7,22 @@
 
 Stack *symboltable = NULL;
 
+int isMethod(char *name) {
+	// TODO: check symboltable not null
+	List *l = symboltable->top;
+	while (l->nextlist != NULL) {
+		l = l->nextlist;
+	}
+	/* bottom of the stack */
+	Node *n = l->first;
+	while (n != NULL) {
+		if (strcmp(n->name, name) == 0 && n->type == METHOD) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
 int getNumNodes(Node *n) {
 	Node *t = n;
 	int k = 0;
