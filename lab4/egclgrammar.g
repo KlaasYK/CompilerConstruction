@@ -672,7 +672,7 @@ expr2<Exp>(Exp left, Exp *exp):
 		}
 	| 
 		COR_OP 
-		andexpr<l>(NULL){
+		andexpr<r>(NULL){
 			LLretval = makeBinNodeExp(makeBinNode(left, r, corop));
 		}
 		expr2<e>(LLretval, exp){
@@ -699,11 +699,12 @@ expr<ExpTree>(Exp *exp) :
 			if(e == NULL){
 				LLretval = l;
 			}else{
+				
 				if((getExpType(l)/10)*10 != BOOLEAN_TYPE || (getExpType(e->node.bnode->r)/10)*10 != BOOLEAN_TYPE){
 					printTypeError(strdup(yytext), WRONGTYPE);
 				}
 				LLretval = *exp;
-				free(exp);
+				//free(exp);
 			}
 		}
 ;

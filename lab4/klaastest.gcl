@@ -1,13 +1,26 @@
 program dummy;
 
-constant A : integer = 1;
-constant B : boolean = true;
-
-var a : integer;
-var b : boolean;
-
 begin
- do b -> a:=A;
- [] b -> b:=B;
- od;
+	var Yes, No, yes, no, a0, a1, b0, b1 : boolean;
+	Yes :=  true;
+	No := false;
+  
+	println Yes, No;
+	yes := 5 div 2 = 2;
+	no := 5 div 2 = 0;
+	
+	println yes, no;
+
+	println Yes = yes, No = no;
+	
+	a0 := yes and no;
+	a1 := yes or no;
+	b0 := not a0;
+	b1 := not a1;
+	
+	println a0, a1, b0, b1;
+	
+
+	a0 := Yes cor 1 div 0 = 5;
+	
 end.
