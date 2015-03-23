@@ -1,6 +1,7 @@
 program dummy;
 
 begin
-	var kaas : integer;
+	var kaas, nummer: integer;
+	kaas, nummer := 42;
 	println kaas;
 end.
