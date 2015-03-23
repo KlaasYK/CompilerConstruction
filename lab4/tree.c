@@ -270,10 +270,11 @@ void freeDec(Dec d) {
 	free(d);
 }
 
-Ass makeAss(ID id, ExpTree expTree) {
+Ass makeAss(ID id, ExpTree expTree, int lineNr) {
 	Ass a = malloc(sizeof (struct Assignment));
 	a->id = id;
 	a->expTree = expTree;
+	a->lineNr = lineNr;
 	return a;
 }
 

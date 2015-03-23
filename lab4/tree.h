@@ -120,6 +120,7 @@ struct Declaration {
 struct Assignment {
     ID id;
     ExpTree expTree;
+    int lineNr;
 };
 
 struct ReadCall {
@@ -191,7 +192,7 @@ Dec makeExpDec(ID id, IDType idType, ExpTree expTree);
 Dec makeStringDec(ID id, IDType idType, char *str);
 void freeDec(Dec d);
 
-Ass makeAss(ID id, ExpTree expTree);
+Ass makeAss(ID id, ExpTree expTree, int lineNr);
 void freeAss(Ass a);
 
 RCall makeRCall(int numids, ID *ids);
