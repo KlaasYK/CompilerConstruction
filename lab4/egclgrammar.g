@@ -1417,8 +1417,29 @@ programbody<Prog>(int numConstDefs, Dec *constDefs, int numVarDefs, Dec *varDefs
 		]* {
 			printf("Num of var defs: %d\n", numVarDefs);
 		}
-		procedure(0,NULL,0,NULL)* 
-		function(0,NULL,0,NULL)* 
+		[
+		procedure<procdef>(0,NULL,0,NULL)
+		{
+			int oldNumProcDefs = numProcDefs;
+				numProcDefs++;
+				if(oldNumProcDefs == 0){
+					procDefs = malloc(numProcDefs*sizeof(ProcDef));
+				}else{
+					procDefs = realloc(procDefs, numProcDefs*sizeof(ProcDef));
+				}
+				procDefs[oldNumProcDefs] = procdef;
+		}
+		]* 
+		[function<funcdef>(0,NULL,0,NULL){
+				int oldNumFuncDefs = numFuncDefs;
+				numFuncDefs++;
+				if(oldNumFuncDefs == 0){
+					funcDefs = malloc(numFuncDefs*sizeof(FuncDef));
+				}else{
+					funcDefs = realloc(funcDefs, numFuncDefs*sizeof(FuncDef));
+				}
+				funcDefs[oldNumFuncDefs] = funcdef;
+		}]* 
 		BEGIN_TOK {
 			putBlock(); /* add a new frame of reference */
 		} 
