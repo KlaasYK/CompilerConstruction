@@ -449,7 +449,6 @@ term<Exp>(Exp *exp) :
 					printTypeError(strdup(yytext), WRONGTYPE);
 				}
 				LLretval = *exp;
-				free(exp);
 			}
 		}
 ;
@@ -502,7 +501,6 @@ sumexpr<Exp>(Exp *exp) :
 					printTypeError(strdup(yytext), WRONGTYPE);
 				}
 				LLretval = *exp;
-				free(exp);
 			}
 		}
 ;
@@ -583,7 +581,6 @@ relexpr<Exp>(Exp *exp) :
 						break;
 				}
 				LLretval = *exp;
-				free(exp);
 			}
 		}
 ;
@@ -649,7 +646,6 @@ andexpr<Exp>(Exp *exp):
 					printTypeError(strdup(yytext), WRONGTYPE);
 				}
 				LLretval = *exp;
-				free(exp);
 			}
 		}
 ;
@@ -702,7 +698,6 @@ expr<ExpTree>(Exp *exp) :
 					printTypeError(strdup(yytext), WRONGTYPE);
 				}
 				LLretval = *exp;
-				//free(exp);
 			}
 		}
 ;
@@ -712,7 +707,7 @@ guardedcommand<GCommand>(ExpTree exp)	:
 			if (e != NULL) {
 				if (getExpType(e)/10*10 != BOOLEAN_TYPE) {
 					/* TODO: print expression */
-					printTypeError(strdup(lexeme), WRONGTYPE);
+					printTypeError(strdup(yytext), WRONGTYPE);
 				} else {
 					exp = e;
 				}
@@ -720,7 +715,8 @@ guardedcommand<GCommand>(ExpTree exp)	:
 		}
 		THEN_TOK 
 		statementset<Stmnts> {
-			LLretval = makeGCommand(exp, Stmnts->numStmnts, Stmnts->stmnts); 
+			LLretval = makeGCommand(exp, Stmnts->numStmnts, Stmnts->stmnts);
+			
 		}
 ;
 
@@ -913,9 +909,10 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 				}
 			}
 			freeTempList();
-			LLretval = stmnts;
 			free(exps);
 			free(name);
+			LLretval = stmnts;
+			
 		}
 ;
 
@@ -1233,7 +1230,7 @@ statementset<Stmnts>:
 		}
 ;
 
-function	: 
+function<FuncDef>(int numparams, Param *p, int numStmnts, Stmnt *stmnts)	: 
 				FUNCTION_TOK 
 				IDENTIFIER 
 				{
@@ -1263,9 +1260,17 @@ function	:
 					putBlock();
 					/* insert all the parameters to the symboltable */
 					Node *n = lookupParams(lastmethodidentifier);
+					numparams = getNumNodes(n);
+					p = malloc(numparams * sizeof(struct Parameter));
+					int i = 0;
 					while (n != NULL) {
 						if (!existsInTop(n->name) && !isMethod(n->name) ) {
 							insertIdentifier(strdup(n->name), n->type, n->evaltype, NULL);
+							if (n->evaltype%10 == 2) {
+								p[i] = makeParam(makeID(n->evaltype,strdup(n->name)), byRef);
+							} else {
+								p[i] = makeParam(makeID(n->evaltype,strdup(n->name)), byVal);
+							}
 							n = n->next;
 						} else if(isMethod(n->name)){
 							printTypeError(n->name, VARIABLEASKED);
@@ -1274,17 +1279,18 @@ function	:
 						}
 					}
 				}
-				statementset<LLdiscard>
+				statementset<stmntsret>
 				END_TOK 
 				{
 					popBlock();
+					LLretval = makeFuncDef(makeID(getType(lastmethodidentifier), lastmethodidentifier),numparams, p, stmntsret->numStmnts, stmntsret->stmnts);
 					free(lastmethodidentifier);
 					lastmethodidentifier = NULL;
 				}
 				SEMICOLON
 			;
 
-procedure	: 
+procedure<ProcDef>(int numparams, Param *p, int numStmnts, Stmnt *stmnts)	: 
 				PROCEDURE_TOK 
 				IDENTIFIER 
 				{
@@ -1307,9 +1313,17 @@ procedure	:
 					putBlock();
 					/* insert all the parameters to the symboltable */
 					Node *n = lookupParams(lastmethodidentifier);
+					numparams = getNumNodes(n);
+					p = malloc(numparams * sizeof(struct Parameter));
+					int i = 0;
 					while (n != NULL) {
 						if (!existsInTop(n->name) && !isMethod(n->name) ) {
 							insertIdentifier(strdup(n->name), n->type, n->evaltype, NULL);
+							if (n->evaltype%10 == 2) {
+								p[i] = makeParam(makeID(n->evaltype,strdup(n->name)), byRef);
+							} else {
+								p[i] = makeParam(makeID(n->evaltype,strdup(n->name)), byVal);
+							}
 							n = n->next;
 						} else if(isMethod(n->name)){
 							printTypeError(n->name, VARIABLEASKED);
@@ -1318,9 +1332,10 @@ procedure	:
 						}
 					}
 				}
-				statementset<LLdiscard>
+				statementset<stmntsret>
 				END_TOK {
 					popBlock();
+					LLretval = makeProcDef(lastmethodidentifier,numparams, p, stmntsret->numStmnts, stmntsret->stmnts);
 					free(lastmethodidentifier);
 					lastmethodidentifier = NULL;
 				}
@@ -1402,8 +1417,8 @@ programbody<Prog>(int numConstDefs, Dec *constDefs, int numVarDefs, Dec *varDefs
 		]* {
 			printf("Num of var defs: %d\n", numVarDefs);
 		}
-		procedure* 
-		function* 
+		procedure(0,NULL,0,NULL)* 
+		function(0,NULL,0,NULL)* 
 		BEGIN_TOK {
 			putBlock(); /* add a new frame of reference */
 		} 
@@ -1415,7 +1430,8 @@ programbody<Prog>(int numConstDefs, Dec *constDefs, int numVarDefs, Dec *varDefs
 		}
 		END_TOK {
 			popBlock();
-			LLretval = makeProg(programname, numConstDefs, constDefs, numVarDefs, varDefs, numProcDefs, procDefs, numFuncDefs, funcDefs, numBodyStmnts, bodyStmnts);
+			Prog prog = makeProg(programname, numConstDefs, constDefs, numVarDefs, varDefs, numProcDefs, procDefs, numFuncDefs, funcDefs, numBodyStmnts, bodyStmnts);
+			LLretval = prog;
 		}
 ;
 			
