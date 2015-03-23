@@ -4,16 +4,17 @@ constant A : boolean = true;
 constant B : integer = 5463634634672328653;
 #constant C : string = 'Hello World!'; not supported by scanner
 var m, y, z : integer;
+var d, g, e : boolean;
 
 
 procedure k(var l : integer, x, i : integer, var j, f : boolean);
 	k := 0;
 end;
 
-function sqrt(var x : integer) -> integer;
+function sqrt2(var x : integer) -> integer;
 
   var l : integer;
-  sqrt := l and -4*5*(7+2)+7*3/l>3/2-6*7/4%32=true;
+  sqrt2 := l and -4*5*(7+2)+7*k(m, 4, 6, d, e)+3/l>3/2-6*7/4%32=true;
 end;
 
 begin

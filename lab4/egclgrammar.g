@@ -305,12 +305,13 @@ rootexpr<Exp>(char *name, int isFunc)	:
 					functioncall<fc>(name, 0, NULL){
 						isFunc = 1;
 						if(lookupEvalType(name, lookupType(name))== VOID_TYPE){
-							//TODO error
+							printTypeError(strdup(name), PROCISOFUNC);
 						}
 						LLretval = makeFuncCallExp(fc);
 					}
 				]?{
 					if(!isFunc){
+						// TODO errors
 						LLretval = makeIDNodeExp(makeID(getType(strdup(name)), name));
 					}
 				}
@@ -750,8 +751,7 @@ functioncall<FuncCall>(char *name, int type, Exps params):
 			if(params->numExps != expectedNumParams){
 				printTypeError(strdup(name), PARAMMISMATCH1);
 			}
-			//TODO check if reversed array
-			for(int i = 0;i<params->numExps;i++){
+			for(int i = params->numExps-1;i>=0;i--){
 				int type = getExpType(params->exps[i]);
 				int expectedType = expectedParams->evaltype;
 				if((type/10)*10 != (expectedType/10)*10){
