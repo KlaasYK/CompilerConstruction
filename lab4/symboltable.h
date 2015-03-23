@@ -38,7 +38,7 @@ typedef struct Stack {
 	List *top;
 } Stack;
 
-void updateFunc(char *name);
+int updateFunc(char *name);
 
 int isMethod(char *name);
 

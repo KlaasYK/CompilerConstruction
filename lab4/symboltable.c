@@ -192,12 +192,14 @@ int popBlock() {
 	return r;
 }
 
-void updateFunc(char *name) {
+int updateFunc(char *name) {
 	if (symboltable->top->name != NULL) {
 		if (strcmp(symboltable->top->name, name) == 0) {
 			symboltable->top->returns = 1;
+			return 1;
 		}
 	}
+	return 0;
 }
 
 void insertIdentifier(char *name, NodeType ntype, int etype, Node *paramlist) {

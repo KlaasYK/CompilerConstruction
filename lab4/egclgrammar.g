@@ -908,7 +908,9 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 						printTypeError(strdup(n->name),RETURNINPROC);
 					} else if (lookupType(n->name) == METHOD && lhs != VOID_TYPE) {
 						// check if we are in the function
-						updateFunc(n->name);
+						if(!updateFunc(n->name)){
+							printTypeError(strdup(n->name),VARIABLEASKED);
+						}
 					} else if ((lhs/10)*10 != (rhs/10)*10 ) {
 						/* the list is freeëd in error */
 						printTypeError(strdup(n->name),WRONGTYPE);
@@ -927,8 +929,9 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 						//Trying to assign something to the proc
 						printTypeError(strdup(n->name),RETURNINPROC);
 					} else if (lookupType(n->name) == METHOD && lhs != VOID_TYPE) {
-						// check if we are in the function
-						updateFunc(n->name);
+						if(!updateFunc(n->name)){
+							printTypeError(strdup(n->name),VARIABLEASKED);
+						}
 					} else if ((lhs/10)*10 != (rhs/10)*10 ) {
 						printTypeError(strdup(n->name),WRONGTYPE);
 					}
