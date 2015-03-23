@@ -1075,8 +1075,8 @@ statement<Stmnts>(Stmnts ss, char *name) :
 		}
 		call<stmnts>(name){
 			ss = stmnts;
+			free(name);
 		}
-		free(name);
 	| 
 		printcall<wc>(0, NULL){
 			ss = malloc(sizeof(struct Stmnts));
