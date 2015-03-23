@@ -930,20 +930,20 @@ assignmentcall<Stmnts>(char *name) :
 
 dostatement<Stmnt>:	
 		DOBEGIN_TOK 
-		guardedcommandset<GCmds>(NULL)
+		guardedcommandset<gCmds>(NULL)
 		{
-			//TODO: check if free is neccesary
-			LLretval = makeDoStmnt(makeDo(GCmds->numGCmds, GCmds->gCmds));
+			LLretval = makeDoStmnt(makeDo(gCmds->numGCmds, gCmds->gCmds));
+			free(gCmds);
 		}
 		DOEND_TOK
 ;
 
 ifstatement<Stmnt>:	
 		IFBEGIN_TOK 
-		guardedcommandset<GCmds>(NULL)
+		guardedcommandset<gCmds>(NULL)
 		{
-			//TODO: check if free is nexxesary
-			LLretval = makeIfStmnt(makeIf(GCmds->numGCmds, GCmds->gCmds));
+			LLretval = makeIfStmnt(makeIf(gCmds->numGCmds, gCmds->gCmds));
+			free(gCmds);
 		}
 		IFEND_TOK
 ;
