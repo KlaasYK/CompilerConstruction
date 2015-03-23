@@ -1,9 +1,11 @@
 program dummy;
 
 constant A : integer = 1;
+constant B : boolean = true;
 
-var a, b : boolean;
+var a : integer;
+var b : boolean;
 
 begin
- a := A;
+ a, b := a, B;
 end.

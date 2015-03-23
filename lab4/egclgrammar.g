@@ -796,6 +796,8 @@ assignmentcallV1<Stmnts>(char *name):
 assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	: 
 		{
 			//TODO typecheck name (watch out for return type of functions!)
+			addTempList(strdup(name));
+			
 			stmnts = malloc(sizeof(struct Stmnts));
 			stmnts->numStmnts = 1;
 			stmnts->stmnts = malloc(stmnts->numStmnts*sizeof(Stmnt));
@@ -804,6 +806,8 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 		[
 			COMMA 
 			IDENTIFIER{
+				addTempList(strdup(yytext));
+				
 				//TODO typecheck IDENTIFIER (watch out for return type of functions!)
 				stmnts->numStmnts++;
 				stmnts->stmnts = realloc(stmnts->stmnts, stmnts->numStmnts*sizeof(Stmnt));
@@ -825,12 +829,47 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 				exps->exps[exps->numExps-1] = e;
 			}
 		]*{
-			if(stmnts->numStmnts!=exps->numExps){
+			
+		
+			if(stmnts->numStmnts!=exps->numExps && exps->numExps!=1){
+				/* if not equal, and not one to many... */
+				freeTempList();
 				printTypeError(NULL, ASSMISMATCH);
 			}
-			for(int i=0;i<exps->numExps;i++){
-				stmnts->stmnts[i]->assignment->expTree = exps->exps[i];
+			if ( exps->numExps != 1) {
+				INode *n = tempidentifierlist;
+				for(int i=exps->numExps-1;i+1>0;i--){
+					/* type checking */
+					int lhs = getType(strdup(n->name));
+					int rhs = getExpType(exps->exps[i]);
+					if ((lhs/10)*10 == (rhs/10)*10 ) {
+						n = n->next;
+						stmnts->stmnts[i]->assignment->expTree = exps->exps[i];
+					}
+					else {
+						freeTempList();
+						printTypeError(strdup(n->name),WRONGTYPE);
+					}
+				}
+			} else {
+				/* one to all statements */
+				int rhs = getExpType(exps->exps[0]);
+				INode *n = tempidentifierlist;
+				for(int i=stmnts->numStmnts-1;i+1 > 0;i--){
+					/* type checking */
+					int lhs = getType(strdup(n->name));
+					if ((lhs/10)*10 == (rhs/10)*10 ) {
+						n = n->next;
+						/* TODO: make a deep copy! */
+						stmnts->stmnts[i]->assignment->expTree = exps->exps[0];
+					}
+					else {
+						freeTempList();
+						printTypeError(strdup(n->name),WRONGTYPE);
+					}
+				}
 			}
+			freeTempList();
 			LLretval = stmnts;
 			free(exps);
 		}
