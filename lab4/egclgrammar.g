@@ -862,7 +862,7 @@ function	:
 				statementset<LLdiscard>
 				END_TOK 
 				{
-					/* popBlock(); TODO: remove popBlock */
+					popBlock();
 					lastmethodidentifier = NULL;
 				}
 				SEMICOLON
@@ -903,7 +903,7 @@ procedure	:
 				}
 				statementset<LLdiscard>
 				END_TOK {
-					/* popBlock(); TODO: remove popBlock */
+					popBlock();
 					lastmethodidentifier = NULL;
 				}
 				SEMICOLON
@@ -996,7 +996,7 @@ programbody<Prog>(int numConstDefs, Dec *constDefs, int numVarDefs, Dec *varDefs
 			free(bss);
 		}
 		END_TOK {
-			/* popBlock(); TODO: activate this after debugging */
+			popBlock();
 			LLretval = makeProg(programname, numConstDefs, constDefs, numVarDefs, varDefs, numProcDefs, procDefs, numFuncDefs, funcDefs, numBodyStmnts, bodyStmnts);
 		}
 ;
