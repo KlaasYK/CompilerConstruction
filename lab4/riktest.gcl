@@ -6,11 +6,11 @@ constant B : integer = 5463634634672328653;
 var m, y, z : integer;
 
 
-procedure k(var k, x, integer);
+procedure k(var k : integer, x, i : integer, var j, f : boolean);
 	k := 0;
 end;
 
-function sqrt(x : integer) -> integer;
+function sqrt(var x : integer) -> integer;
 
   var k : integer;
   sqrt := 1
@@ -20,5 +20,5 @@ begin
     print 'hello World to you too!';
     var m, y, z : integer;
     read y, z;
-    sqrt()
+    sqrt(B);
 end.
