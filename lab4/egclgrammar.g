@@ -292,7 +292,7 @@ int main(int argc, char** argv) {
 
 rootexpr<Exp>(char *name, int isFunc)	: 
 				LPARREN 
-				expr<e>{
+				expr<e>(NULL){
 					LLretval = e;
 				}
 				RPARREN
@@ -361,7 +361,7 @@ factor2<Exp> :
 		}
 ;
 
-factor<Exp> : 
+factor<Exp>: 
 		powbase<l>
 		factor2<e>{
 			if(e == NULL){
@@ -376,7 +376,7 @@ factor<Exp> :
 		} 
 ;
 
-term2<Exp>(BinOp mulOp)	: 
+term2<Exp>(Exp left, Exp *exp, BinOp mulOp)	: 
 		MUL_OP {
 			char *mulOpText = strdup(yytext);
 			if(strcmp(mulOpText, "*") == 0){
@@ -396,16 +396,16 @@ term2<Exp>(BinOp mulOp)	:
 			}
 			free(mulOpText);
 		}
-		factor<l>
-		term2<e>(0){
-			if(e == NULL){
-				LLretval = makeBinNodeExp(makeBinNode(NULL, l, mulOp));
-			}else{
-				e->node.bnode->l = l;
-				if((getExpType(l)/10)*10 != INTEGER_TYPE || (getExpType(e->node.bnode->r)/10)*10 != INTEGER_TYPE){
+		factor<r>{
+			LLretval = makeBinNodeExp(makeBinNode(left, r, mulOp));
+		}
+		term2<e>(LLretval, exp, 0){
+			if(e != NULL){
+				if((getExpType(e->node.bnode->l)/10)*10 != INTEGER_TYPE || (getExpType(e->node.bnode->r)/10)*10 != INTEGER_TYPE){
 					printTypeError(strdup(yytext), WRONGTYPE);
 				}
-				LLretval = makeBinNodeExp(makeBinNode(NULL, e, mulOp));
+			}else{
+				*exp = LLretval;
 			}
 		}
 	| 
@@ -414,48 +414,50 @@ term2<Exp>(BinOp mulOp)	:
 		}
 ;
 
-term<Exp>	: 
+term<Exp>(Exp *exp) : 
+{
+	exp = malloc(sizeof(Exp));
+}
 		factor<l>
-		term2<e>(0){
+		term2<e>(l, exp, 0){
 			if(e == NULL){
 				LLretval = l;
 			}else{
-				e->node.bnode->l = l;
 				if((getExpType(l)/10)*10 != INTEGER_TYPE || (getExpType(e->node.bnode->r)/10)*10 != INTEGER_TYPE){
 					printTypeError(strdup(yytext), WRONGTYPE);
 				}
-				LLretval = e;
+				LLretval = *exp;
+				free(exp);
 			}
 		}
 ;
 
-sumexpr2<Exp> : 
-		PLUS_OP {
+sumexpr2<Exp>(Exp left, Exp *exp) : 
+		PLUS_OP
+		term<r>(NULL){
+			LLretval = makeBinNodeExp(makeBinNode(left, r, plusop));	
 		}
-		term<l>
-		sumexpr2<e>{
-			if(e == NULL){
-				LLretval = makeBinNodeExp(makeBinNode(NULL, l, plusop));
-			}else{
-				e->node.bnode->l = l;
-				if((getExpType(l)/10)*10 != INTEGER_TYPE || (getExpType(e->node.bnode->r)/10)*10 != INTEGER_TYPE){
+		sumexpr2<e>(LLretval, exp){
+			if(e != NULL){
+				if((getExpType(e->node.bnode->l)/10)*10 != INTEGER_TYPE || (getExpType(e->node.bnode->r)/10)*10 != INTEGER_TYPE){
 					printTypeError(strdup(yytext), WRONGTYPE);
 				}
-				LLretval = makeBinNodeExp(makeBinNode(NULL, e, plusop));
+			}else{
+				*exp = LLretval;
 			}
 		}
 	| 
 		MIN_OP 
-		term<l>
-		sumexpr2<e>{
-			if(e == NULL){
-				LLretval = makeBinNodeExp(makeBinNode(NULL, l, minop));
-			}else{
-				e->node.bnode->l = l;
-				if((getExpType(l)/10)*10 != INTEGER_TYPE || (getExpType(e->node.bnode->r)/10)*10 != INTEGER_TYPE){
+		term<r>(NULL){
+			LLretval = makeBinNodeExp(makeBinNode(left, r, minop));
+		}
+		sumexpr2<e>(LLretval, exp){
+			if(e != NULL){
+				if((getExpType(e->node.bnode->l)/10)*10 != INTEGER_TYPE || (getExpType(e->node.bnode->r)/10)*10 != INTEGER_TYPE){
 					printTypeError(strdup(yytext), WRONGTYPE);
 				}
-				LLretval = makeBinNodeExp(makeBinNode(NULL, e, minop));
+			}else{
+				*exp = LLretval;
 			}
 		}
 	| 
@@ -464,9 +466,12 @@ sumexpr2<Exp> :
 		}
 ;
 
-sumexpr<Exp> : 
-		term<l>
-		sumexpr2<e>{
+sumexpr<Exp>(Exp *exp) : 
+{
+	exp = malloc(sizeof(Exp));
+}
+		term<l>(NULL)
+		sumexpr2<e>(l, exp){
 			if(e == NULL){
 				LLretval = l;
 			}else{
@@ -474,12 +479,13 @@ sumexpr<Exp> :
 				if((getExpType(l)/10)*10 != INTEGER_TYPE || (getExpType(e->node.bnode->r)/10)*10 != INTEGER_TYPE){
 					printTypeError(strdup(yytext), WRONGTYPE);
 				}
-				LLretval = e;
+				LLretval = *exp;
+				free(exp);
 			}
 		}
 ;
 
-relexpr2<Exp>(BinOp compOp)	: 
+relexpr2<Exp>(Exp left, Exp *exp, BinOp compOp)	: 
 		COMPARE_OP{
 			char *compOpText = strdup(yytext);
 			if(strcmp(compOpText, "<>") == 0){
@@ -496,27 +502,27 @@ relexpr2<Exp>(BinOp compOp)	:
 			}
 			free(compOpText);
 		}
-		sumexpr<l>
-		relexpr2<e>(0){
-			if(e == NULL){
-				LLretval = makeBinNodeExp(makeBinNode(NULL, l, compOp));
-			}else{
-				e->node.bnode->l = l;
+		sumexpr<r>(NULL){
+			LLretval = makeBinNodeExp(makeBinNode(left, r, compOp));
+		}
+		relexpr2<e>(LLretval, exp, 0){
+			if(e != NULL){
 				switch(e->node.bnode->operator){
 					case gtop:
 					case ltop:
-						if((getExpType(l)/10)*10 != INTEGER_TYPE || (getExpType(e->node.bnode->r)/10)*10 != INTEGER_TYPE){
+						if((getExpType(e->node.bnode->l)/10)*10 != INTEGER_TYPE || (getExpType(e->node.bnode->r)/10)*10 != INTEGER_TYPE){
 							printTypeError(strdup(yytext), WRONGTYPE);
 						}	
 						break;
 					case neqop:
 					case eqop:
-						if(getExpType(l) == -1 || getExpType(e->node.bnode->r) == -1 || (getExpType(l)/10)*10 != (getExpType(e->node.bnode->r)/10)*10){
+						if(getExpType(e->node.bnode->l) == -1 || getExpType(e->node.bnode->r) == -1 || (getExpType(e->node.bnode->l)/10)*10 != (getExpType(e->node.bnode->r)/10)*10){
 							printTypeError(strdup(yytext), WRONGTYPE);
 						}
 						break;
 				}
-				LLretval = makeBinNodeExp(makeBinNode(NULL, e, compOp));
+			}else{
+				*exp = LLretval;
 			}
 		}
 	| 
@@ -525,13 +531,15 @@ relexpr2<Exp>(BinOp compOp)	:
 		}
 ;
 
-relexpr<Exp> : 
-		sumexpr<l> 
-		relexpr2<e>(0){
+relexpr<Exp>(Exp *exp) : 
+{
+	exp = malloc(sizeof(Exp));
+}
+		sumexpr<l>(NULL)
+		relexpr2<e>(l, exp, 0){
 			if(e == NULL){
 				LLretval = l;
 			}else{
-				e->node.bnode->l = l;
 				switch(e->node.bnode->operator){
 					case gtop:
 					case ltop:
@@ -546,7 +554,8 @@ relexpr<Exp> :
 						}
 						break;
 				}
-				LLretval = e;
+				LLretval = *exp;
+				free(exp);
 			}
 		}
 ;
@@ -560,37 +569,37 @@ notexpr<Exp> :
 			LLretval = makeUnNodeExp(makeUnNode(e, notop));
 		}
 	| 
-		relexpr<e>{
+		relexpr<e>(NULL){
 			LLretval = e;
 		}
 ;
 
-andexpr2<Exp> : 
+andexpr2<Exp>(Exp left, Exp *exp) : 
 		AND_OP 
-		notexpr<l>
-		andexpr2<e>{
-			if(e == NULL){
-				LLretval = makeBinNodeExp(makeBinNode(NULL, l, andop));
-			}else{
-				e->node.bnode->l = l;
-				if((getExpType(l)/10)*10 != BOOLEAN_TYPE || (getExpType(e->node.bnode->r)/10)*10 != BOOLEAN_TYPE){
+		notexpr<r>{
+			LLretval = makeBinNodeExp(makeBinNode(left, r, andop));
+		}
+		andexpr2<e>(LLretval, exp){
+			if(e != NULL){
+				if((getExpType(e->node.bnode->l)/10)*10 != BOOLEAN_TYPE || (getExpType(e->node.bnode->r)/10)*10 != BOOLEAN_TYPE){
 					printTypeError(strdup(yytext), WRONGTYPE);
 				}
-				LLretval = makeBinNodeExp(makeBinNode(NULL, e, andop));
+			}else{
+				*exp = LLretval;
 			}
 		}
 	| 
 		CAND_OP 
-		notexpr<l> 
-		andexpr2<e>{
-			if(e == NULL){
-				LLretval = makeBinNodeExp(makeBinNode(NULL, l, candop));
-			}else{
-				e->node.bnode->l = l;
-				if((getExpType(l)/10)*10 != BOOLEAN_TYPE || (getExpType(e->node.bnode->r)/10)*10 != BOOLEAN_TYPE){
+		notexpr<r>{
+			LLretval = makeBinNodeExp(makeBinNode(left, r, candop));
+		}
+		andexpr2<e>(LLretval, exp){
+			if(e != NULL){
+				if((getExpType(e->node.bnode->l)/10)*10 != BOOLEAN_TYPE || (getExpType(e->node.bnode->r)/10)*10 != BOOLEAN_TYPE){
 					printTypeError(strdup(yytext), WRONGTYPE);
 				}
-				LLretval = makeBinNodeExp(makeBinNode(NULL, e, candop));
+			}else{
+				*exp = LLretval;
 			}
 		}
 	| 
@@ -599,47 +608,50 @@ andexpr2<Exp> :
 		}
 ;
 
-andexpr<Exp>: 
+andexpr<Exp>(Exp *exp): 
+{
+	exp = malloc(sizeof(Exp));
+}
 		notexpr<l>
-		andexpr2<e>{
+		andexpr2<e>(l, exp){
 			if(e == NULL){
 				LLretval = l;
 			}else{
-				e->node.bnode->l = l;
 				if((getExpType(l)/10)*10 != BOOLEAN_TYPE || (getExpType(e->node.bnode->r)/10)*10 != BOOLEAN_TYPE){
 					printTypeError(strdup(yytext), WRONGTYPE);
 				}
-				LLretval = e;
+				LLretval = *exp;
+				free(exp);
 			}
 		}
 ;
 			
-expr2<Exp>: 
+expr2<Exp>(Exp left, Exp *exp): 
 		OR_OP
-		andexpr<l>
-		expr2<e>{
-			if(e == NULL){
-				LLretval = makeBinNodeExp(makeBinNode(NULL, l, orop));
-			}else{
-				e->node.bnode->l = l;
-				if((getExpType(l)/10)*10 != BOOLEAN_TYPE || (getExpType(e->node.bnode->r)/10)*10 != BOOLEAN_TYPE){
+		andexpr<r>(NULL){
+			LLretval = makeBinNodeExp(makeBinNode(left, r, orop));
+		}
+		expr2<e>(LLretval, exp){
+			if(e != NULL){
+				if((getExpType(e->node.bnode->l)/10)*10 != BOOLEAN_TYPE || (getExpType(e->node.bnode->r)/10)*10 != BOOLEAN_TYPE){
 					printTypeError(strdup(yytext), WRONGTYPE);
 				}
-				LLretval = makeBinNodeExp(makeBinNode(NULL, e, orop));
+			}else{
+				*exp = LLretval;
 			}
 		}
 	| 
 		COR_OP 
-		andexpr<l>
-		expr2<e>{
-			if(e == NULL){
-				LLretval = makeBinNodeExp(makeBinNode(NULL, l, corop));
-			}else{
-				e->node.bnode->l = l;
-				if((getExpType(l)/10)*10 != BOOLEAN_TYPE || (getExpType(e->node.bnode->r)/10)*10 != BOOLEAN_TYPE){
+		andexpr<l>(NULL){
+			LLretval = makeBinNodeExp(makeBinNode(left, r, corop));
+		}
+		expr2<e>(LLretval, exp){
+			if(e != NULL){
+				if((getExpType(e->node.bnode->l)/10)*10 != BOOLEAN_TYPE || (getExpType(e->node.bnode->r)/10)*10 != BOOLEAN_TYPE){
 					printTypeError(strdup(yytext), WRONGTYPE);
 				}
-				LLretval = makeBinNodeExp(makeBinNode(NULL, e, corop));
+			}else{
+				*exp = LLretval;
 			}
 		}
 	| 
@@ -648,23 +660,26 @@ expr2<Exp>:
 		}
 ;
 
-expr<ExpTree> : 
-		andexpr<l>
-		expr2<e>{
+expr<ExpTree>(Exp *exp) :
+{
+	exp = malloc(sizeof(Exp));
+}
+		andexpr<l>(NULL)
+		expr2<e>(l, exp){
 			if(e == NULL){
 				LLretval = l;
 			}else{
-				e->node.bnode->l = l;
 				if((getExpType(l)/10)*10 != BOOLEAN_TYPE || (getExpType(e->node.bnode->r)/10)*10 != BOOLEAN_TYPE){
 					printTypeError(strdup(yytext), WRONGTYPE);
 				}
-				LLretval = e;
+				LLretval = *exp;
+				free(exp);
 			}
 		}
 ;
 
 guardedcommand	: 
-		expr 
+		expr<e>(NULL) 
 		THEN_TOK 
 		statementset<LLdiscard>
 ;
@@ -715,14 +730,14 @@ functioncall<FuncCall>(char *name, int type, Exps params):
 			params->exps = NULL;
 		}
 		[
-		expr<e>{
+		expr<e>(NULL){
 			params->numExps = 1;
 			params->exps = malloc(params->numExps*sizeof(Exp));
 			params->exps[0] = e;
 		}
 			[
 				COMMA 
-				expr<e>{
+				expr<e>(NULL){
 					params->numExps++;
 					params->exps = realloc(params->exps, params->numExps*sizeof(Exp));
 					params->exps[params->numExps-1] = e;
@@ -756,13 +771,13 @@ functioncall<FuncCall>(char *name, int type, Exps params):
 /* original version of assignmentcall that has an equal length for the identifiers and the following expressions (could make semantics very hard to handle) */
 assignmentcallV1<Stmnts>(char *name): 
 		ASSIGNMENT_OP 
-		expr
+		expr<LLdiscard>(NULL)
 	| 
 		COMMA 
 		IDENTIFIER 
-		assignmentcall<LLDiscard>(name)
+		assignmentcall<LLdiscard>(name)
 		COMMA 
-		expr
+		expr<LLdiscard>(NULL)
 ;
 
 /* newer version of assignmentcall that doesn't make sure yet that the amount of identifiers equals the amount of expressions (semantically easier to evaluate) */
@@ -784,7 +799,7 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 			}
 		]* 
 		ASSIGNMENT_OP 
-		expr<e>{
+		expr<e>(NULL){
 			exps = malloc(sizeof(struct Exps));
 			exps->numExps = 1;
 			exps->exps = malloc(exps->numExps*sizeof(Exp));
@@ -792,7 +807,7 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 		}
 		[
 			COMMA 
-			expr<e>{
+			expr<e>(NULL){
 				exps->numExps++;
 				exps->exps = realloc(exps->exps, exps->numExps*sizeof(Exp));
 				exps->exps[exps->numExps-1] = e;
@@ -834,8 +849,8 @@ printable<Printable> :
 			LLretval = p;
 		}
 	| 
-		expr{
-			Printable p = NULL;
+		expr<e>(NULL){
+			Printable p = makeExpPrintable(e);
 			LLretval = p;
 		}
 ;
