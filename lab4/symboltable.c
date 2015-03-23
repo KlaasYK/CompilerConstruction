@@ -158,7 +158,7 @@ void freeSymbolTable() {
 	free(symboltable);
 }
 
-void putBlock() {
+void putBlock(char *identifier) {
 	if (symboltable == NULL) {
 		printf("Symboltable not initialised!\n");
 		exit(EXIT_FAILURE);
@@ -168,12 +168,15 @@ void putBlock() {
 		printf("Allocation error!\n");
 		exit(EXIT_FAILURE);
 	}
+	newtop->name = identifier;
+	newtop->returns = 0;
 	newtop->first = NULL;
 	newtop->nextlist = symboltable->top;
 	symboltable->top = newtop;
 }
 
-void popBlock() {
+int popBlock() {
+	int r;
 	if (symboltable == NULL) {
 		printf("Symboltable not initialised!\n");
 		exit(EXIT_FAILURE);
@@ -184,7 +187,17 @@ void popBlock() {
 	}
 	List *oldtop = symboltable->top;
 	symboltable->top = oldtop->nextlist;
+	r = oldtop->returns;
 	freeList(oldtop);
+	return r;
+}
+
+void updateFunc(char *name) {
+	if (symboltable->top->name != NULL) {
+		if (strcmp(symboltable->top->name, name) == 0) {
+			symboltable->top->returns = 1;
+		}
+	}
 }
 
 void insertIdentifier(char *name, NodeType ntype, int etype, Node *paramlist) {

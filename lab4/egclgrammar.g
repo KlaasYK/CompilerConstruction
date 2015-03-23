@@ -907,7 +907,8 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 						//Trying to assign something to the proc
 						printTypeError(strdup(n->name),RETURNINPROC);
 					} else if (lookupType(n->name) == METHOD && lhs != VOID_TYPE) {
-						//Update symboltable that this functions returns
+						// check if we are in the function
+						updateFunc(n->name);
 					} else if ((lhs/10)*10 != (rhs/10)*10 ) {
 						/* the list is freeëd in error */
 						printTypeError(strdup(n->name),WRONGTYPE);
@@ -925,6 +926,9 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 					if (lhs == VOID_TYPE) {
 						//Trying to assign something to the proc
 						printTypeError(strdup(n->name),RETURNINPROC);
+					} else if (lookupType(n->name) == METHOD && lhs != VOID_TYPE) {
+						// check if we are in the function
+						updateFunc(n->name);
 					} else if ((lhs/10)*10 != (rhs/10)*10 ) {
 						printTypeError(strdup(n->name),WRONGTYPE);
 					}
@@ -1305,7 +1309,7 @@ function<FuncDef>(int numparams, Param *p, int numStmnts, Stmnt *stmnts)	:
 				}
 				SEMICOLON
 				{
-					putBlock();
+					putBlock(lastmethodidentifier);
 					/* insert all the parameters to the symboltable */
 					Node *n = lookupParams(lastmethodidentifier);
 					numparams = getNumNodes(n);
@@ -1331,7 +1335,10 @@ function<FuncDef>(int numparams, Param *p, int numStmnts, Stmnt *stmnts)	:
 				statementset<ss>
 				END_TOK 
 				{
-					popBlock();
+					int returns = popBlock();
+					if (!returns) {
+						printTypeError(strdup(lastmethodidentifier), MISSINGRETURN);
+					}
 					LLretval = makeFuncDef(makeID(getType(strdup(lastmethodidentifier)), lastmethodidentifier),numparams, p, ss->numStmnts, ss->stmnts);
 					free(lastmethodidentifier);
 					lastmethodidentifier = NULL;
@@ -1360,7 +1367,7 @@ procedure<ProcDef>(int numparams, Param *p, int numStmnts, Stmnt *stmnts)	:
 					}
 				}
 				SEMICOLON {
-					putBlock();
+					putBlock(NULL);
 					/* insert all the parameters to the symboltable */
 					Node *n = lookupParams(lastmethodidentifier);
 					numparams = getNumNodes(n);
@@ -1498,7 +1505,7 @@ programbody<Prog>(int numConstDefs, Dec *constDefs, int numVarDefs, Dec *varDefs
 			printf("Num of func defs: %d\n", numFuncDefs);
 		}
 		BEGIN_TOK {
-			putBlock(); /* add a new frame of reference */
+			putBlock(NULL); /* add a new frame of reference */
 		} 
 		statementset<bss>{
 			numBodyStmnts = bss->numStmnts;

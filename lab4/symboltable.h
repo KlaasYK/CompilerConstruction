@@ -29,6 +29,8 @@ typedef struct Node {
 typedef struct List {
 	Node *first;
 	struct List *nextlist;
+	char *name;
+	int returns;
 } List;
 
 /* a stack of lists */
@@ -36,6 +38,7 @@ typedef struct Stack {
 	List *top;
 } Stack;
 
+void updateFunc(char *name);
 
 int isMethod(char *name);
 
@@ -57,9 +60,9 @@ void initSymbolTable();
 /* frees the memory of the symboltable*/
 void freeSymbolTable();
 /* puts an empty block on the stack */
-void putBlock();
+void putBlock(char *identifier);
 /* removes the top block from the stack */
-void popBlock();
+int popBlock();
 /* inserts an identifier in the current block */
 void insertIdentifier(char *name, NodeType ntype, int etype, Node *paramlist);
 /* returns identifier type */
