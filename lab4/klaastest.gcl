@@ -2,5 +2,5 @@ program dummy;
 
 begin
 	var kaas : integer;
-	kaas := 1;
+	println kaas;
 end.
