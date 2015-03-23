@@ -451,6 +451,7 @@ term<Exp>(Exp *exp) :
 				}
 				LLretval = *exp;
 			}
+			free(exp);
 		}
 ;
 
@@ -503,6 +504,7 @@ sumexpr<Exp>(Exp *exp) :
 				}
 				LLretval = *exp;
 			}
+			free(exp);
 		}
 ;
 
@@ -583,6 +585,7 @@ relexpr<Exp>(Exp *exp) :
 				}
 				LLretval = *exp;
 			}
+			free(exp);
 		}
 ;
 
@@ -648,6 +651,7 @@ andexpr<Exp>(Exp *exp):
 				}
 				LLretval = *exp;
 			}
+			free(exp);
 		}
 ;
 			
@@ -700,6 +704,7 @@ expr<ExpTree>(Exp *exp) :
 				}
 				LLretval = *exp;
 			}
+			free(exp);
 		}
 ;
 
