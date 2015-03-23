@@ -58,6 +58,14 @@ char *getTypeString(int typeval) {
 
 void printList(List *list, int level) {
 	Node *n = list->first;
+		
+	if (list->name != NULL) {
+		for(int i = 0; i < level; i++) {
+			printf(" ");
+		}
+		printf("%s",list->name);
+		printf("\n");
+	}
 	while (n != NULL) {
 		int i;
 		for(i = 0; i < level; i++) {
@@ -129,6 +137,8 @@ void initSymbolTable() {
 	/* make the first (global) scope empty */
 	top->first = NULL;
 	top->nextlist = NULL;
+	top->name = "[GLOBAL VARIABLES]";
+	top->returns = 0;
 	symboltable->top = top;
 }
 
