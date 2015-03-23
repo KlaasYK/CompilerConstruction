@@ -18,6 +18,10 @@
 #define WRONGTYPE 257
 #define UNKNOWN 258
 #define WRITETOCONSTANT 259
+#define	METHODASKED 260
+#define PARAMMISMATCH1 261
+#define PARAMMISMATCH2 262
+#define REFERENCETOCONSTANT 263
 
 typedef struct Stmnts{
 	int numStmnts;
@@ -202,6 +206,10 @@ void printTypeError(char *identifier, int ErrorType) {
 		case WRONGTYPE: printf("Value of '%s' is of the wrong type, at column %d\n", identifier, columnnr+1); break;//TODO: print more info
 		case UNKNOWN: printf("Unknown identifier (%s), at column %d\n", identifier, columnnr+1); break;
 		case WRITETOCONSTANT: printf("Trying to write to '%s' which is a constant, at column %d\n", identifier, columnnr+1); break;//TODO: print more info
+		case METHODASKED: printf("Variable '%s' found in stead of function, at column %d\n", identifier, columnnr+1);break;
+		case PARAMMISMATCH1: printf("The number of parameters for function '%s' differs from what was previously defined\n", identifier);break;
+		case PARAMMISMATCH2: printf("One of the parameters for function '%s' has a type mismatch\n", identifier);break;
+		case REFERENCETOCONSTANT: printf("In function '%s' a constant was used as reference parameter\n", identifier);break;
 	}
 	
 	free(identifier);
@@ -394,7 +402,8 @@ expr2	:
 expr<ExpTree> : 
 			andexpr 
 			expr2{
-				LLretval = makeBoolExp(makeBool(true));//TODO remove dummy
+				char *name = strdup("helloWorld");
+				LLretval = makeIDNodeExp(makeID(20, name));//TODO remove dummy
 			}
 		;
 
@@ -442,7 +451,7 @@ functioncall<FuncCall>(char *name, int type, Exps params):
 		LPARREN{
 			NodeType nt = lookupType(name);
 			if(nt != METHOD){
-				//TODO error
+				printTypeError(strdup(name), METHODASKED);
 			}
 			type = getType(strdup(name));
 			params = malloc(sizeof(struct Exps));
@@ -468,14 +477,17 @@ functioncall<FuncCall>(char *name, int type, Exps params):
 			Node *expectedParams = lookupParams(name);
 			int expectedNumParams = getNumNodes(expectedParams);
 			if(params->numExps != expectedNumParams){
-				//TODO error
+				printTypeError(strdup(name), PARAMMISMATCH1);
 			}
 			//TODO check if reversed array
 			for(int i = 0;i<params->numExps;i++){
 				int type = getExpType(params->exps[i]);
-				int expectedType = expectedParams->type;
-				if(type != expectedType){
-					//TODO error
+				int expectedType = expectedParams->evaltype;
+				if((type/10)*10 != (expectedType/10)*10){
+					printTypeError(strdup(name), PARAMMISMATCH2);
+				}
+				if(type%10 == 1 && expectedType%10 == 2){
+					printTypeError(strdup(name), REFERENCETOCONSTANT);					
 				}
 				expectedParams = expectedParams->next;
 			}
