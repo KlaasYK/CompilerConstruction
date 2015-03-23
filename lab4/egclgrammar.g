@@ -205,7 +205,8 @@ void LLmessage(int token) {
 void printTypeError(char *identifier, int ErrorType) {
 	int i = 0, k;
 	
-	printf("\n Symboltable:\n");
+	/* print symbol table for debug reasons */
+	printf("\nSymboltable:\n");
 	printSymbolTable();
 	
 	printf("\n");
@@ -291,9 +292,6 @@ int main(int argc, char** argv) {
 	printf("\nSymbolTable:\n");
 	printSymbolTable();
 	printf("\n");
-	
-
-	
 	/* end test region for symbol table */
 
 	if (argc == 2) {
@@ -302,8 +300,9 @@ int main(int argc, char** argv) {
 	}
 
 	printf("Parsing succesfull\n");
-	
+
 	utilCleanUp();
+	freeProg(program);
 	freeSymbolTable();
 	freeLines();
 	
@@ -334,7 +333,6 @@ rootexpr<Exp>(char *name, int isFunc)	:
 					}
 				]?{
 					if(!isFunc){
-						// TODO errors
 						LLretval = makeIDNodeExp(makeID(getTypeConst(strdup(name)), name));
 					}
 				}
@@ -805,22 +803,23 @@ functioncall<FuncCall>(char *name, int type, Exps params):
 			Node *expectedParams = lookupParams(name);
 			int expectedNumParams = getNumNodes(expectedParams);
 			if(params->numExps != expectedNumParams){
-				printTypeError(strdup(name), PARAMMISMATCH1);
+				printTypeError(name, PARAMMISMATCH1);
 			}
 			for(int i = params->numExps-1;i>=0;i--){
 				int type = getExpType(params->exps[i]);
 				int expectedType = expectedParams->evaltype;
 				if((type/10)*10 != (expectedType/10)*10){
-					printTypeError(strdup(name), PARAMMISMATCH2);
+					printTypeError(name, PARAMMISMATCH2);
 				}
 				if(type%10 == 1 && expectedType%10 == 2){
-					printTypeError(strdup(name), REFERENCETOCONSTANT);					
+					printTypeError(name, REFERENCETOCONSTANT);					
 				}
 				expectedParams = expectedParams->next;
 			}
 			FuncCall fc = makeFuncCall(type, name, params->numExps, params->exps);
 			LLretval = fc;
 			free(params);
+			free(name);
 		}
 ;
 
@@ -916,6 +915,7 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 			freeTempList();
 			LLretval = stmnts;
 			free(exps);
+			free(name);
 		}
 ;
 
@@ -1267,8 +1267,9 @@ function	:
 						if (!existsInTop(n->name) && !isMethod(n->name) ) {
 							insertIdentifier(strdup(n->name), n->type, n->evaltype, NULL);
 							n = n->next;
+						} else if(isMethod(n->name)){
+							printTypeError(n->name, VARIABLEASKED);
 						} else {
-							/* TODO: make error for incorrect parameters */
 							printTypeError(lastmethodidentifier, DUPLICATE);
 						}
 					}
@@ -1313,7 +1314,6 @@ procedure	:
 						} else if(isMethod(n->name)){
 							printTypeError(n->name, VARIABLEASKED);
 						} else {
-							/* TODO: make error for incorrect parameters */
 							printTypeError(n->name, DUPLICATE);
 						}
 					}
@@ -1433,14 +1433,11 @@ start		:
 			program  = prog;
 		}
 		DOT{
-			printf("Program name: %s\n", program->name);
+			/*printf("Program name: %s\n", program->name);
 			if(strcmp(file_name, "riktest.gcl") == 0){
 				printf("Print string: %s\n", program->bodyStmnts[0]->wCall->items[0]->string);
 				printf("boolval: %s\n", (program->constDefs[0]->expTree->node.boolval->value == true)?"true":"false");
 				printf("intval: %s\n", program->constDefs[1]->expTree->node.intval->value);
-				
-				
-			}
-			freeProg(program);
+			}*/
 		}
 ; 
