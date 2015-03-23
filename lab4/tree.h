@@ -169,7 +169,6 @@ void freeParam(Param p);
 Stmnt makeDecStmnt(Dec d);
 Stmnt makeAssStmnt(Ass a);
 Stmnt makeFuncCallStmnt(FuncCall fc);
-Stmnt makeProcCallStmnt(ProcCall pc);
 Stmnt makeRCallStmnt(RCall rc);
 Stmnt makeWCallStmnt(WCall wc);
 Stmnt makeIfStmnt(If i);
