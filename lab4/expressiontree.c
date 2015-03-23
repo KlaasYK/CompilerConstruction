@@ -183,7 +183,7 @@ ExpTree deepCopyExp(ExpTree exp){
 				break;
 			case intexp:
 				retExp->kind = intexp;
-				retExp->node.intval = makeInt(strdup(exp->node.intval->value));
+				retExp->node.intval = makeInt(exp->node.intval->value);
 				break;
 			case boolexp:
 				retExp->kind = boolexp;
