@@ -834,7 +834,7 @@ function	:
 					int tc_type = stringToEvalType(yytext);
 					
 					if (!existsInTop(lastmethodidentifier)) {
-						insertIdentifier(lastmethodidentifier, METHOD, tc_type, tempparamlist);
+						insertIdentifier(strdup(lastmethodidentifier), METHOD, tc_type, tempparamlist);
 						tempparamlist = NULL;
 						
 					} else {
@@ -863,6 +863,7 @@ function	:
 				END_TOK 
 				{
 					popBlock();
+					free(lastmethodidentifier);
 					lastmethodidentifier = NULL;
 				}
 				SEMICOLON
@@ -879,7 +880,7 @@ procedure	:
 				RPARREN 
 				{
 					if (!existsInTop(lastmethodidentifier)) {
-						insertIdentifier(lastmethodidentifier, METHOD, VOID_TYPE, tempparamlist);
+						insertIdentifier(strdup(lastmethodidentifier), METHOD, VOID_TYPE, tempparamlist);
 						tempparamlist = NULL;
 					} else {
 						freeTempParamList();
@@ -904,6 +905,7 @@ procedure	:
 				statementset<LLdiscard>
 				END_TOK {
 					popBlock();
+					free(lastmethodidentifier);
 					lastmethodidentifier = NULL;
 				}
 				SEMICOLON
