@@ -335,6 +335,7 @@ rootexpr<Exp>(char *name, int isFunc)	:
 					if(!isFunc){
 						LLretval = makeIDNodeExp(makeID(getTypeConst(strdup(name)), name));
 					}
+					free(name);
 				}
 			| 
 				NUMBER{
@@ -1100,6 +1101,7 @@ statement<Stmnts>(Stmnts ss, char *name) :
 		}
 ]{
 	LLretval = ss;
+	free(name);
 }
 ;
 
@@ -1266,9 +1268,9 @@ function<FuncDef>(int numparams, Param *p, int numStmnts, Stmnt *stmnts)	:
 						if (!existsInTop(n->name) && !isMethod(n->name) ) {
 							insertIdentifier(strdup(n->name), n->type, n->evaltype, NULL);
 							if (n->evaltype%10 == 2) {
-								p[i] = makeParam(makeID(n->evaltype,strdup(n->name)), byRef);
+								p[i] = makeParam(makeID(n->evaltype,n->name), byRef);
 							} else {
-								p[i] = makeParam(makeID(n->evaltype,strdup(n->name)), byVal);
+								p[i] = makeParam(makeID(n->evaltype,n->name), byVal);
 							}
 							i++;
 							n = n->next;
@@ -1283,7 +1285,7 @@ function<FuncDef>(int numparams, Param *p, int numStmnts, Stmnt *stmnts)	:
 				END_TOK 
 				{
 					popBlock();
-					LLretval = makeFuncDef(makeID(getType(strdup(lastmethodidentifier)), strdup(lastmethodidentifier)),numparams, p, stmntsret->numStmnts, stmntsret->stmnts);
+					LLretval = makeFuncDef(makeID(getType(strdup(lastmethodidentifier)), lastmethodidentifier),numparams, p, stmntsret->numStmnts, stmntsret->stmnts);
 					free(lastmethodidentifier);
 					lastmethodidentifier = NULL;
 				}
@@ -1320,9 +1322,9 @@ procedure<ProcDef>(int numparams, Param *p, int numStmnts, Stmnt *stmnts)	:
 						if (!existsInTop(n->name) && !isMethod(n->name) ) {
 							insertIdentifier(strdup(n->name), n->type, n->evaltype, NULL);
 							if (n->evaltype%10 == 2) {
-								p[i] = makeParam(makeID(n->evaltype,strdup(n->name)), byRef);
+								p[i] = makeParam(makeID(n->evaltype,n->name), byRef);
 							} else {
-								p[i] = makeParam(makeID(n->evaltype,strdup(n->name)), byVal);
+								p[i] = makeParam(makeID(n->evaltype,n->name), byVal);
 							}
 							i++;
 							n = n->next;
@@ -1336,7 +1338,7 @@ procedure<ProcDef>(int numparams, Param *p, int numStmnts, Stmnt *stmnts)	:
 				statementset<stmntsret>
 				END_TOK {
 					popBlock();
-					LLretval = makeProcDef(strdup(lastmethodidentifier),numparams, p, stmntsret->numStmnts, stmntsret->stmnts);
+					LLretval = makeProcDef(lastmethodidentifier,numparams, p, stmntsret->numStmnts, stmntsret->stmnts);
 					free(lastmethodidentifier);
 					lastmethodidentifier = NULL;
 				}
