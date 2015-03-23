@@ -168,10 +168,10 @@ void printLexError(char *illchar, int line, int column) {
 	}
 	printf("^\n");
 	printf("Illegal character (%s) detected at column %d\n", illchar, column+1);
-	utilCleanUp();
+	/*utilCleanUp();
 	freeLines();
 	freeSymbolTable();
-	exit(EXIT_FAILURE);
+	exit(EXIT_FAILURE);*/
 }
 
 void LLmessage(int token) {
@@ -195,10 +195,10 @@ void LLmessage(int token) {
 		printf("Expected %s, found %s (%s).\n", LLgetSymbol(token), LLgetSymbol(LLsymb), yytext);
 		break;
 	}
-	utilCleanUp();
+	/*utilCleanUp();
 	freeLines();
 	freeSymbolTable();
-	exit(EXIT_FAILURE);
+	exit(EXIT_FAILURE);*/
 }
 
 
@@ -232,11 +232,11 @@ void printTypeError(char *identifier, int ErrorType) {
 	
 	free(identifier);
 	
-	utilCleanUp();
+	/*utilCleanUp();
 	
 	freeLines();
 	freeSymbolTable();
-	exit(EXIT_FAILURE);
+	exit(EXIT_FAILURE);*/
 }
 
 int getType(char *name) {
