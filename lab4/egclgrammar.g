@@ -1286,13 +1286,14 @@ function<FuncDef>(int numparams, Param *p, int numStmnts, Stmnt *stmnts)	:
 						}
 					}
 				}
-				statementset<stmntsret>
+				statementset<ss>
 				END_TOK 
 				{
 					popBlock();
-					LLretval = makeFuncDef(makeID(getType(strdup(lastmethodidentifier)), lastmethodidentifier),numparams, p, stmntsret->numStmnts, stmntsret->stmnts);
+					LLretval = makeFuncDef(makeID(getType(strdup(ss)), lastmethodidentifier),numparams, p, ss->numStmnts, ss->stmnts);
 					free(lastmethodidentifier);
 					lastmethodidentifier = NULL;
+					free(ss);
 				}
 				SEMICOLON
 			;
@@ -1340,12 +1341,13 @@ procedure<ProcDef>(int numparams, Param *p, int numStmnts, Stmnt *stmnts)	:
 						}
 					}
 				}
-				statementset<stmntsret>
+				statementset<ss>
 				END_TOK {
 					popBlock();
-					LLretval = makeProcDef(lastmethodidentifier,numparams, p, stmntsret->numStmnts, stmntsret->stmnts);
+					LLretval = makeProcDef(lastmethodidentifier,numparams, p, ss->numStmnts, ss->stmnts);
 					free(lastmethodidentifier);
 					lastmethodidentifier = NULL;
+					free(ss);
 				}
 				SEMICOLON
 			;
