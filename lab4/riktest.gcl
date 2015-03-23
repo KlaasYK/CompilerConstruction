@@ -19,7 +19,7 @@ function sqrt2(var x : integer) -> integer;
 
   var l : integer;
   sqrt2 := 42;
-  n: 2;
+  n:= 2;
 end;
 
 begin
@@ -27,5 +27,4 @@ begin
     var m, y, z: integer;
     read y, z;
     sqrt2(m);
-    #n: 0;
 end.
