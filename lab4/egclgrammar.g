@@ -819,16 +819,16 @@ functioncall<FuncCall>(char *name, int type, Exps params):
 			Node *expectedParams = lookupParams(name);
 			int expectedNumParams = getNumNodes(expectedParams);
 			if(params->numExps != expectedNumParams){
-				printTypeError(name, PARAMMISMATCH1);
+				printTypeError(strdup(name), PARAMMISMATCH1);
 			}
 			for(int i = params->numExps-1;i>=0;i--){
 				int type = getExpType(params->exps[i]);
 				int expectedType = expectedParams->evaltype;
 				if((type/10)*10 != (expectedType/10)*10){
-					printTypeError(name, PARAMMISMATCH2);
+					printTypeError(strdup(name), PARAMMISMATCH2);
 				}
 				if(type%10 == 1 && expectedType%10 == 2){
-					printTypeError(name, REFERENCETOCONSTANT);					
+					printTypeError(strdup(name), REFERENCETOCONSTANT);					
 				}
 				expectedParams = expectedParams->next;
 			}
