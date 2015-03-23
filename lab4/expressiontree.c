@@ -145,6 +145,61 @@ void freeExp(Exp exp) {
 	}
 }
 
+ExpTree deepCopyExp(ExpTree exp){
+	if (exp != NULL) {
+		ExpTree retExp = malloc(sizeof(struct Expression));
+		switch (exp->kind) {
+			case unodeexp:
+				retExp->kind = unodeexp;
+				retExp->node.unode = makeUnNode(
+						deepCopyExp(exp->node.unode->e), 
+						exp->node.unode->operator)
+				break;
+			case bnodeexp:
+				retExp->kind = bnodeexp;
+				retExp->node.bnode = makeBinNode(
+						deepCopyExp(exp->node.bnode->l), 
+						deepCopyExp(exp->node.bnode->r),
+						exp->node.bnode->operator);
+				break;
+			case idexp:
+				retExp->kind = idexp;
+				retExp->node.id = makeID(
+						exp->node.id->type, 
+						exp->node.id->name);
+				break;
+			case funcexp:
+				retExp->kind = funcexp;
+				Exp *exps = malloc(exp->node.funcCall->numParams*sizeof(Exp));
+				int i;
+				for (i = 0; i < exp->node.funcCall->numParams; i++) {
+					exps[i] = deepCopyExp(exp->node.funcCall->params[i]);
+				}
+				retExp->node.funcCall = makeFuncCall(
+						makeID(
+							exp->node.funcCall->id->type, 
+							exp->node.funcCall->id->name), 
+						exp->node.funcCall->numParams, 
+						exps);
+				break;
+			case intexp:
+				retExp->kind = intexp;
+				retExp->node.intval = makeInt(strdup(exp->node.intval->value));
+				break;
+			case boolexp:
+				retExp->kind = boolexp;
+				retExp->node.boolval = makeBool(exp->node.boolval->value);
+				break;
+			default:
+				fprintf(stderr, "Undefined kind of expression!");
+				exit(EXIT_FAILURE);
+		}
+		return retExp;
+	}else{
+		return NULL;
+	}
+}
+
 int getExpType(Exp e) {
 	switch (e->kind) {
 		case unodeexp:;
