@@ -1370,7 +1370,7 @@ procedure<ProcDef>(int numparams, Param *p, int numStmnts, Stmnt *stmnts)	:
 					}
 				}
 				SEMICOLON {
-					putBlock(NULL);
+					putBlock("[LOCAL PROCEDURE]");
 					/* insert all the parameters to the symboltable */
 					Node *n = lookupParams(lastmethodidentifier);
 					numparams = getNumNodes(n);
@@ -1508,7 +1508,7 @@ programbody<Prog>(int numConstDefs, Dec *constDefs, int numVarDefs, Dec *varDefs
 			printf("Num of func defs: %d\n", numFuncDefs);
 		}
 		BEGIN_TOK {
-			putBlock(NULL); /* add a new frame of reference */
+			putBlock("[MAIN VARIABLES]"); /* add a new frame of reference */
 		} 
 		statementset<bss>{
 			numBodyStmnts = bss->numStmnts;
