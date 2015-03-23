@@ -240,16 +240,18 @@ void printTypeError(char *identifier, int ErrorType) {
 }
 
 int getType(char *name) {
+	printf("test start\n");
 	NodeType nt = lookupType(name);
 	int type = lookupEvalType(name, nt);
 	if(type == -1){
 		// trying to save something that was not declared
 		printTypeError(name, UNKNOWN);
-	}
-	if (type == CONST_BOOLEAN_TYPE || type == CONST_INTEGER_TYPE) {
+	}else if (type == CONST_BOOLEAN_TYPE || type == CONST_INTEGER_TYPE) {
 		printTypeError(name, WRITETOCONSTANT);
+	}else {
+		free(name);
 	}
-	free(name);
+	printf("test end\n");
 	return type;
 }
 
@@ -260,8 +262,9 @@ int getTypeConst(char *name) {
 	if(type == -1){
 		// trying to save something that was not declared
 		printTypeError(name, UNKNOWN);
+	}else{
+		free(name);
 	}
-	free(name);
 	return type;
 }
 
@@ -846,7 +849,8 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 			stmnts = malloc(sizeof(struct Stmnts));
 			stmnts->numStmnts = 1;
 			stmnts->stmnts = malloc(stmnts->numStmnts*sizeof(Stmnt));
-			stmnts->stmnts[0] = makeAssStmnt(makeAss(makeID(getType(strdup(name)), name), NULL, linecount));
+			int type = getType(strdup(name));
+			stmnts->stmnts[0] = makeAssStmnt(makeAss(makeID(type, name), NULL, linecount));
 		}
 		[
 			COMMA 
@@ -856,7 +860,8 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 				//TODO typecheck IDENTIFIER (watch out for return type of functions!)
 				stmnts->numStmnts++;
 				stmnts->stmnts = realloc(stmnts->stmnts, stmnts->numStmnts*sizeof(Stmnt));
-				stmnts->stmnts[stmnts->numStmnts-1] = makeAssStmnt(makeAss(makeID(getType(strdup(yytext)), yytext), NULL, linecount));
+				int type = getType(strdup(yytext));
+				stmnts->stmnts[stmnts->numStmnts-1] = makeAssStmnt(makeAss(makeID(type, yytext), NULL, linecount));
 			}
 		]* 
 		ASSIGNMENT_OP 
