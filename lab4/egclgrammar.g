@@ -23,6 +23,8 @@
 #define PARAMMISMATCH2 262
 #define REFERENCETOCONSTANT 263
 #define PROCISOFUNC 264	
+#define ASSMISMATCH 265
+#define	VARIABLEASKED 266
 
 typedef struct Stmnts{
 	int numStmnts;
@@ -212,6 +214,8 @@ void printTypeError(char *identifier, int ErrorType) {
 		case PARAMMISMATCH2: printf("One of the parameters for function '%s' has a type mismatch\n", identifier);break;
 		case REFERENCETOCONSTANT: printf("In function '%s' a constant was used as reference parameter\n", identifier);break;
 		case PROCISOFUNC: printf("Procedure '%s' is used as function, at column %d\n", identifier, columnnr+1);break;
+		case ASSMISMATCH: printf("The number of variables is unequal to the number of assigned expressions\n");break;
+		case VARIABLEASKED: printf("Function '%s' found in stead of variable, at column %d\n", identifier, columnnr+1);break;
 	}
 	
 	free(identifier);
@@ -685,47 +689,77 @@ functioncall<FuncCall>(char *name, int type, Exps params):
 ;
 
 /* original version of assignmentcall that has an equal length for the identifiers and the following expressions (could make semantics very hard to handle) */
-assignmentcallV1	: 
-						ASSIGNMENT_OP 
-						expr
-					| 
-						COMMA 
-						IDENTIFIER 
-						assignmentcall 
-						COMMA 
-						expr
-					;
+assignmentcallV1<Stmnts>(char *name): 
+		ASSIGNMENT_OP 
+		expr
+	| 
+		COMMA 
+		IDENTIFIER 
+		assignmentcall<LLDiscard>(name)
+		COMMA 
+		expr
+;
 
 /* newer version of assignmentcall that doesn't make sure yet that the amount of identifiers equals the amount of expressions (semantically easier to evaluate) */
-assignmentcallV2	: 
-						[
-							COMMA 
-							IDENTIFIER
-						]* 
-						ASSIGNMENT_OP 
-						expr 
-						[
-							COMMA 
-							expr
-						]*
-					;
+assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	: 
+		{
+			stmnts = malloc(sizeof(struct Stmnts));
+			stmnts->numStmnts = 1;
+			stmnts->stmnts = malloc(stmnts->numStmnts*sizeof(Stmnt));
+			stmnts->stmnts[0] = makeAssStmnt(makeAss(makeID(getType(strdup(name)), name), NULL, linecount));
+		}
+		[
+			COMMA 
+			IDENTIFIER{
+				stmnts->numStmnts++;
+				stmnts->stmnts = realloc(stmnts->stmnts, stmnts->numStmnts*sizeof(Stmnt));
+				stmnts->stmnts[stmnts->numStmnts-1] = makeAssStmnt(makeAss(makeID(getType(strdup(yytext)), yytext), NULL, linecount));
+			}
+		]* 
+		ASSIGNMENT_OP 
+		expr<e>{
+			exps = malloc(sizeof(struct Exps));
+			exps->numExps = 1;
+			exps->exps = malloc(exps->numExps*sizeof(Exp));
+			exps->exps[0] = e;
+		}
+		[
+			COMMA 
+			expr<e>{
+				exps->numExps++;
+				exps->exps = realloc(exps->exps, exps->numExps*sizeof(Exp));
+				exps->exps[exps->numExps-1] = e;
+			}
+		]*{
+			if(stmnts->numStmnts!=exps->numExps){
+				printTypeError(NULL, ASSMISMATCH);
+			}
+			for(int i=0;i<exps->numExps;i++){
+				stmnts->stmnts[i]->assignment->expTree = exps->exps[i];
+			}
+			LLretval = stmnts;
+			free(exps);
+		}
+;
 
 /* select assignmentcall V1 or V2 */
-assignmentcall	: 
-					assignmentcallV2
-				;
+assignmentcall<Stmnts>(char *name) : 
+		assignmentcallV2<ss>(name, NULL, NULL){
+			LLretval = ss;
+		}
+;
 
 dostatement	:	
-				DOBEGIN_TOK 
-				guardedcommandset
-				DOEND_TOK
-			;
+		DOBEGIN_TOK 
+		guardedcommandset
+		DOEND_TOK
+;
 
 ifstatement	:	
-				IFBEGIN_TOK 
-				guardedcommandset 
-				IFEND_TOK
-			;
+		IFBEGIN_TOK 
+		guardedcommandset 
+		IFEND_TOK
+;
 
 printable<Printable> : 
 		STRING{
@@ -760,26 +794,26 @@ printcall<WCall>(int numitems, Printable *ps) :
 ;
 
 readcall<RCall>(IDs ids)	: 
-				READ_TOK 
-				IDENTIFIER{
-					ids = malloc(sizeof(struct IDs));
-					ids->numIds = 1;
-					ids->ids = malloc(ids->numIds * sizeof(ID));
-					ids->ids[0] = makeID(getType(strdup(yytext)), yytext);
-				}
-				[
-					COMMA 
-					IDENTIFIER{
-						ids->numIds++;
-						ids->ids = realloc(ids->ids, ids->numIds * sizeof(ID));
-						ids->ids[ids->numIds-1] = makeID(getType(strdup(yytext)), yytext);
-					}
-				]*{
-					RCall rc = makeRCall(ids->numIds, ids->ids);
-					free(ids);
-					LLretval = rc;
-				}
-			;
+		READ_TOK 
+		IDENTIFIER{
+			ids = malloc(sizeof(struct IDs));
+			ids->numIds = 1;
+			ids->ids = malloc(ids->numIds * sizeof(ID));
+			ids->ids[0] = makeID(getType(strdup(yytext)), yytext);
+		}
+		[
+			COMMA 
+			IDENTIFIER{
+				ids->numIds++;
+				ids->ids = realloc(ids->ids, ids->numIds * sizeof(ID));
+				ids->ids[ids->numIds-1] = makeID(getType(strdup(yytext)), yytext);
+			}
+		]*{
+			RCall rc = makeRCall(ids->numIds, ids->ids);
+			free(ids);
+			LLretval = rc;
+		}
+;
 
 call<Stmnts>(char *name) :	
 		functioncall<fc>(name, 0, NULL){
@@ -790,11 +824,8 @@ call<Stmnts>(char *name) :
 		LLretval = ss;
 		}
 	|	
-		assignmentcall{
-			Stmnts ss = malloc(sizeof(struct Stmnts));
-			ss->numStmnts = 0;
-			ss->stmnts = NULL;
-		LLretval = ss;
+		assignmentcall<ss>(name){
+			LLretval = ss;
 		}
 		
 ;
@@ -827,6 +858,8 @@ declaration<Decs>(IDs idents):
 						/* check if the  identifier exists already */
 						if ( !existsInTop(n->name) && !isMethod(n->name) ) {
 							insertIdentifier(strdup(n->name), VARIABLE, stringToEvalType(yytext), NULL);
+						} else if(isMethod(n->name)){
+							printTypeError(n->name, VARIABLEASKED);
 						} else {
 							printTypeError(n->name, DUPLICATE);
 						}
