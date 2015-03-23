@@ -241,6 +241,18 @@ int getType(char *name) {
 	return type;
 }
 
+/* constants may be used! */
+int getTypeConst(char *name) {
+	NodeType nt = lookupType(name);
+	int type = lookupEvalType(name, nt);
+	if(type == -1){
+		// trying to save something that was not declared
+		printTypeError(name, UNKNOWN);
+	}
+	free(name);
+	return type;
+}
+
 int main(int argc, char** argv) {
 	// initialise global vars to NULL/0
 	linecount = 0, columnnr = 0;
@@ -312,7 +324,7 @@ rootexpr<Exp>(char *name, int isFunc)	:
 				]?{
 					if(!isFunc){
 						// TODO errors
-						LLretval = makeIDNodeExp(makeID(getType(strdup(name)), name));
+						LLretval = makeIDNodeExp(makeID(getTypeConst(strdup(name)), name));
 					}
 				}
 			| 
@@ -995,7 +1007,6 @@ statement<Stmnts>(Stmnts ss, char *name) :
 ;
 
 parameterset 	: 
-		/* TODO: check for same name of parameters */
 		VAR_TOK
 		IDENTIFIER {
 			addTempList(strdup(yytext));
