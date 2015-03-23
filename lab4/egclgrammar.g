@@ -904,15 +904,11 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 				for(int i=stmnts->numStmnts-1;i+1 > 0;i--){
 					/* type checking */
 					int lhs = getType(strdup(n->name));
-					if ((lhs/10)*10 == (rhs/10)*10 ) {
-						n = n->next;
-						/* TODO: make a deep copy! */
 						stmnts->stmnts[i]->assignment->expTree = exps->exps[0];
-					}
-					else {
-						
+					if ((lhs/10)*10 != (rhs/10)*10 ) {
 						printTypeError(strdup(n->name),WRONGTYPE);
 					}
+					n = n->next;
 				}
 			}
 			freeTempList();
