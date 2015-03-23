@@ -17,7 +17,7 @@ typedef enum {
 } BinOp;
 
 typedef enum {
-    unodeexp, bnodeexp, idexp, funcexp, intexp, boolexp, noexp
+    unodeexp, bnodeexp, idexp, funcexp, intexp, boolexp
 } ExpKind;
 
 //ref defs

@@ -137,13 +137,10 @@ void freeExp(Exp exp) {
 			case boolexp:
 				freeBool(exp->node.boolval);
 				break;
-			case noexp:
-				break;
 			default:
 				fprintf(stderr, "Undefined kind of expression!");
 				exit(EXIT_FAILURE);
 		}
-		exp->kind = noexp;
 		free(exp);
 	}
 }
