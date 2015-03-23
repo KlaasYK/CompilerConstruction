@@ -11,15 +11,19 @@ procedure k(var l : integer, x, i : integer, var j, f : boolean);
 	k := 0;
 end;
 
+function n(var l : integer, x, i : integer, var j, f : boolean)->integer;
+	k := 0;
+end;
+
 function sqrt2(var x : integer) -> integer;
 
   var l : integer;
-  sqrt2 := l and -4*5*(7+2)+7*k(m, 4, 6, d, e)+3/l>3/2-6*7/4%32=true;
+  sqrt2 := -4*5*(7+2)+7*n(m, 4, 6, d, e)+3/l>3/2-6*7/4%32=true;
 end;
 
 begin
     print 'hello World to you too!';
     var m, y, z : integer;
     read y, z;
-    sqrt(m);
+    sqrt2(m);
 end.
