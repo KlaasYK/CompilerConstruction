@@ -626,7 +626,7 @@ declaration<Decs>(IDs idents):
 					INode *n = tempidentifierlist;
 					while (n != NULL) {
 						/* check if the  identifier exists already */
-						if ( !existsInTop(n->name) ) {
+						if ( !existsInTop(n->name) && !isMethod(n->name) ) {
 							insertIdentifier(strdup(n->name), VARIABLE, stringToEvalType(yytext), NULL);
 						} else {
 							printTypeError(n->name, DUPLICATE);
@@ -838,7 +838,7 @@ function	:
 					/* insert all the parameters to the symboltable */
 					Node *n = lookupParams(lastmethodidentifier);
 					while (n != NULL) {
-						if (!existsInTop(n->name)) {
+						if (!existsInTop(n->name) && !isMethod(n->name) ) {
 							insertIdentifier(strdup(n->name), n->type, n->evaltype, NULL);
 							n = n->next;
 						} else {
@@ -880,7 +880,7 @@ procedure	:
 					/* insert all the parameters to the symboltable */
 					Node *n = lookupParams(lastmethodidentifier);
 					while (n != NULL) {
-						if (!existsInTop(n->name)) {
+						if (!existsInTop(n->name) && !isMethod(n->name) ) {
 							insertIdentifier(strdup(n->name), n->type, n->evaltype, NULL);
 							n = n->next;
 						} else {

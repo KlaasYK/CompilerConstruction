@@ -19,6 +19,7 @@ int isMethod(char *name) {
 		if (strcmp(n->name, name) == 0 && n->type == METHOD) {
 			return 1;
 		}
+		n = n->next;
 	}
 	return 0;
 }
