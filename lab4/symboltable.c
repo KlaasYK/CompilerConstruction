@@ -184,7 +184,6 @@ void popBlock() {
 	List *oldtop = symboltable->top;
 	symboltable->top = oldtop->nextlist;
 	freeList(oldtop);
-	free(oldtop);
 }
 
 void insertIdentifier(char *name, NodeType ntype, int etype, Node *paramlist) {

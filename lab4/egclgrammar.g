@@ -1021,7 +1021,7 @@ function	:
 					int tc_type = stringToEvalType(yytext);
 					
 					if (!existsInTop(lastmethodidentifier)) {
-						insertIdentifier(lastmethodidentifier, METHOD, tc_type, tempparamlist);
+						insertIdentifier(strdup(lastmethodidentifier), METHOD, tc_type, tempparamlist);
 						tempparamlist = NULL;
 						
 					} else {
@@ -1049,7 +1049,8 @@ function	:
 				statementset<LLdiscard>
 				END_TOK 
 				{
-					/* popBlock(); TODO: remove popBlock */
+					popBlock();
+					free(lastmethodidentifier);
 					lastmethodidentifier = NULL;
 				}
 				SEMICOLON
@@ -1066,7 +1067,7 @@ procedure	:
 				RPARREN 
 				{
 					if (!existsInTop(lastmethodidentifier)) {
-						insertIdentifier(lastmethodidentifier, METHOD, VOID_TYPE, tempparamlist);
+						insertIdentifier(strdup(lastmethodidentifier), METHOD, VOID_TYPE, tempparamlist);
 						tempparamlist = NULL;
 					} else {
 						freeTempParamList();
@@ -1090,7 +1091,8 @@ procedure	:
 				}
 				statementset<LLdiscard>
 				END_TOK {
-					/* popBlock(); TODO: remove popBlock */
+					popBlock();
+					free(lastmethodidentifier);
 					lastmethodidentifier = NULL;
 				}
 				SEMICOLON
@@ -1183,7 +1185,7 @@ programbody<Prog>(int numConstDefs, Dec *constDefs, int numVarDefs, Dec *varDefs
 			free(bss);
 		}
 		END_TOK {
-			/* popBlock(); TODO: activate this after debugging */
+			popBlock();
 			LLretval = makeProg(programname, numConstDefs, constDefs, numVarDefs, varDefs, numProcDefs, procDefs, numFuncDefs, funcDefs, numBodyStmnts, bodyStmnts);
 		}
 ;
