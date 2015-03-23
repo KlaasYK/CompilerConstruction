@@ -890,14 +890,12 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 					/* type checking */
 					int lhs = getType(strdup(n->name));
 					int rhs = getExpType(exps->exps[i]);
-					if ((lhs/10)*10 == (rhs/10)*10 ) {
-						n = n->next;
-						stmnts->stmnts[i]->assignment->expTree = exps->exps[i];
-					}
-					else {
+					stmnts->stmnts[i]->assignment->expTree = exps->exps[i];
+					if ((lhs/10)*10 != (rhs/10)*10 ) {
 						/* the list is freeëd in error */
 						printTypeError(strdup(n->name),WRONGTYPE);
 					}
+					n = n->next;
 				}
 			} else {
 				/* one to all statements */
