@@ -289,6 +289,8 @@ rootexpr(char *name)	:
 				]?
 			| 
 				NUMBER
+			|
+				BOOLEAN
 			;
 
 
@@ -351,8 +353,6 @@ relexpr2	:
 relexpr : 
 			sumexpr 
 			relexpr2
-		| 
-			BOOLEAN
 		;
 
 notexpr	: 
