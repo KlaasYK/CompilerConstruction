@@ -924,7 +924,7 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 				for(int i=stmnts->numStmnts-1;i+1 > 0;i--){
 					/* type checking */
 					int lhs = getType(strdup(n->name));
-					stmnts->stmnts[i]->assignment->expTree = exps->exps[0];
+					stmnts->stmnts[i]->assignment->expTree = deepCopyExp(exps->exps[0]);
 					if (lhs == VOID_TYPE) {
 						//Trying to assign something to the proc
 						printTypeError(strdup(n->name),RETURNINPROC);
