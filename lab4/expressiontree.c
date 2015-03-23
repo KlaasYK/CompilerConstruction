@@ -153,7 +153,7 @@ ExpTree deepCopyExp(ExpTree exp){
 				retExp->kind = unodeexp;
 				retExp->node.unode = makeUnNode(
 						deepCopyExp(exp->node.unode->e), 
-						exp->node.unode->operator)
+						exp->node.unode->operator);
 				break;
 			case bnodeexp:
 				retExp->kind = bnodeexp;
@@ -176,9 +176,8 @@ ExpTree deepCopyExp(ExpTree exp){
 					exps[i] = deepCopyExp(exp->node.funcCall->params[i]);
 				}
 				retExp->node.funcCall = makeFuncCall(
-						makeID(
-							exp->node.funcCall->id->type, 
-							exp->node.funcCall->id->name), 
+						exp->node.funcCall->id->type, 
+						exp->node.funcCall->id->name, 
 						exp->node.funcCall->numParams, 
 						exps);
 				break;

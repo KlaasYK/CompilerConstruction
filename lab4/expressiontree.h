@@ -102,6 +102,7 @@ Exp makeBoolExp(Bool b);
 void freeExp(Exp exp);
 
 int getExpType(Exp e);
+ExpTree deepCopyExp(Exp e);
 
 Unode makeUnNode(Exp e, UnOp op);
 void freeUnNode(Unode un);
