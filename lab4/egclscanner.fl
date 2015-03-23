@@ -11,6 +11,15 @@ extern int columnnr;
 
 extern void printLexError(char *illchar, int line, int column);
 
+char *lexeme = NULL;
+
+void lex(char *c) {
+	if (lexeme != NULL) {
+		free(lexeme);
+	}
+	lexeme = c;
+}
+
 %}
 
 %%
@@ -67,12 +76,12 @@ false {columnnr += strlen(yytext); return BOOLEAN;}
 true {columnnr += strlen(yytext); return BOOLEAN;}
 [0-9]* { columnnr += strlen(yytext); return NUMBER;}
 
-[a-zA-Z](_?)([a-zA-Z0-9]_?)* {columnnr += strlen(yytext); return IDENTIFIER;}
+[a-zA-Z](_?)([a-zA-Z0-9]_?)* {columnnr += strlen(yytext); lex(strdup(yytext)); return IDENTIFIER;}
 
 #(.)*\n {columnnr=0; linecount++; /* skip return COMMENT;*/ }
 
 [ \t]+ { columnnr += strlen(yytext); /* skip return WHITESPACE;*/ }
-<<EOF>> { return EOF; }
+<<EOF>> { lex(NULL); /* free lexeme */ return EOF; }
 (\n|\r\n) { linecount++; columnnr=0; /* skip return EOL; */ }
 . { printLexError(yytext, linecount, columnnr); }
 %%

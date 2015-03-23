@@ -46,8 +46,14 @@ typedef struct Exps{
 	ExpTree *exps;
 }*Exps;
 
+typedef struct GCmds {
+	int numGCmds;
+	GCommand *gCmds;
+}*GCmds;
+
 extern FILE * yyin;
 extern char * yytext;
+extern char * lexeme;
 
 char **lines;
 char *file_name;
@@ -140,9 +146,14 @@ void freeLines() {
 void utilCleanUp() {
 	if (programname != NULL) {
 		free(programname);
+		programname = NULL;
 	}
 	if (tempidentifierlist != NULL) {
 		freeTempList();
+	}
+	if (lexeme != NULL) {
+		free(lexeme);
+		lexeme = NULL;
 	}
 }
 
@@ -691,18 +702,44 @@ expr<ExpTree>(Exp *exp) :
 		}
 ;
 
-guardedcommand	: 
-		expr<e>(NULL) 
+guardedcommand<GCommand>(ExpTree exp)	: 
+		expr<e>(NULL)  {
+			if (e != NULL) {
+				if (getExpType(e)/10*10 != BOOLEAN_TYPE) {
+					/* TODO: print expression */
+					printTypeError(strdup(lexeme), WRONGTYPE);
+				} else {
+					exp = e;
+				}
+			}
+		}
 		THEN_TOK 
-		statementset<LLdiscard>
+		statementset<Stmnts> {
+			LLretval = makeGCommand(exp, Stmnts->numStmnts, Stmnts->stmnts); 
+		}
 ;
 
-guardedcommandset	: 
-						guardedcommand 
+guardedcommandset<GCmds>(GCmds gcmds)	: 
+						guardedcommand<retgcmd>(NULL) {
+							gcmds = malloc(sizeof(struct GCmds));
+							gcmds->numGCmds = 1;
+							gcmds->gCmds = malloc(sizeof(GCommand));
+							gcmds->gCmds[0] = retgcmd;
+						}
 						[
 							ALTGUARD 
-							guardedcommand
-						]*
+							guardedcommand<retgcmd>(NULL)
+							{
+								// add them
+								gcmds->numGCmds++;
+								gcmds->gCmds = realloc(gcmds->gCmds,gcmds->numGCmds*sizeof(GCommand));
+								gcmds->gCmds[gcmds->numGCmds-1] = retgcmd;
+								// TODO: free?? if needed...
+							}
+						]* 
+						{
+							LLretval = gcmds;
+						}
 					;
 
 identifierarray<IDs>(IDs idents)	: 
@@ -882,15 +919,23 @@ assignmentcall<Stmnts>(char *name) :
 		}
 ;
 
-dostatement	:	
+dostatement<Stmnt>:	
 		DOBEGIN_TOK 
-		guardedcommandset
+		guardedcommandset<GCmds>(NULL)
+		{
+			//TODO: check if free is neccesary
+			LLretval = makeDoStmnt(makeDo(GCmds->numGCmds, GCmds->gCmds));
+		}
 		DOEND_TOK
 ;
 
-ifstatement	:	
+ifstatement<Stmnt>:	
 		IFBEGIN_TOK 
-		guardedcommandset 
+		guardedcommandset<GCmds>(NULL)
+		{
+			//TODO: check if free is nexxesary
+			LLretval = makeIfStmnt(makeIf(GCmds->numGCmds, GCmds->gCmds));
+		}
 		IFEND_TOK
 ;
 
@@ -1037,9 +1082,19 @@ statement<Stmnts>(Stmnts ss, char *name) :
 			ss->stmnts[0] = makeRCallStmnt(rc);
 		}
 	| 
-		dostatement
+		dostatement<dostmnt> {
+			ss = malloc(sizeof(struct Stmnts));
+			ss->numStmnts = 1;
+			ss->stmnts = malloc(ss->numStmnts*sizeof(Stmnt));
+			ss->stmnts[0] = dostmnt;
+		}
 	|
-		ifstatement
+		ifstatement<ifstmnt> {
+			ss = malloc(sizeof(struct Stmnts));
+			ss->numStmnts = 1;
+			ss->stmnts = malloc(ss->numStmnts*sizeof(Stmnt));
+			ss->stmnts[0] = ifstmnt;
+		}
 ]{
 	LLretval = ss;
 }

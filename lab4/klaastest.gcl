@@ -7,7 +7,7 @@ var a : integer;
 var b : boolean;
 
 begin
- a, b := a, B;
- a := a + A;
- b := b and B;
+ do b -> a:=A;
+ [] b -> b:=B;
+ od;
 end.
