@@ -1,8 +1,6 @@
 program dummy;
 
-var dummyvar : integer;
-
 begin
- var kaasislekker : boolean;
- read kaasislekker;
+	var kaas : integer;
+	kaas := 1;
 end.

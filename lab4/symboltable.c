@@ -110,6 +110,7 @@ void freeNode(Node *nodeptr) {
 	Node *param = nodeptr->parameters;
 	while (param != NULL) {
 		Node *nextparam = param->next;
+		free(param->name);
 		free(param);
 		param = nextparam;
 	}

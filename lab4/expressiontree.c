@@ -172,6 +172,8 @@ int getExpType(Exp e){
 					break;
 				case gtop:
 				case ltop:
+				case geop:
+				case leop:
 					if(lType == -1 || rType == -1 || (lType/10)*10 != INTEGER_TYPE || (rType/10)*10 != INTEGER_TYPE){
 						return -1;
 					}

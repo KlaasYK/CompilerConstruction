@@ -46,8 +46,14 @@ typedef struct Exps{
 	ExpTree *exps;
 }*Exps;
 
+typedef struct GCmds {
+	int numGCmds;
+	GCommand *gCmds;
+}*GCmds;
+
 extern FILE * yyin;
 extern char * yytext;
+extern char * lexeme;
 
 char **lines;
 char *file_name;
@@ -140,9 +146,14 @@ void freeLines() {
 void utilCleanUp() {
 	if (programname != NULL) {
 		free(programname);
+		programname = NULL;
 	}
 	if (tempidentifierlist != NULL) {
 		freeTempList();
+	}
+	if (lexeme != NULL) {
+		free(lexeme);
+		lexeme = NULL;
 	}
 }
 
@@ -194,7 +205,8 @@ void LLmessage(int token) {
 void printTypeError(char *identifier, int ErrorType) {
 	int i = 0, k;
 	
-	printf("\n Symboltable:\n");
+	/* print symbol table for debug reasons */
+	printf("\nSymboltable:\n");
 	printSymbolTable();
 	
 	printf("\n");
@@ -241,6 +253,18 @@ int getType(char *name) {
 	return type;
 }
 
+/* constants may be used! */
+int getTypeConst(char *name) {
+	NodeType nt = lookupType(name);
+	int type = lookupEvalType(name, nt);
+	if(type == -1){
+		// trying to save something that was not declared
+		printTypeError(name, UNKNOWN);
+	}
+	free(name);
+	return type;
+}
+
 int main(int argc, char** argv) {
 	// initialise global vars to NULL/0
 	linecount = 0, columnnr = 0;
@@ -268,9 +292,6 @@ int main(int argc, char** argv) {
 	printf("\nSymbolTable:\n");
 	printSymbolTable();
 	printf("\n");
-	
-
-	
 	/* end test region for symbol table */
 
 	if (argc == 2) {
@@ -279,8 +300,9 @@ int main(int argc, char** argv) {
 	}
 
 	printf("Parsing succesfull\n");
-	
+
 	utilCleanUp();
+	freeProg(program);
 	freeSymbolTable();
 	freeLines();
 	
@@ -311,8 +333,7 @@ rootexpr<Exp>(char *name, int isFunc)	:
 					}
 				]?{
 					if(!isFunc){
-						// TODO errors
-						LLretval = makeIDNodeExp(makeID(getType(strdup(name)), name));
+						LLretval = makeIDNodeExp(makeID(getTypeConst(strdup(name)), name));
 					}
 				}
 			| 
@@ -428,7 +449,6 @@ term<Exp>(Exp *exp) :
 					printTypeError(strdup(yytext), WRONGTYPE);
 				}
 				LLretval = *exp;
-				free(exp);
 			}
 		}
 ;
@@ -481,7 +501,6 @@ sumexpr<Exp>(Exp *exp) :
 					printTypeError(strdup(yytext), WRONGTYPE);
 				}
 				LLretval = *exp;
-				free(exp);
 			}
 		}
 ;
@@ -498,8 +517,14 @@ relexpr2<Exp>(Exp left, Exp *exp, BinOp compOp)	:
 			else if(strcmp(compOpText, ">") == 0){
 				compOp = gtop;
 			}
+			else if(strcmp(compOpText, ">=") == 0){
+				compOp = geop;
+			}
 			else if(strcmp(compOpText, "<") == 0){
 				compOp = ltop;
+			}
+			else if(strcmp(compOpText, "<=") == 0){
+				compOp = leop;
 			}
 			free(compOpText);
 		}
@@ -556,7 +581,6 @@ relexpr<Exp>(Exp *exp) :
 						break;
 				}
 				LLretval = *exp;
-				free(exp);
 			}
 		}
 ;
@@ -622,7 +646,6 @@ andexpr<Exp>(Exp *exp):
 					printTypeError(strdup(yytext), WRONGTYPE);
 				}
 				LLretval = *exp;
-				free(exp);
 			}
 		}
 ;
@@ -643,7 +666,7 @@ expr2<Exp>(Exp left, Exp *exp):
 		}
 	| 
 		COR_OP 
-		andexpr<l>(NULL){
+		andexpr<r>(NULL){
 			LLretval = makeBinNodeExp(makeBinNode(left, r, corop));
 		}
 		expr2<e>(LLretval, exp){
@@ -670,27 +693,54 @@ expr<ExpTree>(Exp *exp) :
 			if(e == NULL){
 				LLretval = l;
 			}else{
+				
 				if((getExpType(l)/10)*10 != BOOLEAN_TYPE || (getExpType(e->node.bnode->r)/10)*10 != BOOLEAN_TYPE){
 					printTypeError(strdup(yytext), WRONGTYPE);
 				}
 				LLretval = *exp;
-				free(exp);
 			}
 		}
 ;
 
-guardedcommand	: 
-		expr<e>(NULL) 
+guardedcommand<GCommand>(ExpTree exp)	: 
+		expr<e>(NULL)  {
+			if (e != NULL) {
+				if (getExpType(e)/10*10 != BOOLEAN_TYPE) {
+					/* TODO: print expression */
+					printTypeError(strdup(yytext), WRONGTYPE);
+				} else {
+					exp = e;
+				}
+			}
+		}
 		THEN_TOK 
-		statementset<LLdiscard>
+		statementset<Stmnts> {
+			LLretval = makeGCommand(exp, Stmnts->numStmnts, Stmnts->stmnts);
+			
+		}
 ;
 
-guardedcommandset	: 
-						guardedcommand 
+guardedcommandset<GCmds>(GCmds gcmds)	: 
+						guardedcommand<retgcmd>(NULL) {
+							gcmds = malloc(sizeof(struct GCmds));
+							gcmds->numGCmds = 1;
+							gcmds->gCmds = malloc(sizeof(GCommand));
+							gcmds->gCmds[0] = retgcmd;
+						}
 						[
 							ALTGUARD 
-							guardedcommand
-						]*
+							guardedcommand<retgcmd>(NULL)
+							{
+								// add them
+								gcmds->numGCmds++;
+								gcmds->gCmds = realloc(gcmds->gCmds,gcmds->numGCmds*sizeof(GCommand));
+								gcmds->gCmds[gcmds->numGCmds-1] = retgcmd;
+								// TODO: free?? if needed...
+							}
+						]* 
+						{
+							LLretval = gcmds;
+						}
 					;
 
 identifierarray<IDs>(IDs idents)	: 
@@ -749,16 +799,16 @@ functioncall<FuncCall>(char *name, int type, Exps params):
 			Node *expectedParams = lookupParams(name);
 			int expectedNumParams = getNumNodes(expectedParams);
 			if(params->numExps != expectedNumParams){
-				printTypeError(strdup(name), PARAMMISMATCH1);
+				printTypeError(name, PARAMMISMATCH1);
 			}
 			for(int i = params->numExps-1;i>=0;i--){
 				int type = getExpType(params->exps[i]);
 				int expectedType = expectedParams->evaltype;
 				if((type/10)*10 != (expectedType/10)*10){
-					printTypeError(strdup(name), PARAMMISMATCH2);
+					printTypeError(name, PARAMMISMATCH2);
 				}
 				if(type%10 == 1 && expectedType%10 == 2){
-					printTypeError(strdup(name), REFERENCETOCONSTANT);					
+					printTypeError(name, REFERENCETOCONSTANT);					
 				}
 				expectedParams = expectedParams->next;
 			}
@@ -784,6 +834,8 @@ assignmentcallV1<Stmnts>(char *name):
 assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	: 
 		{
 			//TODO typecheck name (watch out for return type of functions!)
+			addTempList(strdup(name));
+			
 			stmnts = malloc(sizeof(struct Stmnts));
 			stmnts->numStmnts = 1;
 			stmnts->stmnts = malloc(stmnts->numStmnts*sizeof(Stmnt));
@@ -792,6 +844,8 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 		[
 			COMMA 
 			IDENTIFIER{
+				addTempList(strdup(yytext));
+				
 				//TODO typecheck IDENTIFIER (watch out for return type of functions!)
 				stmnts->numStmnts++;
 				stmnts->stmnts = realloc(stmnts->stmnts, stmnts->numStmnts*sizeof(Stmnt));
@@ -813,14 +867,51 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 				exps->exps[exps->numExps-1] = e;
 			}
 		]*{
-			if(stmnts->numStmnts!=exps->numExps){
+			
+		
+			if(stmnts->numStmnts!=exps->numExps && exps->numExps!=1){
+				/* if not equal, and not one to many... */
+				freeTempList();
 				printTypeError(NULL, ASSMISMATCH);
 			}
-			for(int i=0;i<exps->numExps;i++){
-				stmnts->stmnts[i]->assignment->expTree = exps->exps[i];
+			if ( exps->numExps != 1) {
+				INode *n = tempidentifierlist;
+				for(int i=exps->numExps-1;i+1>0;i--){
+					/* type checking */
+					int lhs = getType(strdup(n->name));
+					int rhs = getExpType(exps->exps[i]);
+					if ((lhs/10)*10 == (rhs/10)*10 ) {
+						n = n->next;
+						stmnts->stmnts[i]->assignment->expTree = exps->exps[i];
+					}
+					else {
+						/* the list is freeëd in error */
+						printTypeError(strdup(n->name),WRONGTYPE);
+					}
+				}
+			} else {
+				/* one to all statements */
+				int rhs = getExpType(exps->exps[0]);
+				INode *n = tempidentifierlist;
+				for(int i=stmnts->numStmnts-1;i+1 > 0;i--){
+					/* type checking */
+					int lhs = getType(strdup(n->name));
+					if ((lhs/10)*10 == (rhs/10)*10 ) {
+						n = n->next;
+						/* TODO: make a deep copy! */
+						stmnts->stmnts[i]->assignment->expTree = exps->exps[0];
+					}
+					else {
+						
+						printTypeError(strdup(n->name),WRONGTYPE);
+					}
+				}
 			}
-			LLretval = stmnts;
+			freeTempList();
 			free(exps);
+			free(name);
+			LLretval = stmnts;
+			
 		}
 ;
 
@@ -831,15 +922,23 @@ assignmentcall<Stmnts>(char *name) :
 		}
 ;
 
-dostatement	:	
+dostatement<Stmnt>:	
 		DOBEGIN_TOK 
-		guardedcommandset
+		guardedcommandset<GCmds>(NULL)
+		{
+			//TODO: check if free is neccesary
+			LLretval = makeDoStmnt(makeDo(GCmds->numGCmds, GCmds->gCmds));
+		}
 		DOEND_TOK
 ;
 
-ifstatement	:	
+ifstatement<Stmnt>:	
 		IFBEGIN_TOK 
-		guardedcommandset 
+		guardedcommandset<GCmds>(NULL)
+		{
+			//TODO: check if free is nexxesary
+			LLretval = makeIfStmnt(makeIf(GCmds->numGCmds, GCmds->gCmds));
+		}
 		IFEND_TOK
 ;
 
@@ -986,16 +1085,25 @@ statement<Stmnts>(Stmnts ss, char *name) :
 			ss->stmnts[0] = makeRCallStmnt(rc);
 		}
 	| 
-		dostatement
+		dostatement<dostmnt> {
+			ss = malloc(sizeof(struct Stmnts));
+			ss->numStmnts = 1;
+			ss->stmnts = malloc(ss->numStmnts*sizeof(Stmnt));
+			ss->stmnts[0] = dostmnt;
+		}
 	|
-		ifstatement
+		ifstatement<ifstmnt> {
+			ss = malloc(sizeof(struct Stmnts));
+			ss->numStmnts = 1;
+			ss->stmnts = malloc(ss->numStmnts*sizeof(Stmnt));
+			ss->stmnts[0] = ifstmnt;
+		}
 ]{
 	LLretval = ss;
 }
 ;
 
 parameterset 	: 
-		/* TODO: check for same name of parameters */
 		VAR_TOK
 		IDENTIFIER {
 			addTempList(strdup(yytext));
@@ -1121,7 +1229,7 @@ statementset<Stmnts>:
 		}
 ;
 
-function	: 
+function<FuncDef>(int numparams, Param *p, int numStmnts, Stmnt *stmnts)	: 
 				FUNCTION_TOK 
 				IDENTIFIER 
 				{
@@ -1151,27 +1259,38 @@ function	:
 					putBlock();
 					/* insert all the parameters to the symboltable */
 					Node *n = lookupParams(lastmethodidentifier);
+					numparams = getNumNodes(n);
+					p = malloc(numparams * sizeof(struct Parameter));
+					int i = 0;
 					while (n != NULL) {
 						if (!existsInTop(n->name) && !isMethod(n->name) ) {
 							insertIdentifier(strdup(n->name), n->type, n->evaltype, NULL);
+							if (n->evaltype%10 == 2) {
+								p[i] = makeParam(makeID(n->evaltype,strdup(n->name)), byRef);
+							} else {
+								p[i] = makeParam(makeID(n->evaltype,strdup(n->name)), byVal);
+							}
+							i++;
 							n = n->next;
+						} else if(isMethod(n->name)){
+							printTypeError(n->name, VARIABLEASKED);
 						} else {
-							/* TODO: make error for incorrect parameters */
 							printTypeError(lastmethodidentifier, DUPLICATE);
 						}
 					}
 				}
-				statementset<LLdiscard>
+				statementset<stmntsret>
 				END_TOK 
 				{
 					popBlock();
+					LLretval = makeFuncDef(makeID(getType(strdup(lastmethodidentifier)), strdup(lastmethodidentifier)),numparams, p, stmntsret->numStmnts, stmntsret->stmnts);
 					free(lastmethodidentifier);
 					lastmethodidentifier = NULL;
 				}
 				SEMICOLON
 			;
 
-procedure	: 
+procedure<ProcDef>(int numparams, Param *p, int numStmnts, Stmnt *stmnts)	: 
 				PROCEDURE_TOK 
 				IDENTIFIER 
 				{
@@ -1194,21 +1313,30 @@ procedure	:
 					putBlock();
 					/* insert all the parameters to the symboltable */
 					Node *n = lookupParams(lastmethodidentifier);
+					numparams = getNumNodes(n);
+					p = malloc(numparams * sizeof(struct Parameter));
+					int i = 0;
 					while (n != NULL) {
 						if (!existsInTop(n->name) && !isMethod(n->name) ) {
 							insertIdentifier(strdup(n->name), n->type, n->evaltype, NULL);
+							if (n->evaltype%10 == 2) {
+								p[i] = makeParam(makeID(n->evaltype,strdup(n->name)), byRef);
+							} else {
+								p[i] = makeParam(makeID(n->evaltype,strdup(n->name)), byVal);
+							}
+							i++;
 							n = n->next;
 						} else if(isMethod(n->name)){
 							printTypeError(n->name, VARIABLEASKED);
 						} else {
-							/* TODO: make error for incorrect parameters */
 							printTypeError(n->name, DUPLICATE);
 						}
 					}
 				}
-				statementset<LLdiscard>
+				statementset<stmntsret>
 				END_TOK {
 					popBlock();
+					LLretval = makeProcDef(strdup(lastmethodidentifier),numparams, p, stmntsret->numStmnts, stmntsret->stmnts);
 					free(lastmethodidentifier);
 					lastmethodidentifier = NULL;
 				}
@@ -1290,8 +1418,29 @@ programbody<Prog>(int numConstDefs, Dec *constDefs, int numVarDefs, Dec *varDefs
 		]* {
 			printf("Num of var defs: %d\n", numVarDefs);
 		}
-		procedure* 
-		function* 
+		[
+		procedure<procdef>(0,NULL,0,NULL)
+		{
+			int oldNumProcDefs = numProcDefs;
+				numProcDefs++;
+				if(oldNumProcDefs == 0){
+					procDefs = malloc(numProcDefs*sizeof(ProcDef));
+				}else{
+					procDefs = realloc(procDefs, numProcDefs*sizeof(ProcDef));
+				}
+				procDefs[oldNumProcDefs] = procdef;
+		}
+		]* 
+		[function<funcdef>(0,NULL,0,NULL){
+				int oldNumFuncDefs = numFuncDefs;
+				numFuncDefs++;
+				if(oldNumFuncDefs == 0){
+					funcDefs = malloc(numFuncDefs*sizeof(FuncDef));
+				}else{
+					funcDefs = realloc(funcDefs, numFuncDefs*sizeof(FuncDef));
+				}
+				funcDefs[oldNumFuncDefs] = funcdef;
+		}]* 
 		BEGIN_TOK {
 			putBlock(); /* add a new frame of reference */
 		} 
@@ -1303,7 +1452,8 @@ programbody<Prog>(int numConstDefs, Dec *constDefs, int numVarDefs, Dec *varDefs
 		}
 		END_TOK {
 			popBlock();
-			LLretval = makeProg(programname, numConstDefs, constDefs, numVarDefs, varDefs, numProcDefs, procDefs, numFuncDefs, funcDefs, numBodyStmnts, bodyStmnts);
+			Prog prog = makeProg(programname, numConstDefs, constDefs, numVarDefs, varDefs, numProcDefs, procDefs, numFuncDefs, funcDefs, numBodyStmnts, bodyStmnts);
+			LLretval = prog;
 		}
 ;
 			
@@ -1321,14 +1471,11 @@ start		:
 			program  = prog;
 		}
 		DOT{
-			printf("Program name: %s\n", program->name);
+			/*printf("Program name: %s\n", program->name);
 			if(strcmp(file_name, "riktest.gcl") == 0){
 				printf("Print string: %s\n", program->bodyStmnts[0]->wCall->items[0]->string);
 				printf("boolval: %s\n", (program->constDefs[0]->expTree->node.boolval->value == true)?"true":"false");
 				printf("intval: %s\n", program->constDefs[1]->expTree->node.intval->value);
-				
-				
-			}
-			//freeProg(program);
+			}*/
 		}
 ; 
