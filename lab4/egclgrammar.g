@@ -914,8 +914,8 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 				}
 			}
 			freeTempList();
+			free(exps->exps);
 			free(exps);
-			free(name);
 			LLretval = stmnts;
 			
 		}
@@ -1106,7 +1106,6 @@ statement<Stmnts>(Stmnts ss, char *name) :
 		}
 ]{
 	LLretval = ss;
-	free(name);
 }
 ;
 
