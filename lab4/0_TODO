@@ -1,0 +1,15 @@
+Program: state /wml with memory leak
+boolean.gcl: chrash
+eculid.gcl: parses /wml
+euclid2.gcl: parses /wml
+extended.gcl: unknown identifier (expected) /wml
+hello.gcl: parses
+lexerror.gcl: illegal char (expected) /wml
+mult.gcl: parses /wml
+random.gcl: parses /wml
+realsyntaxerror.gcl: syntaxerror (expected) /wml
+sqrt.gcl: parses /wml
+syntaxerror.gcl: parses (expected) /wml
+
+
+ 
