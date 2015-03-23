@@ -1268,7 +1268,7 @@ function<FuncDef>(int numparams, Param *p, int numStmnts, Stmnt *stmnts)	:
 					Node *n = lookupParams(lastmethodidentifier);
 					numparams = getNumNodes(n);
 					p = malloc(numparams * sizeof(struct Parameter));
-					int i = 0;
+					int i = numparams-1;
 					while (n != NULL) {
 						if (!existsInTop(n->name) && !isMethod(n->name) ) {
 							insertIdentifier(strdup(n->name), n->type, n->evaltype, NULL);
@@ -1277,7 +1277,7 @@ function<FuncDef>(int numparams, Param *p, int numStmnts, Stmnt *stmnts)	:
 							} else {
 								p[i] = makeParam(makeID(n->evaltype,n->name), byVal);
 							}
-							i++;
+							i--;
 							n = n->next;
 						} else if(isMethod(n->name)){
 							printTypeError(n->name, VARIABLEASKED);
