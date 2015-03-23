@@ -904,7 +904,7 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 				for(int i=stmnts->numStmnts-1;i+1 > 0;i--){
 					/* type checking */
 					int lhs = getType(strdup(n->name));
-						stmnts->stmnts[i]->assignment->expTree = exps->exps[0];
+					stmnts->stmnts[i]->assignment->expTree = exps->exps[0];
 					if ((lhs/10)*10 != (rhs/10)*10 ) {
 						printTypeError(strdup(n->name),WRONGTYPE);
 					}
