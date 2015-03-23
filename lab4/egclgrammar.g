@@ -25,6 +25,8 @@
 #define PROCISOFUNC 264	
 #define ASSMISMATCH 265
 #define	VARIABLEASKED 266
+#define RETURNINPROC 267
+#define MISSINGRETURN 268
 
 typedef struct Stmnts{
 	int numStmnts;
@@ -210,8 +212,8 @@ void printTypeError(char *identifier, int ErrorType) {
 	int i = 0, k;
 	
 	/* print symbol table for debug reasons */
-	//printf("\nSymboltable:\n");
-	//printSymbolTable();
+	printf("\nSymboltable:\n");
+	printSymbolTable();
 	
 	printf("\n");
 	k = printf("Error on line %d: ", linecount+1);
@@ -232,6 +234,8 @@ void printTypeError(char *identifier, int ErrorType) {
 		case PROCISOFUNC: printf("Procedure '%s' is used as function, at column %d\n", identifier, columnnr+1);break;
 		case ASSMISMATCH: printf("The number of variables is unequal to the number of assigned expressions\n");break;
 		case VARIABLEASKED: printf("Function or procedure '%s' found in stead of variable, at column %d\n", identifier, columnnr+1);break;
+		case RETURNINPROC: printf("Trying to return a value to a procedure '%s', at column %d\n", identifier, columnnr+1);break;
+		case MISSINGRETURN: printf("Function '%s' has nothing assigned to its return variable, at column %d\n", identifier, columnnr+1);break;
 	}
 	
 	free(identifier);
@@ -899,7 +903,12 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 					int lhs = getType(strdup(n->name));
 					int rhs = getExpType(exps->exps[i]);
 					stmnts->stmnts[i]->assignment->expTree = exps->exps[i];
-					if ((lhs/10)*10 != (rhs/10)*10 ) {
+					if (lhs == VOID_TYPE) {
+						//Trying to assign something to the proc
+						printTypeError(strdup(n->name),RETURNINPROC);
+					} else if (lookupType(n->name) == METHOD && lhs != VOID_TYPE) {
+						//Update symboltable that this functions returns
+					} else if ((lhs/10)*10 != (rhs/10)*10 ) {
 						/* the list is freeëd in error */
 						printTypeError(strdup(n->name),WRONGTYPE);
 					}
@@ -913,7 +922,10 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 					/* type checking */
 					int lhs = getType(strdup(n->name));
 					stmnts->stmnts[i]->assignment->expTree = exps->exps[0];
-					if ((lhs/10)*10 != (rhs/10)*10 ) {
+					if (lhs == VOID_TYPE) {
+						//Trying to assign something to the proc
+						printTypeError(strdup(n->name),RETURNINPROC);
+					} else if ((lhs/10)*10 != (rhs/10)*10 ) {
 						printTypeError(strdup(n->name),WRONGTYPE);
 					}
 					n = n->next;

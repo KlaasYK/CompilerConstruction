@@ -18,7 +18,7 @@ end;
 function sqrt2(var x : integer) -> integer;
 
   var l : integer;
-  sqrt2 := -4*5*(7+2)+7*n(m, 4, 6, d, e)+3/l>3/2-6*7/4%32=true;
+  sqrt2 := 42;
 end;
 
 begin
