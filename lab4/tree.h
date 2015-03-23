@@ -44,10 +44,6 @@ typedef struct WriteCall *WCall;
 
 typedef struct PrintableItem *Printable;
 
-// function call defined in expressiontree.h
-
-typedef struct ProcedureCall *ProcCall;
-
 typedef struct IfStatement *If;
 
 typedef struct DoStatement *Do;
@@ -98,7 +94,6 @@ struct Statement {
         Dec dec;
         Ass assignment;
         FuncCall funcCall;
-        ProcCall procCall;
         RCall rCall;
         WCall wCall;
         If ifStmnt;
@@ -140,12 +135,6 @@ struct PrintableItem {
         char *string;
         ExpTree exp;
     };
-};
-
-struct ProcedureCall {
-    char *name;
-    int numParams;
-    ExpTree *params;
 };
 
 struct IfStatement {
@@ -204,9 +193,6 @@ void freeWCall(WCall wc);
 Printable makeStringPrintable(char *string);
 Printable makeExpPrintable(ExpTree exp);
 void freePrintable(Printable p);
-
-ProcCall makeProcCall(char *name, int numParams, ExpTree *params);
-void freeProcCall(ProcCall pc);
 
 If makeIf(int numGCommands, GCommand *gcs);
 void freeIf(If i);

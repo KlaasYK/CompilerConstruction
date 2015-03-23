@@ -150,13 +150,6 @@ Stmnt makeFuncCallStmnt(FuncCall fc) {
 	return s;
 }
 
-Stmnt makeProcCallStmnt(ProcCall pc) {
-	Stmnt s = malloc(sizeof (struct Statement));
-	s->kind = procCallStmnt;
-	s->procCall = pc;
-	return s;
-}
-
 Stmnt makeRCallStmnt(RCall rc) {
 	Stmnt s = malloc(sizeof (struct Statement));
 	s->kind = readCallStmnt;
@@ -195,9 +188,6 @@ void freeStmnt(Stmnt s) {
 			break;
 		case funcCallStmnt:
 			freeFuncCall(s->funcCall);
-			break;
-		case procCallStmnt:
-			freeProcCall(s->procCall);
 			break;
 		case readCallStmnt:
 			freeRCall(s->rCall);
@@ -350,30 +340,6 @@ void freePrintable(Printable p) {
 			exit(EXIT_FAILURE);
 	}
 	free(p);
-}
-
-ProcCall makeProcCall(char *name, int numParams, Exp *params) {
-	ProcCall pc = malloc(sizeof (struct ProcedureCall));
-	if(name != NULL){
-		int nLength = strlen(name) + 1;
-		char *nCopy = malloc(nLength * sizeof (char));
-		memcpy(nCopy, name, nLength * sizeof (char));
-		pc->name = nCopy;
-	}
-	pc->numParams = numParams;
-	pc->params = params;
-	return pc;
-}
-
-void freeProcCall(ProcCall pc) {
-	free(pc->name);
-	for (int i = 0; i < pc->numParams; i++) {
-		freeExp(pc->params[i]);
-	}
-	if (pc->numParams > 0) {
-		free(pc->params);
-	}
-	free(pc);
 }
 
 If makeIf(int numGCommands, GCommand *gcs) {
