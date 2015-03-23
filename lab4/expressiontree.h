@@ -13,7 +13,7 @@ typedef enum {
 } UnOp;
 
 typedef enum {
-    plusop, minop, mulop, divop, modop, powop, andop, orop, candop, corop
+    plusop, minop, mulop, divop, modop, powop, andop, orop, candop, corop, neqop, eqop, gtop, ltop
 } BinOp;
 
 typedef enum {
@@ -100,6 +100,8 @@ Exp makeFuncCallExp(FuncCall fc);
 Exp makeIntExp(Int i);
 Exp makeBoolExp(Bool b);
 void freeExp(Exp exp);
+
+int getExpType(Exp e);
 
 Unode makeUnNode(Exp e, UnOp op);
 void freeUnNode(Unode un);

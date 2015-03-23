@@ -470,16 +470,18 @@ functioncall<FuncCall>(char *name, int type, Exps params):
 			if(params->numExps != expectedNumParams){
 				//TODO error
 			}
+			//TODO check if reversed array
 			for(int i = 0;i<params->numExps;i++){
 				int type = getExpType(params->exps[i]);
-				int expectedType = expectedParams.type;
+				int expectedType = expectedParams->type;
 				if(type != expectedType){
 					//TODO error
 				}
+				expectedParams = expectedParams->next;
 			}
-			FuncCall fc = makeFuncCall(type, name, exps->numExps, exps->exps);
+			FuncCall fc = makeFuncCall(type, name, params->numExps, params->exps);
 			LLretval = fc;
-			free(exps);
+			free(params);
 		}
 ;
 

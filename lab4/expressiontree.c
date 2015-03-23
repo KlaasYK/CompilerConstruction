@@ -1,5 +1,6 @@
 #include <string.h>
 #include "expressiontree.h"
+#include "symboltable.h"
 
 ID makeID(int type, char* name) {
 	ID id = malloc(sizeof (struct Identifier));
@@ -130,6 +131,82 @@ void freeExp(Exp exp) {
 			exit(EXIT_FAILURE);
 	}
 	free(exp);
+}
+
+int getExpType(Exp e){
+	switch (e->kind) {
+		case unodeexp: ;
+			int type = getExpType(e->node.unode->e);
+			switch(e->node.unode->operator){
+				case notop:
+					if(type == -1 || (type/10)*10 != BOOLEAN_TYPE){
+						return -1;
+					}
+					return type;
+					break;
+				case negop:
+					if(type == -1 || (type/10)*10 != INTEGER_TYPE){
+						return -1;
+					}
+					return type;
+					break;
+				default:
+					fprintf(stderr, "Undefined kind of unary operator!");
+					exit(EXIT_FAILURE);
+			}
+			break;
+		case bnodeexp: ;
+			int lType = getExpType(e->node.bnode->l);
+			int rType = getExpType(e->node.bnode->r);
+			switch(e->node.bnode->operator){
+				case plusop:
+				case minop:
+				case mulop:
+				case divop:
+				case modop:
+				case powop:
+				case gtop:
+				case ltop:
+					if(lType == -1 || rType == -1 || (lType/10)*10 != INTEGER_TYPE || (rType/10)*10 != INTEGER_TYPE){
+						return -1;
+					}
+					break;
+				case andop:
+				case orop:
+				case candop:
+				case corop:
+					if(lType == -1 || rType == -1 || (lType/10)*10 != BOOLEAN_TYPE || (rType/10)*10 != BOOLEAN_TYPE){
+						return -1;
+					}
+					break;
+				case neqop:
+				case eqop:
+					if(lType == -1 || rType == -1 || (lType/10)*10 != (rType/10)*10){
+						return -1;
+					}
+					break;
+				default:
+					fprintf(stderr, "Undefined kind of binary operator!");
+					exit(EXIT_FAILURE);
+			}
+			break;
+		case idexp:
+			return e->node.id->type;
+			break;
+		case funcexp:
+			return e->node.funcCall->id->type;
+			break;
+		case intexp:
+			return INTEGER_TYPE;
+			break;
+		case boolexp:
+			return BOOLEAN_TYPE;
+			break;
+		default:
+			fprintf(stderr, "Undefined kind of expression!");
+			exit(EXIT_FAILURE);
+		
+	}
 }
 
 Unode makeUnNode(Exp e, UnOp op) {
