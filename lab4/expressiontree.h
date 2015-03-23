@@ -95,7 +95,7 @@ void freeBool(Bool b);
 
 Exp makeUnNodeExp(Unode un);
 Exp makeBinNodeExp(Bnode bin);
-Exp makeIDNodeExp(Bnode bin);
+Exp makeIDNodeExp(ID id);
 Exp makeFuncCallExp(FuncCall fc);
 Exp makeIntExp(Int i);
 Exp makeBoolExp(Bool b);

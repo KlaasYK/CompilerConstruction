@@ -78,10 +78,10 @@ Exp makeBinNodeExp(Bnode bin) {
 	return exp;
 }
 
-Exp makeIDNodeExp(Bnode bin) {
+Exp makeIDNodeExp(ID id) {
 	Exp exp = malloc(sizeof (struct Expression));
 	exp->kind = idexp;
-	exp->node.bnode = bin;
+	exp->node.id = id;
 	return exp;
 }
 
