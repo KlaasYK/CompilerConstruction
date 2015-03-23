@@ -937,6 +937,7 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 					}
 					n = n->next;
 				}
+				freeExp(exps->exps[0]);
 			}
 			freeTempList();
 			free(exps->exps);
