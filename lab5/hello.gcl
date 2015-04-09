@@ -1,0 +1,7 @@
+program hello;
+# The famous hello world program in GCL
+
+begin
+  print 'Hello';
+  println ' world';
+end.

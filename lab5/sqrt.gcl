@@ -1,0 +1,22 @@
+program root;
+# computation of the (integer) square root using binary search
+
+function sqrt(x : integer) -> integer;
+  var m, y, z : integer;
+  y :=0;
+  z:=x+1;
+  # invariant: y^2 <= x < z^2
+  do y+1 <> z -> m := (y+z) div 2;
+                 if m^2 <= x -> y :=m;
+                 [] m^2 > x  -> z := m;
+                 fi;                 
+  od;
+  sqrt := y;
+end;
+
+begin
+  var n : integer;
+  print 'input? ';
+  read n;
+  println 'floor(sqrt(', n, '))=', sqrt(n);
+end.
