@@ -9,9 +9,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "codegen.h"
 #include "symboltable.h"
-
 #include "tree.h"
+
+
 
 /* different typechecking errors */
 #define DUPLICATE 256
@@ -284,7 +286,7 @@ int main(int argc, char** argv) {
 	
 	printf("Extended Guarded Command Language Compiler.\n");
 	if (argc > 2) {
-		fprintf(stderr, "Usage: %s [filename.c]\n", argv[0]);
+		fprintf(stderr, "Usage: %s [filename.gcl]\n", argv[0]);
 		exit(-1);
   	}
 	if (argc == 2) {
@@ -298,12 +300,10 @@ int main(int argc, char** argv) {
 	
 	parser();
 	
-	/* test region for symbol table */	
-	printf("\nSymbolTable:\n");
-	printSymbolTable();
-	printf("\n");
-	/* end test region for symbol table */
-
+	// TODO: replace by outputfile name (argv[2]?)
+	generateCode(program, "out.c");
+	
+	
 	if (argc == 2) {
 		fclose(yyin);
 		yyin = NULL;

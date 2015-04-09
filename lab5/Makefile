@@ -8,13 +8,13 @@ GCL = $(subst .gcl,.c99,$(wildcard *.gcl))
 
 
 all: parser scanner cfiles
-	gcc -g -o $(EXE) egclgrammar.o lex.yy.o symboltable.o tree.o expressiontree.o bigints.o
+	gcc -g -o $(EXE) egclgrammar.o lex.yy.o symboltable.o tree.o expressiontree.o bigints.o codegen.o
 parser: egclgrammar.g
 	LLnextgen egclgrammar.g
 scanner: egclscanner.fl
 	flex egclscanner.fl
 cfiles: egclgrammar.c lex.yy.c symboltable.c bigints.c
-	gcc -c -g -std=gnu99 egclgrammar.c lex.yy.c symboltable.c expressiontree.c tree.c bigints.c
+	gcc -c -g -std=gnu99 egclgrammar.c lex.yy.c symboltable.c expressiontree.c tree.c bigints.c codegen.c
 
 
 run: $(GCL)
@@ -35,3 +35,4 @@ clean:
 	rm -f tree.o
 	rm -f expressiontree.o
 	rm -f bigints.o
+	rm -f codegen.o
