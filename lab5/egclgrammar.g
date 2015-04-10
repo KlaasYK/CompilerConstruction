@@ -986,8 +986,10 @@ printable<Printable> :
 		}
 ;
 
-printcall<WCall>(int numitems, Printable *ps) : 
-		PRINT_TOK 
+printcall<WCall>(int numitems, Printable *ps, char *printTok) : 
+		PRINT_TOK {
+		    printTok = strdup(yytext);
+		}
 		printable<p>{
 			numitems = 1;
 			ps = malloc(sizeof(Printable));
@@ -1001,8 +1003,14 @@ printcall<WCall>(int numitems, Printable *ps) :
 				ps[numitems-1] = p;
 			}
 		]*{
-			WCall wc = makeWCall(numitems, ps);
-			LLretval = wc;
+		    WCall wc;
+		    if(strcmp(printTok, "print")){
+			wc = makeWCall(numitems, ps, false);
+		    }else{
+			wc = makeWCall(numitems, ps, true);
+		    }
+		    free(printTok);
+		    LLretval = wc;
 		}
 ;
 
@@ -1104,7 +1112,7 @@ statement<Stmnts>(Stmnts ss, char *name) :
 			free(name);
 		}
 	| 
-		printcall<wc>(0, NULL){
+		printcall<wc>(0, NULL, NULL){
 			ss = malloc(sizeof(struct Stmnts));
 			ss->numStmnts = 1;
 			ss->stmnts = malloc(ss->numStmnts*sizeof(Stmnt));
