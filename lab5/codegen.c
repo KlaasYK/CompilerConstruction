@@ -15,50 +15,50 @@ void compileDo(Do dostatement);
 void compileIf(If ifstatement);
 
 void WTF(char *code) {
-	fputs(code,outputfile);
+    fputs(code, outputfile);
 }
 
 char *getCTypeString(int type) {
-	switch(type) {
-		case BOOLEAN_TYPE:
-			return "int";
-		case CONST_BOOLEAN_TYPE:
-			return "const int";
-		case REF_BOOLEAN_TYPE:
-			return "int *";
-		case INTEGER_TYPE:
-			return "Integer";
-		case CONST_INTEGER_TYPE:
-			return "const Integer *";
-		case REF_INTEGER_TYPE:
-			return "Integer *";
-		default:
-			return "void";
-	}
+    switch (type) {
+	case BOOLEAN_TYPE:
+	    return "int";
+	case CONST_BOOLEAN_TYPE:
+	    return "const int";
+	case REF_BOOLEAN_TYPE:
+	    return "int *";
+	case INTEGER_TYPE:
+	    return "Integer";
+	case CONST_INTEGER_TYPE:
+	    return "const Integer *";
+	case REF_INTEGER_TYPE:
+	    return "Integer *";
+	default:
+	    return "void";
+    }
 }
 
 void writeHeaders() {
-		WTF("#include <stdio.h>\n");
-		WTF("#include <stdlib.h>\n");
-		// Use this, to prevent errors
-		WTF("#include <stdint.h>\n");
-		WTF("#include \"bigints.h\"\n");
+    WTF("#include <stdio.h>\n");
+    WTF("#include <stdlib.h>\n");
+    // Use this, to prevent errors
+    WTF("#include <stdint.h>\n");
+    WTF("#include \"bigints.h\"\n");
 }
 
 void writeLabel(int num) {
-	WTF("label lbl");
-	char labelstring[32];
-	sprintf(labelstring, "%d", num);
-	WTF(labalstring);
-	WTF(";\n");
+    WTF("label lbl");
+    char labelstring[32];
+    sprintf(labelstring, "%d", num);
+    WTF(labalstring);
+    WTF(";\n");
 }
 
 void writeGoto(int num) {
-	WTF("goto ");
-	char labelstring[32];
-	sprintf(labelstring, "%d", num);
-	WTF(labalstring);
-	WTF(";\n");
+    WTF("goto ");
+    char labelstring[32];
+    sprintf(labelstring, "%d", num);
+    WTF(labalstring);
+    WTF(";\n");
 }
 
 void writeAssignment(char *varName, char *lhs, char op, char *rhs);
@@ -66,132 +66,137 @@ void writeAssignment(char *varName, char *lhs, char op, char *rhs);
 void compileExpression(ExpTree exp);
 
 void compileDec(Dec declaration) {
-	WTF(getCTypeString(declaration->id->type));
-	WTF(" ");
-	WTF(declaration->id->name);
-	WTF(" = ");
-	// TODO: expression tree
-	
-	WTF(";\n");
+    WTF(getCTypeString(declaration->id->type));
+    WTF(" ");
+    WTF(declaration->id->name);
+    WTF(" = ");
+    // TODO: expression tree
+
+    WTF(";\n");
 }
 
-
 void compileDo(Do dostatement) {
-	// TODO:
+    // TODO:
 }
 
 void compileIf(If ifstatement) {
-	
+
 }
 
 void compileWriteCall(WCall write) {
-	WTF("printf(\"");
-	int k = 0;
-	for (int i = 0; i < write->numitems; i++) {
-		Printable p = write->items[i];
-		if (p->kind == stringKind) {
-			WTF(p->string);
-		} else {
-			k++;
-			compileExpression();// TODO
-			// make a switch for the kind
-			// use printInteger if type is integer (ie start new printf)
-			// or make PrintInteger return a string
-			// use %d for booleans
-		}
+    
+    // first compile the expression tree and make a list of temp vars and kinds
+    int j = 0;
+    int *vars = malloc(write->numitems * sizeof (int));
+    ExpKind *kinds = malloc(write->numitems * sizeof (PrintKind));
+    for (int i = 0; i < write->numitems; i++) {
+	Printable p = write->items[i];
+	if (p->kind == expKind) {
+	    compileExpression(p->exp);
+	    kinds[j] = getExpType(p->exp);
+	    vars[j] = varcnt - 1;
+	    j++;
 	}
-	
-	//TODO: check if println or print was called.
-	// Needs to be stored inside the tree!
-	// Make an extra action for this in the grammar!
-	WTF("\"");
-	// Are there any expressions to be printed?
-	if (k > 0) {
-		WTF(",");
-		for (int i = 0; i < write->numitems; i++) {
-			Printable p = write->items[i];
-			if (p->kind == stringKind) {
-				// DO nothing
-			} else {
-				// TODO
-				// make a switch for the kind
-				// use printInteger if type is interger (ie start new printf)
-				// or make PrintInteger return a string
-				// use %d for booleans
-				WTF(",");
-			}
-		}
+    }
+    // Start printing
+    int k = 0;
+    WTF("printf(\"");
+    for (int i = 0; i < write->numitems; i++) {
+	Printable p = write->items[i];
+	if (p->kind == stringKind) {
+	    WTF(p->string);
+	} else {
+	    if (kinds[k] / 10 == INTEGER_TYPE / 10) {
+		WTF("%s");
+	    } else {
+		WTF("%d");
+	    }
+	    k++;
 	}
-	WTF(");\n");
+    }
+    if(write->newLine == true){
+	WTF("\n");
+    }
+    WTF("\"");
+    // Are there any expressions to be printed?
+    for(int i = 0;i<j;i++) {
+	WTF(",");
+	WTF("")
+    }
+    WTF(");\n");
 }
 
 void compileStatement(Stmnt statement) {
-	switch(statement->kind) {
-		case decStmnt: compileDec(statement->dec);break;
-		case assStmnt: break; //TODO;
-		case funcCallStmnt: break; //TODO:
-		case procCallStmnt: break; //TODO;
-		case readCallStmnt: break; //TODO;
-		case writeCallStmnt: compileWriteCall(statement->wCall); break; //TODO;
-		case ifStmnt: break; compileIf(statement->ifStmnt);
-		case doStmnt: break; compileDo(statement->doStmnt);
-	}
+    switch (statement->kind) {
+	case decStmnt: compileDec(statement->dec);
+	    break;
+	case assStmnt: break; //TODO;
+	case funcCallStmnt: break; //TODO:
+	case procCallStmnt: break; //TODO;
+	case readCallStmnt: break; //TODO;
+	case writeCallStmnt: compileWriteCall(statement->wCall);
+	    break; //TODO;
+	case ifStmnt: break;
+	    compileIf(statement->ifStmnt);
+	case doStmnt: break;
+	    compileDo(statement->doStmnt);
+    }
 }
 
 void compileFunc(FuncDef function) {
-	WTF(getCTypeString(function->id->type));
-	WTF(" ");
-	WTF(function->id->name);
-	WTF("(");
-	// arguments
-	WTF(") {\n");
-	//body
-	WTF("}\n");
+    WTF(getCTypeString(function->id->type));
+    WTF(" ");
+    WTF(function->id->name);
+    WTF("(");
+    // arguments
+    WTF(") {\n");
+    //body
+    WTF("}\n");
 }
 
 void compileProc(ProcDef procedure) {
-	WTF("void ");
-	WTF(procedure->name);
-	WTF("(");
-	// arguments
-	WTF(") {\n");
-	//body
-	WTF("}\n");
+    WTF("void ");
+    WTF(procedure->name);
+    WTF("(");
+    // arguments
+    WTF(") {\n");
+    //body
+    WTF("}\n");
 }
 
 void compileMain(Prog program) {
-	WTF("int main(int argc, char **argv){\n");
-	
-	for (int i = 0; i < program->numBodyStmnts; i++) {
-		compileStatement(program->bodyStmnts[i]);
-	}
-	
-	WTF("return EXIT_SUCCESS;\n");
-	WTF("}\n");
+    WTF("int main(int argc, char **argv){\n");
+
+    for (int i = 0; i < program->numBodyStmnts; i++) {
+	compileStatement(program->bodyStmnts[i]);
+    }
+
+    WTF("return EXIT_SUCCESS;\n");
+    WTF("}\n");
 }
 
 void generateCode(Prog program, char *outputfilename) {
-	outputfile = fopen(outputfilename, "w");
-	
-	writeHeaders();
-	
-	for (int i = 0; i < program->numConstDefs; i++) {
-		compileDec(program->constDefs[i]);
-	}
-	
-	for (int i = 0; i < program->numVarDefs; i++) {
-		compileDec(program->varDefs[i]);
-	}
-	
-	for (int i = 0; i < program->numProcDefs; i++) {
-		compileProc(program->procDefs[i]);
-	}
-	
-	for (int i = 0; i < program->numFuncDefs; i++) {
-		compileFunc(program->funcDefs[i]);
-	}
-	
-	compileMain(program);
-	
-	fclose(outputfile);
+    outputfile = fopen(outputfilename, "w");
+
+    writeHeaders();
+
+    for (int i = 0; i < program->numConstDefs; i++) {
+	compileDec(program->constDefs[i]);
+    }
+
+    for (int i = 0; i < program->numVarDefs; i++) {
+	compileDec(program->varDefs[i]);
+    }
+
+    for (int i = 0; i < program->numProcDefs; i++) {
+	compileProc(program->procDefs[i]);
+    }
+
+    for (int i = 0; i < program->numFuncDefs; i++) {
+	compileFunc(program->funcDefs[i]);
+    }
+
+    compileMain(program);
+
+    fclose(outputfile);
 }
