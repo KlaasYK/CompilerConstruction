@@ -56,7 +56,7 @@ void writeLabel(int num) {
     WTF("label lbl");
     char labelstring[32];
     sprintf(labelstring, "%d", num);
-    WTF(labalstring);
+    WTF(labelstring);
     WTF(";\n");
 }
 
@@ -64,13 +64,17 @@ void writeGoto(int num) {
     WTF("goto ");
     char labelstring[32];
     sprintf(labelstring, "%d", num);
-    WTF(labalstring);
+    WTF(labelstring);
     WTF(";\n");
 }
 
-void writeAssignment(char *varName, char *lhs, char op, char *rhs);
+void writeAssignment(char *varName, char *lhs, char op, char *rhs){
+    //TODO
+}
 
-void compileExpression(ExpTree exp);
+void compileExpression(ExpTree exp){
+    //TODO
+}
 
 void compileDec(Dec declaration) {
     WTF(getCTypeString(declaration->id->type));
@@ -103,7 +107,7 @@ void compileIf(If ifstatement) {
 
 	// First evaluate everything
 	for (int i = 0; i < ifstatement->numGCommands; i++) {
-		GCommand g = gCommands[i];
+		GCommand g = ifstatement->gCommands[i];
 		compileExpression(g->condition);
 		WTF("if (");
 		writeTempVar(varcnt-1);
@@ -168,9 +172,11 @@ void compileWriteCall(WCall write) {
     // Are there any expressions to be printed?
     for(int i = 0;i<j;i++) {
 	WTF(",");
-	WTF("")
+	writeTempVar(vars[i]);
     }
     WTF(");\n");
+    free(vars);
+    free(kinds);
 }
 
 void compileStatement(Stmnt statement) {
