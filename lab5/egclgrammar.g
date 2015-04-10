@@ -1004,7 +1004,7 @@ printcall<WCall>(int numitems, Printable *ps, char *printTok) :
 			}
 		]*{
 		    WCall wc;
-		    if(strcmp(printTok, "print")){
+		    if(strcmp(printTok, "print") == 0){
 			wc = makeWCall(numitems, ps, false);
 		    }else{
 			wc = makeWCall(numitems, ps, true);

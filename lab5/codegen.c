@@ -9,6 +9,7 @@ FILE *outputfile;
 
 int varcnt = 0;
 int lblcnt = 0;
+int indentDept = 0;
 
 void compileStatement(Stmnt statement);
 void compileDo(Do dostatement);
@@ -42,7 +43,7 @@ void writeHeaders() {
     WTF("#include <stdlib.h>\n");
     // Use this, to prevent errors
     WTF("#include <stdint.h>\n");
-    WTF("#include \"bigints.h\"\n");
+    WTF("#include \"bigints.h\"\n\n");
 }
 
 void writeTempVar(int num) {
@@ -68,6 +69,11 @@ void writeGoto(int num) {
     WTF(";\n");
 }
 
+void writeIndents(){
+    for(int i=0;i<indentDept;i++){
+	WTF("    ");
+    }
+}
 void writeAssignment(char *varName, char *lhs, char op, char *rhs){
     //TODO
 }
@@ -151,11 +157,14 @@ void compileWriteCall(WCall write) {
     }
     // Start printing
     int k = 0;
+    writeIndents();
     WTF("printf(\"");
     for (int i = 0; i < write->numitems; i++) {
 	Printable p = write->items[i];
 	if (p->kind == stringKind) {
-	    WTF(p->string);
+	    //strip the first and last character (the quotes)
+	    p->string[strlen(p->string) - 1] = 0;
+	    WTF(p->string+1);
 	} else {
 	    if (kinds[k] / 10 == INTEGER_TYPE / 10) {
 		WTF("%s");
@@ -166,7 +175,7 @@ void compileWriteCall(WCall write) {
 	}
     }
     if(write->newLine == true){
-	WTF("\n");
+	WTF("\\n");
     }
     WTF("\"");
     // Are there any expressions to be printed?
@@ -219,12 +228,13 @@ void compileProc(ProcDef procedure) {
 
 void compileMain(Prog program) {
     WTF("int main(int argc, char **argv){\n");
-
+    indentDept++;
     for (int i = 0; i < program->numBodyStmnts; i++) {
 	compileStatement(program->bodyStmnts[i]);
     }
-
+    writeIndents();
     WTF("return EXIT_SUCCESS;\n");
+    indentDept--;
     WTF("}\n");
 }
 

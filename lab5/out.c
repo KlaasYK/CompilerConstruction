@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include "bigints.h"
+
 int main(int argc, char **argv){
-return EXIT_SUCCESS;
+    printf("Hello");
+    printf(" world\n");
+    return EXIT_SUCCESS;
 }
