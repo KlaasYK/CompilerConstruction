@@ -46,9 +46,19 @@ void writeHeaders() {
 }
 
 void writeLabel(int num) {
-		WTF("label lbl");
-		
-		WTF("");
+	WTF("label lbl");
+	char labelstring[32];
+	sprintf(labelstring, "%d", num);
+	WTF(labalstring);
+	WTF(";\n");
+}
+
+void writeGoto(int num) {
+	WTF("goto ");
+	char labelstring[32];
+	sprintf(labelstring, "%d", num);
+	WTF(labalstring);
+	WTF(";\n");
 }
 
 void compileDec(Dec declaration) {
