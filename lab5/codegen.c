@@ -51,6 +51,10 @@ void writeLabel(int num) {
 		WTF("");
 }
 
+void writeAssignment(char *varName, char *lhs, char op, char *rhs);
+
+void compileExpression(ExpTree exp);
+
 void compileDec(Dec declaration) {
 	WTF(getCTypeString(declaration->id->type));
 	WTF(" ");
@@ -60,6 +64,7 @@ void compileDec(Dec declaration) {
 	
 	WTF(";\n");
 }
+
 
 void compileDo(Do dostatement) {
 	// TODO:
@@ -78,9 +83,9 @@ void compileWriteCall(WCall write) {
 			WTF(p->string);
 		} else {
 			k++;
-			// TODO
+			compileExpression();// TODO
 			// make a switch for the kind
-			// use printInteger if type is interger (ie start new printf)
+			// use printInteger if type is integer (ie start new printf)
 			// or make PrintInteger return a string
 			// use %d for booleans
 		}
