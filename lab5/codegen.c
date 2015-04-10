@@ -45,6 +45,13 @@ void writeHeaders() {
 		WTF("#include \"bigints.h\"\n");
 }
 
+void writeTempVar(int num) {
+	WTF("t");
+	char numstring[32];
+	sprintf(numstring, "%d", num);
+	WTF(numstring);
+}
+
 void writeLabel(int num) {
 	WTF("label lbl");
 	char labelstring[32];
@@ -76,6 +83,19 @@ void compileDo(Do dostatement) {
 }
 
 void compileIf(If ifstatement) {
+	int truecounter = varcnt++;
+	WTF("int ");
+	writeTempVar(truecounter);
+	WTF(" = 0;\n");
+	int startlabel = lblcnt++;
+	writeLabel(startlabel);
+
+	// First evaluate everything
+	for (int i = 0; i < ifstatement->numGCommands; i++) {
+		GCommand g = gCommands[i];
+		compileExpression(g->condition);
+		WTF("if ()");
+	}
 	
 }
 
