@@ -22,15 +22,15 @@ void WTF(char *code) {
 char *getCTypeString(int type) {
     switch (type) {
 	case BOOLEAN_TYPE:
-	    return "int";
+	    return "int ";
 	case CONST_BOOLEAN_TYPE:
-	    return "const int";
+	    return "const int ";
 	case REF_BOOLEAN_TYPE:
 	    return "int *";
 	case INTEGER_TYPE:
-	    return "Integer";
+	    return "Integer ";
 	case CONST_INTEGER_TYPE:
-	    return "const Integer *";
+	    return "const Integer ";
 	case REF_INTEGER_TYPE:
 	    return "Integer *";
 	default:
@@ -80,17 +80,29 @@ void writeAssignment(char *varName, char *lhs, char op, char *rhs) {
 }
 
 void compileExpression(ExpTree exp) {
+    WTF("//compile the expression here\n");
+    WTF("Integer t0 = makeInteger(\"1\");//dummy\n");
+    varcnt++;
+    //TODO
+}
+
+void compileAss(Ass assignment) {
     //TODO
 }
 
 void compileDec(Dec declaration) {
+    if (declaration->idType == constant) {
+	compileExpression(declaration->expTree);
+    }
+    writeIndents();
     WTF(getCTypeString(declaration->id->type));
-    WTF(" ");
     WTF(declaration->id->name);
-    WTF(" = ");
-    // TODO: expression tree
-
+    if (declaration->idType == constant) {
+	WTF(" = ");
+	writeTempVar(varcnt - 1);
+    }
     WTF(";\n");
+
 }
 
 void compileDo(Do dostatement) {
@@ -114,6 +126,7 @@ void compileIf(If ifstatement) {
 
     // First evaluate everything
     for (int i = 0; i < ifstatement->numGCommands; i++) {
+
 	GCommand g = ifstatement->gCommands[i];
 	compileExpression(g->condition);
 	WTF("if (");
@@ -181,6 +194,7 @@ void compileWriteCall(WCall write) {
     WTF("\"");
     // Are there any expressions to be printed?
     for (int i = 0; i < j; i++) {
+
 	WTF(",");
 	writeTempVar(vars[i]);
     }
@@ -193,7 +207,8 @@ void compileStatement(Stmnt statement) {
     switch (statement->kind) {
 	case decStmnt: compileDec(statement->dec);
 	    break;
-	case assStmnt: break; //TODO;
+	case assStmnt: compileAss(statement->assignment);
+	    break;
 	case funcCallStmnt: break; //TODO:
 	case procCallStmnt: break; //TODO;
 	case readCallStmnt: break; //TODO;
@@ -201,6 +216,7 @@ void compileStatement(Stmnt statement) {
 	    break; //TODO;
 	case ifStmnt: break;
 	    compileIf(statement->ifStmnt);
+
 	case doStmnt: break;
 	    compileDo(statement->doStmnt);
     }
@@ -215,6 +231,7 @@ void compileFunc(FuncDef function) {
     WTF(") {\n");
     indentDept++;
     for (int i = 0; i < function->numStmnts; i++) {
+
 	compileStatement(function->stmnts[i]);
     }
     // TODO print for return statement
@@ -230,6 +247,7 @@ void compileProc(ProcDef procedure) {
     WTF(") {\n");
     indentDept++;
     for (int i = 0; i < procedure->numStmnts; i++) {
+
 	compileStatement(procedure->stmnts[i]);
     }
     indentDept--;
@@ -240,6 +258,7 @@ void compileMain(Prog program) {
     WTF("int main(int argc, char **argv){\n");
     indentDept++;
     for (int i = 0; i < program->numBodyStmnts; i++) {
+
 	compileStatement(program->bodyStmnts[i]);
     }
     writeIndents();

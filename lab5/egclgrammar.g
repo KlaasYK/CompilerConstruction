@@ -301,7 +301,7 @@ int main(int argc, char** argv) {
 	parser();
 	
 	// TODO: replace by outputfile name (argv[2]?)
-	generateCode(program, "out.c");
+	generateCode(program, "out.c99");
 	
 	
 	if (argc == 2) {
