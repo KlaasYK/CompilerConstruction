@@ -89,9 +89,16 @@ void compileDo(Do dostatement) {
 
 void compileIf(If ifstatement) {
 	int truecounter = varcnt++;
+	int arrayloc = varcnt++;
 	WTF("int ");
 	writeTempVar(truecounter);
 	WTF(" = 0;\n");
+	
+	WTF("int ");
+	writeTempVar(arrayloc);
+	char num[40];
+	sprintf(num, "[%d] = {0};\n", ifstatement->numGCommands);
+	WTF(num);
 	int startlabel = lblcnt++;
 	writeLabel(startlabel);
 
@@ -99,8 +106,28 @@ void compileIf(If ifstatement) {
 	for (int i = 0; i < ifstatement->numGCommands; i++) {
 		GCommand g = gCommands[i];
 		compileExpression(g->condition);
-		WTF("if ()");
+		WTF("if (");
+		writeTempVar(varcnt-1);
+		WTF(" != 0) {");
+		// If this one is true, 
+		writeTempVar(truecounter);
+		WTF("++;\n");
+		writeTempVar(arrayloc);
+		char num[40];
+		sprintf(num, "[%d] = 1;\n", i);
+		WTF(num);
+		WTF("}\n");
 	}
+	// Check if atleast one of them is true
+	WTF("if (");
+	writeTempVar(truecounter);
+	WTF(" < 1) {\n");
+		// Error
+		WTF("printf(\"Runtime Error, no guard is true!\\n\");\n");
+		WTF("exit(EXIT_FAILURE);\n");
+	WTF("}\n");
+	// Then determine which to exucute
+	
 	
 }
 
