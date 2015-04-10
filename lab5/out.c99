@@ -4,7 +4,8 @@
 #include "bigints.h"
 
 //compile the expression here
-Integer t0 = makeInteger("1");//dummy
+Integer t0;
+makeIntegerFromString(&t0, "1");//dummy
 const Integer A = t0;
 int main(int argc, char **argv){
     Integer x;

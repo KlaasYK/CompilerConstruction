@@ -22,7 +22,7 @@ run: $(GCL)
 	
 %.c99: %.gcl $(EXE)
 	./$(EXE) $<
-	gcc -c -g -std=gnu99 out.c99 bigints.c
+	gcc -c -g -std=gnu99 -x c out.c99 bigints.c
 	gcc -g -o a.out out.o bigints.o
 
 clean: 

@@ -81,7 +81,7 @@ void writeAssignment(char *varName, char *lhs, char op, char *rhs) {
 
 void compileExpression(ExpTree exp) {
     WTF("//compile the expression here\n");
-    WTF("Integer t0 = makeInteger(\"1\");//dummy\n");
+    WTF("Integer t0;\nmakeIntegerFromString(&t0, \"1\");//dummy\n");
     varcnt++;
     //TODO
 }
