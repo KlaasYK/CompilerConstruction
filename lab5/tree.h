@@ -126,6 +126,7 @@ struct ReadCall {
 struct WriteCall {
     int numitems;
     Printable *items;
+    BoolVal newLine;
 };
 
 struct PrintableItem {
@@ -186,7 +187,7 @@ void freeAss(Ass a);
 RCall makeRCall(int numids, ID *ids);
 void freeRCall(RCall rc);
 
-WCall makeWCall(int numitems, Printable *p);
+WCall makeWCall(int numitems, Printable *p, Boolval b);
 void freeWCall(WCall wc);
 
 Printable makeStringPrintable(char *string);

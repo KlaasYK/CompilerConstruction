@@ -310,10 +310,11 @@ void freeRCall(RCall rc) {
 	}
 }
 
-WCall makeWCall(int numitems, Printable *p) {
+WCall makeWCall(int numitems, Printable *p, Boolval b) {
 	WCall wc = malloc(sizeof (struct WriteCall));
 	wc->numitems = numitems;
 	wc->items = p;
+	wc->newLine = b;
 	return wc;
 }
 
