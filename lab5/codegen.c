@@ -47,10 +47,10 @@ void writeHeaders() {
 }
 
 void writeTempVar(int num) {
-	WTF("t");
-	char numstring[32];
-	sprintf(numstring, "%d", num);
-	WTF(numstring);
+    WTF("t");
+    char numstring[32];
+    sprintf(numstring, "%d", num);
+    WTF(numstring);
 }
 
 void writeLabel(int num) {
@@ -69,16 +69,17 @@ void writeGoto(int num) {
     WTF(";\n");
 }
 
-void writeIndents(){
-    for(int i=0;i<indentDept;i++){
+void writeIndents() {
+    for (int i = 0; i < indentDept; i++) {
 	WTF("    ");
     }
 }
-void writeAssignment(char *varName, char *lhs, char op, char *rhs){
+
+void writeAssignment(char *varName, char *lhs, char op, char *rhs) {
     //TODO
 }
 
-void compileExpression(ExpTree exp){
+void compileExpression(ExpTree exp) {
     //TODO
 }
 
@@ -97,51 +98,51 @@ void compileDo(Do dostatement) {
 }
 
 void compileIf(If ifstatement) {
-	int truecounter = varcnt++;
-	int arrayloc = varcnt++;
-	WTF("int ");
+    int truecounter = varcnt++;
+    int arrayloc = varcnt++;
+    WTF("int ");
+    writeTempVar(truecounter);
+    WTF(" = 0;\n");
+
+    WTF("int ");
+    writeTempVar(arrayloc);
+    char num[40];
+    sprintf(num, "[%d] = {0};\n", ifstatement->numGCommands);
+    WTF(num);
+    int startlabel = lblcnt++;
+    writeLabel(startlabel);
+
+    // First evaluate everything
+    for (int i = 0; i < ifstatement->numGCommands; i++) {
+	GCommand g = ifstatement->gCommands[i];
+	compileExpression(g->condition);
+	WTF("if (");
+	writeTempVar(varcnt - 1);
+	WTF(" != 0) {");
+	// If this one is true, 
 	writeTempVar(truecounter);
-	WTF(" = 0;\n");
-	
-	WTF("int ");
+	WTF("++;\n");
 	writeTempVar(arrayloc);
 	char num[40];
-	sprintf(num, "[%d] = {0};\n", ifstatement->numGCommands);
+	sprintf(num, "[%d] = 1;\n", i);
 	WTF(num);
-	int startlabel = lblcnt++;
-	writeLabel(startlabel);
-
-	// First evaluate everything
-	for (int i = 0; i < ifstatement->numGCommands; i++) {
-		GCommand g = ifstatement->gCommands[i];
-		compileExpression(g->condition);
-		WTF("if (");
-		writeTempVar(varcnt-1);
-		WTF(" != 0) {");
-		// If this one is true, 
-		writeTempVar(truecounter);
-		WTF("++;\n");
-		writeTempVar(arrayloc);
-		char num[40];
-		sprintf(num, "[%d] = 1;\n", i);
-		WTF(num);
-		WTF("}\n");
-	}
-	// Check if atleast one of them is true
-	WTF("if (");
-	writeTempVar(truecounter);
-	WTF(" < 1) {\n");
-		// Error
-		WTF("printf(\"Runtime Error, no guard is true!\\n\");\n");
-		WTF("exit(EXIT_FAILURE);\n");
 	WTF("}\n");
-	// Then determine which to exucute
-	
-	
+    }
+    // Check if atleast one of them is true
+    WTF("if (");
+    writeTempVar(truecounter);
+    WTF(" < 1) {\n");
+    // Error
+    WTF("printf(\"Runtime Error, no guard is true!\\n\");\n");
+    WTF("exit(EXIT_FAILURE);\n");
+    WTF("}\n");
+    // Then determine which to exucute
+
+
 }
 
 void compileWriteCall(WCall write) {
-    
+
     // first compile the expression tree and make a list of temp vars and kinds
     int j = 0;
     int *vars = malloc(write->numitems * sizeof (int));
@@ -164,7 +165,7 @@ void compileWriteCall(WCall write) {
 	if (p->kind == stringKind) {
 	    //strip the first and last character (the quotes)
 	    p->string[strlen(p->string) - 1] = 0;
-	    WTF(p->string+1);
+	    WTF(p->string + 1);
 	} else {
 	    if (kinds[k] / 10 == INTEGER_TYPE / 10) {
 		WTF("%s");
@@ -174,12 +175,12 @@ void compileWriteCall(WCall write) {
 	    k++;
 	}
     }
-    if(write->newLine == true){
+    if (write->newLine == true) {
 	WTF("\\n");
     }
     WTF("\"");
     // Are there any expressions to be printed?
-    for(int i = 0;i<j;i++) {
+    for (int i = 0; i < j; i++) {
 	WTF(",");
 	writeTempVar(vars[i]);
     }
@@ -210,9 +211,14 @@ void compileFunc(FuncDef function) {
     WTF(" ");
     WTF(function->id->name);
     WTF("(");
-    // arguments
+    // TODO arguments
     WTF(") {\n");
-    //body
+    indentDept++;
+    for (int i = 0; i < function->numStmnts; i++) {
+	compileStatement(function->stmnts[i]);
+    }
+    // TODO print for return statement
+    indentDept--;
     WTF("}\n");
 }
 
@@ -220,9 +226,13 @@ void compileProc(ProcDef procedure) {
     WTF("void ");
     WTF(procedure->name);
     WTF("(");
-    // arguments
+    // TODO arguments
     WTF(") {\n");
-    //body
+    indentDept++;
+    for (int i = 0; i < procedure->numStmnts; i++) {
+	compileStatement(procedure->stmnts[i]);
+    }
+    indentDept--;
     WTF("}\n");
 }
 
