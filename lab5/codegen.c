@@ -45,6 +45,12 @@ void writeHeaders() {
 		WTF("#include \"bigints.h\"\n");
 }
 
+void writeLabel(int num) {
+		WTF("label lbl");
+		
+		WTF("");
+}
+
 void compileDec(Dec declaration) {
 	WTF(getCTypeString(declaration->id->type));
 	WTF(" ");
@@ -60,7 +66,7 @@ void compileDo(Do dostatement) {
 }
 
 void compileIf(If ifstatement) {
-	// TODO:
+	
 }
 
 void compileWriteCall(WCall write) {
