@@ -83,7 +83,6 @@ void writeAssignment(char *varName, char *lhs, char op, char *rhs) {
 	//TODO
 }
 
-
 void compileIntegerExp(Int intval) {
 	int tempvar = varcnt++;
 	writeIndents();
@@ -100,7 +99,26 @@ void compileIntegerExp(Int intval) {
 
 void compileIDexp(ID id) {
 	if ((id->type / 10) * 10 == INTEGER_TYPE) {
-		
+		writeIndents();
+		int tempvar = varcnt++;
+		WTF("Integer ");
+		writeTempVar(tempvar);
+		char *num;
+		num = malloc((strlen(id->name) + 42) * sizeof (char));
+		sprintf(num, " = %s;\n", id->name);
+		WTF(num);
+		free(num);
+	} else {
+		// Boolean type
+		writeIndents();
+		int tempvar = varcnt++;
+		WTF("int ");
+		writeTempVar(tempvar);
+		char *num;
+		num = malloc((strlen(id->name) + 42) * sizeof (char));
+		sprintf(num, " = %s;\n", id->name);
+		WTF(num);
+		free(num);
 	}
 }
 
@@ -127,7 +145,7 @@ void compileExpression(ExpTree exp) {
 			//TODO;
 			break;
 		case idexp:
-			//TODO;
+			compileIDExp(exp->node.id);
 			break;
 		case funcexp:
 			//TODO;
@@ -499,101 +517,101 @@ void compileParameter(Param parameter) {
 	WTF(parameter->id->name);
 	if (parameter->call == byRef) {
 		paramsByRef->numParams++;
-		if(paramsByRef->numParams == 1){
-			paramsByRef->params = malloc(paramsByRef->numParams * sizeof(Param));
-		}else{
-			paramsByRef->params = realloc(paramsByRef->numParams * sizeof(Param));
+		if (paramsByRef->numParams == 1) {
+			paramsByRef->params = malloc(paramsByRef->numParams * sizeof (Param));
+		} else {
+			paramsByRef->params = realloc(paramsByRef->numParams * sizeof (Param));
 		}
 		paramsByRef->params[paramsByRef->numParams - 1] = parameter;
 	}
 
-void compileFunc(FuncDef function) {
-	WTF(getCTypeString(function->id->type));
-	WTF(function->id->name);
-	WTF("(");
-	paramsByRef = malloc(sizeof(struct Params));
-	paramsByRef->numParams = 0;
-	for (int i = 0; i < procedure->numParams; i++) {
-		if (i != 0) WTF(", ");
-		compileParameter(procedure->params[i]);
+	void compileFunc(FuncDef function) {
+		WTF(getCTypeString(function->id->type));
+		WTF(function->id->name);
+		WTF("(");
+		paramsByRef = malloc(sizeof (struct Params));
+		paramsByRef->numParams = 0;
+		for (int i = 0; i < procedure->numParams; i++) {
+			if (i != 0) WTF(", ");
+			compileParameter(procedure->params[i]);
+		}
+		WTF(") {\n");
+		indentDept++;
+		for (int i = 0; i < function->numStmnts; i++) {
+			compileStatement(function->stmnts[i]);
+		}
+		// TODO print for return statement
+		indentDept--;
+		WTF("}\n");
+		free(paramsByRef->params);
+		free(paramsByRef);
 	}
-	WTF(") {\n");
-	indentDept++;
-	for (int i = 0; i < function->numStmnts; i++) {
-		compileStatement(function->stmnts[i]);
-	}
-	// TODO print for return statement
-	indentDept--;
-	WTF("}\n");
-	free(paramsByRef->params);
-	free(paramsByRef);
-}
 
-void compileProc(ProcDef procedure) {
-	WTF("void ");
-	WTF(procedure->name);
-	WTF("(");
-	paramsByRef = malloc(sizeof(struct Params));
-	paramsByRef->numParams = 0;
-	for (int i = 0; i < procedure->numParams; i++) {
-		if (i != 0) WTF(", ");
-		compileParameter(procedure->params[i]);
-	}
-	WTF(") {\n");
-	indentDept++;
-	for (int i = 0; i < procedure->numStmnts; i++) {
+	void compileProc(ProcDef procedure) {
+		WTF("void ");
+		WTF(procedure->name);
+		WTF("(");
+		paramsByRef = malloc(sizeof (struct Params));
+		paramsByRef->numParams = 0;
+		for (int i = 0; i < procedure->numParams; i++) {
+			if (i != 0) WTF(", ");
+			compileParameter(procedure->params[i]);
+		}
+		WTF(") {\n");
+		indentDept++;
+		for (int i = 0; i < procedure->numStmnts; i++) {
 
-		compileStatement(procedure->stmnts[i]);
-	}
-	indentDept--;
-	WTF("}\n");
-	free(paramsByRef->params);
-	free(paramsByRef);
+			compileStatement(procedure->stmnts[i]);
+		}
+		indentDept--;
+		WTF("}\n");
+		free(paramsByRef->params);
+		free(paramsByRef);
 
-}
+	}
 
-void compileMain(Prog program) {
-	WTF("int main(int argc, char **argv){\n");
-	indentDept++;
-	for (int i = 0; i < program->numConstDefs; i++) {
-		writeConstantInitialization(program->constDefs[i]);
+	void compileMain(Prog program) {
+		WTF("int main(int argc, char **argv){\n");
+		indentDept++;
+		for (int i = 0; i < program->numConstDefs; i++) {
+			writeConstantInitialization(program->constDefs[i]);
+		}
+		if (program->numConstDefs > 0) WTF("\n");
+		paramsByRef = malloc(sizeof (struct Params));
+		paramsByRef->numParams = 0;
+		// main doesnt have parameters
+		for (int i = 0; i < program->numBodyStmnts; i++) {
+			compileStatement(program->bodyStmnts[i]);
+		}
+		free(paramsByRef->params);
+		free(paramsByRef);
+		writeIndents();
+		WTF("return EXIT_SUCCESS;\n");
+		indentDept--;
+		WTF("}\n");
 	}
-	if (program->numConstDefs > 0) WTF("\n");
-	paramsByRef = malloc(sizeof(struct Params));
-	paramsByRef->numParams = 0;
-	// main doesnt have parameters
-	for (int i = 0; i < program->numBodyStmnts; i++) {
-		compileStatement(program->bodyStmnts[i]);
-	}
-	free(paramsByRef->params);
-	free(paramsByRef);
-	writeIndents();
-	WTF("return EXIT_SUCCESS;\n");
-	indentDept--;
-	WTF("}\n");
-}
 
-void generateCode(Prog program, char *outputfilename) {
-	outputfile = fopen(outputfilename, "w");
-	writeHeaders();
+	void generateCode(Prog program, char *outputfilename) {
+		outputfile = fopen(outputfilename, "w");
+		writeHeaders();
 
-	for (int i = 0; i < program->numConstDefs; i++) {
-		compileDec(program->constDefs[i]);
-	}
-	if (program->numConstDefs > 0) WTF("\n");
-	for (int i = 0; i < program->numVarDefs; i++) {
-		compileDec(program->varDefs[i]);
-	}
-	if (program->numVarDefs > 0) WTF("\n");
-	for (int i = 0; i < program->numProcDefs; i++) {
-		compileProc(program->procDefs[i]);
-		WTF("\n");
-	}
-	for (int i = 0; i < program->numFuncDefs; i++) {
-		compileFunc(program->funcDefs[i]);
-		WTF("\n");
-	}
-	compileMain(program);
+		for (int i = 0; i < program->numConstDefs; i++) {
+			compileDec(program->constDefs[i]);
+		}
+		if (program->numConstDefs > 0) WTF("\n");
+		for (int i = 0; i < program->numVarDefs; i++) {
+			compileDec(program->varDefs[i]);
+		}
+		if (program->numVarDefs > 0) WTF("\n");
+		for (int i = 0; i < program->numProcDefs; i++) {
+			compileProc(program->procDefs[i]);
+			WTF("\n");
+		}
+		for (int i = 0; i < program->numFuncDefs; i++) {
+			compileFunc(program->funcDefs[i]);
+			WTF("\n");
+		}
+		compileMain(program);
 
-	fclose(outputfile);
-}
+		fclose(outputfile);
+	}
