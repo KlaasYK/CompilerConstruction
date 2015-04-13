@@ -302,8 +302,6 @@ int main(int argc, char** argv) {
 	
 	parser();
 	
-	// TODO: replace by outputfile name (argv[2]?)
-	generateCode(program, "out.c99");
 	
 	
 	if (argc == 2) {
@@ -313,6 +311,9 @@ int main(int argc, char** argv) {
 	if (error) {
 		printf("Parser failed!\n");
 	} else {
+		// TODO: replace by outputfile name (argv[2]?)
+		generateCode(program, "out.c99");
+		
 		printf("Parsing succesfull\n");
 	}
 	
