@@ -89,7 +89,12 @@ void compileExpression(ExpTree exp) {
 }
 
 void compileAss(Ass assignment) {
-	//TODO
+	compileExpression(assignment->expTree);
+	writeIndents();
+	WTF(assignment->id->name);
+	char num[40];
+	sprintf(num, " = t%d;\n", varcnt-1);
+	WTF(num);
 }
 
 void compileDec(Dec declaration) {
@@ -103,7 +108,7 @@ void compileDec(Dec declaration) {
 	WTF("\n");
 }
 
-writeConstantInitialization(Dec declaration) {
+void writeConstantInitialization(Dec declaration) {
 	//compileExpression(declaration->expTree);
 	//writeIndents();
 	//WTF(declaration->id->name);
