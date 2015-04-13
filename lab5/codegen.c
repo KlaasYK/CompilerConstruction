@@ -220,7 +220,8 @@ void compileDo(Do dostatement) {
 	writeLabel(startwhilelabel);
 	writeIndents();
 	writeTempVar(randomvar);
-	sprintf(num, " = rand() %% %d;\n", dostatement->numGCommands);
+	sprintf(num, "= rand() %% %d;\n", dostatement->numGCommands);
+	writeIndents();
 	WTF(num);
 	// Check if this one is true
 	writeIndents();
@@ -458,6 +459,7 @@ void compileProc(ProcDef procedure) {
 	}
 	indentDept--;
 	WTF("}\n");
+	
 }
 
 void compileMain(Prog program) {
@@ -490,12 +492,12 @@ void generateCode(Prog program, char *outputfilename) {
 	if (program->numVarDefs > 0) WTF("\n");
 	for (int i = 0; i < program->numProcDefs; i++) {
 		compileProc(program->procDefs[i]);
+		WTF("\n");
 	}
-	if (program->numProcDefs > 0) WTF("\n");
 	for (int i = 0; i < program->numFuncDefs; i++) {
 		compileFunc(program->funcDefs[i]);
+		WTF("\n");
 	}
-	if (program->numFuncDefs > 0) WTF("\n");
 	compileMain(program);
 
 	fclose(outputfile);
