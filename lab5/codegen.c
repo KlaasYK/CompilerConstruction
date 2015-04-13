@@ -104,16 +104,31 @@ void compileDec(Dec declaration) {
 }
 
 writeConstantInitialization(Dec declaration) {
+		//compileExpression(declaration->expTree);
+		//writeIndents();
+		//WTF(declaration->id->name);
+		//WTF(" = ");
+		//writeTempVar(varcnt-1);
+		//WTF(";\n");
 	int expType = getExpType(declaration->expTree);
 	if ((expType / 10)*10 == INTEGER_TYPE) {
-		//compileExpression(declaration->expTree);
 		writeIndents();
 		WTF("makeIntegerFromString(&");
 		WTF(declaration->id->name);
 		WTF(", \"");
 		WTF(declaration->expTree->node.intval->value);
-		//writeTempVar(varcnt-1);
 		WTF("\");\n");
+	}else{
+		writeIndents();
+		WTF(declaration->id->name);
+		WTF(" = ");
+		if(declaration->expTree->node.boolval->value == true){
+			WTF("1");
+		}else{
+			WTF("0");
+		}
+		WTF(";\n");
+		
 	}
 }
 
@@ -342,6 +357,7 @@ void compileMain(Prog program) {
 	for (int i = 0; i < program->numConstDefs; i++) {
 		writeConstantInitialization(program->constDefs[i]);
 	}
+	if(program->numConstDefs > 0) WTF("\n");
 	for (int i = 0; i < program->numBodyStmnts; i++) {
 		compileStatement(program->bodyStmnts[i]);
     }
@@ -358,19 +374,19 @@ void generateCode(Prog program, char *outputfilename) {
 	for (int i = 0; i < program->numConstDefs; i++) {
 		compileDec(program->constDefs[i]);
 	}
-
+	if(program->numConstDefs > 0) WTF("\n");
 	for (int i = 0; i < program->numVarDefs; i++) {
 		compileDec(program->varDefs[i]);
 	}
-
+	if(program->numVarDefs > 0) WTF("\n");
 	for (int i = 0; i < program->numProcDefs; i++) {
 		compileProc(program->procDefs[i]);
 	}
-
+	if(program->numProcDefs > 0) WTF("\n");
 	for (int i = 0; i < program->numFuncDefs; i++) {
 		compileFunc(program->funcDefs[i]);
 	}
-
+	if(program->numFuncDefs > 0) WTF("\n");
 	compileMain(program);
 
 	fclose(outputfile);
