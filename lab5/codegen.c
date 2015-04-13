@@ -18,6 +18,7 @@ Params paramsByRef;
 void compileStatement(Stmnt statement);
 void compileDo(Do dostatement);
 void compileIf(If ifstatement);
+void compileExpression(ExpTree exp);
 
 void WTF(char *code) {
 	fputs(code, outputfile);
@@ -144,8 +145,35 @@ void compilebinodeexp(Bnode bnode) {
 	varcnt++;
 }
 
+
+
 void compileunodeexp(Unode unode) {
-	varcnt++;
+	compileExpression(unode->e);
+	int expvar = varcnt -1;
+	if (unode->operator == notop) {
+		int newvar = varcnt++;
+		writeIndents();
+		WTF("int ");
+		writeTempVar(newvar);
+		char num[42];
+		sprintf(num, " = !t%d;\n", expvar);
+		WTF(num);
+	} else if (unode->operator == negop) {
+		int newvar = varcnt++;
+		writeIndents();
+		WTF("Integer ");
+		writeTempVar(newvar);
+		WTF(";\n");
+		writeIndents();
+		char num[64];
+		sprintf(num, "makeIntegerFromString(&t%d,\"0\")\n", newvar);
+		WTF(num);
+		writeIndents();
+		sprintf(num, "subInteger(&t%d,t%d)\n", newvar,expvar);
+		WTF(num);
+	} else {
+		printf("ERRORZZZ....\n");
+	}
 }
 
 void compileExpression(ExpTree exp) {
