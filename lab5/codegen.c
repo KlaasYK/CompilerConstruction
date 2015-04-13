@@ -532,9 +532,9 @@ void compileFunc(FuncDef function) {
 	WTF("(");
 	paramsByRef = malloc(sizeof (struct Params));
 	paramsByRef->numParams = 0;
-	for (int i = 0; i < procedure->numParams; i++) {
+	for (int i = 0; i < function->numParams; i++) {
 		if (i != 0) WTF(", ");
-		compileParameter(procedure->params[i]);
+		compileParameter(function->params[i]);
 	}
 	WTF(") {\n");
 	indentDept++;
