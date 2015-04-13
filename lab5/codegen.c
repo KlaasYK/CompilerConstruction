@@ -133,7 +133,117 @@ writeConstantInitialization(Dec declaration) {
 }
 
 void compileDo(Do dostatement) {
-	// TODO:
+	writeIndents();
+	WTF("/* START DO */\n");
+	int truecounter = varcnt++;
+	int arrayloc = varcnt++;
+	writeIndents();
+	WTF("int ");
+	writeTempVar(truecounter);
+	WTF(" = 0; //True counter\n");
+	writeIndents();
+	WTF("int ");
+	writeTempVar(arrayloc);
+	char num[40];
+	sprintf(num, "[%d] = {0}; //True array\n", dostatement->numGCommands);
+	WTF(num);
+
+	/* initialize random var */
+	int randomvar = varcnt++;
+	writeIndents();
+	WTF("int ");
+	writeTempVar(randomvar);
+	WTF(" = -1; // Random Var\n");
+
+	int startlabel = lblcnt++;
+	int enddolabel = lblcnt++;
+	writeIndents();
+	writeLabel(startlabel);
+
+	// First evaluate everything
+	for (int i = 0; i < dostatement->numGCommands; i++) {
+		GCommand g = dostatement->gCommands[i];
+		compileExpression(g->condition);
+		writeIndents();
+		WTF("if (");
+		writeTempVar(varcnt - 1);
+		WTF(" != 0) {\n");
+		indentDept++;
+		// If this one is true, 
+		writeIndents();
+		writeTempVar(truecounter);
+		WTF("++;\n");
+		writeIndents();
+		writeTempVar(arrayloc);
+		sprintf(num, "[%d] = 1;\n", i);
+		WTF(num);
+		writeIndents();
+		//Check if this one may execute
+		WTF("if (");
+		writeTempVar(randomvar);
+		sprintf(num, "== %d", i);
+		WTF(num);
+		WTF(") {\n");
+		indentDept++;
+		// Compile the statements
+		for (int j = 0; j < g->numStmnts; j++) {
+			compileStatement(g->stmnts[j]);
+		}
+		indentDept--;
+		writeIndents();
+		WTF("}\n");
+		indentDept--;
+		writeIndents();
+		WTF("}\n");
+	}
+	// Check if atleast one of them is true
+	writeIndents();
+	WTF("if (");
+	writeTempVar(truecounter);
+	WTF(" < 1) {\n");
+	indentDept++;
+	// End of Do loop
+	writeIndents();
+	writeGoto(enddolabel);
+	indentDept--;
+	writeIndents();
+	WTF("}\n");
+
+	// Reset truecounter
+	writeIndents();
+	writeTempVar(truecounter);
+	WTF(" = 0; //Reset True counter\n");
+
+	// Then determine which to exucute
+	int startwhilelabel = lblcnt++;
+	writeIndents();
+	writeLabel(startwhilelabel);
+	writeIndents();
+	writeTempVar(randomvar);
+	sprintf(num, "= rand() %% %d;\n", dostatement->numGCommands);
+	writeIndents();
+	WTF(num);
+	// Check if this one is true
+	writeIndents();
+	WTF("if (");
+	writeTempVar(arrayloc);
+	sprintf(num, "[t%d] != 1) {\n", randomvar);
+	indentDept++;
+	writeIndents();
+	WTF(num);
+	writeIndents();
+	writeGoto(startwhilelabel);
+	indentDept--;
+	writeIndents();
+	WTF("}\n");
+	writeIndents();
+	//Jump back to start
+	writeGoto(startlabel);
+	writeIndents();
+	writeLabel(enddolabel);
+	writeIndents();
+	WTF("/* END DO */\n");
+	// DONE
 }
 
 void compileIf(If ifstatement) {
