@@ -1,7 +1,8 @@
 program dummy;
 
 begin
-	var kaas, nummer: integer;
-	kaas, nummer := 42;
-	println kaas;
+	if true -> print 'Hello World';
+	[] false -> print 'I am afraid I can not do that';
+	fi;
+	print 'Kaas is Lekker';
 end.
