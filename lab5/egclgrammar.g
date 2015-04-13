@@ -179,11 +179,7 @@ void LLmessage(int token) {
 		printf("Expected %s, found %s (%s).\n", LLgetSymbol(token), LLgetSymbol(LLsymb), yytext);
 		break;
 	}
-	utilCleanUp();
-	freeLines();
-	
-	freeSymbolTable();
-	exit(EXIT_FAILURE);
+	error = 1;
 }
 
 
@@ -226,6 +222,15 @@ void printTypeError(char *identifier, int ErrorType) {
 	freeSymbolTable();
 	exit(EXIT_FAILURE);*/
 	error = 1;
+}
+
+void exitCompiler(){
+	printf("\nParser failed!\n");
+	printf("Stopping compiler\n\n");
+	utilCleanUp();
+	freeLines();
+	freeSymbolTable();
+	exit(EXIT_FAILURE);
 }
 
 int getType(char *name) {
@@ -769,6 +774,11 @@ identifierarray<IDs>(IDs idents)	:
 ;
 
 functioncall<FuncCall>(char *name, int type, Exps params): 
+{
+	if(error){
+		exitCompiler();
+	}
+}
 		LPARREN{
 			NodeType nt = lookupType(name);
 			if(nt != METHOD){
@@ -928,6 +938,9 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 
 /* select assignmentcall V1 or V2 */
 assignmentcall<Stmnts>(char *name) : 
+{
+	printf("assignmentcall\n");
+}
 		assignmentcallV2<ss>(name, NULL, NULL){
 			LLretval = ss;
 		}
@@ -1016,6 +1029,9 @@ readcall<RCall>(IDs ids)	:
 ;
 
 call<Stmnts>(char *name):
+{
+	printf("call\n");
+} 
 	[		
 		functioncall<fc>(name, 0, NULL){
 			Stmnts ss = malloc(sizeof(struct Stmnts));
@@ -1071,7 +1087,10 @@ declaration<Decs>(IDs idents):
 				}
 			;
 
-statement<Stmnts>(Stmnts ss, char *name) : 
+statement<Stmnts>(Stmnts ss, char *name) :
+{
+	printf("statement\n");
+} 
 [
 		declaration<ds>(NULL){
 			/*TODO placeholder*/
@@ -1505,6 +1524,9 @@ programbody<Prog>(int numConstDefs, Dec *constDefs, int numVarDefs, Dec *varDefs
 			printf("Num of func defs: %d\n", numFuncDefs);
 		}
 		BEGIN_TOK {
+			if(error){
+				exitCompiler();
+			}
 			putBlock("[MAIN VARIABLES]"); /* add a new frame of reference */
 		} 
 		statementset<bss>{
@@ -1514,31 +1536,47 @@ programbody<Prog>(int numConstDefs, Dec *constDefs, int numVarDefs, Dec *varDefs
 			free(bss);
 		}
 		END_TOK {
+			if(error){
+				exitCompiler();
+			}
 			popBlock();
 			Prog prog = makeProg(programname, numConstDefs, constDefs, numVarDefs, varDefs, numProcDefs, procDefs, numFuncDefs, funcDefs, numBodyStmnts, bodyStmnts);
 			LLretval = prog;
 		}
 ;
 			
-header		: 
-		PROGRAM_TOK
+header		:
+		PROGRAM_TOK{
+			if(error){
+				exitCompiler();
+			}
+		}
 		IDENTIFIER {
+			if(error){
+				exitCompiler();
+			}
 			programname = strdup(yytext); /* the token is freed in freeNode (normally) */
 		} 
-		SEMICOLON 
+		SEMICOLON {
+			if(error){
+				exitCompiler();
+			}
+		}
 ;
 
-start		: 
+start :
+{
+	if(error){
+		exitCompiler();
+	}
+}
 		header 
 		programbody<prog>(0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL){
 			program  = prog;
 		}
 		DOT{
-			/*printf("Program name: %s\n", program->name);
-			if(strcmp(file_name, "riktest.gcl") == 0){
-				printf("Print string: %s\n", program->bodyStmnts[0]->wCall->items[0]->string);
-				printf("boolval: %s\n", (program->constDefs[0]->expTree->node.boolval->value == true)?"true":"false");
-				printf("intval: %s\n", program->constDefs[1]->expTree->node.intval->value);
-			}*/
+			if(error){
+				exitCompiler();
+			}
 		}
 ; 

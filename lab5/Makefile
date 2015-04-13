@@ -6,7 +6,7 @@ endif
 
 GCL2 = $(subst .gcl,.c99,$(wildcard *.gcl))
 
-GCL = riktest2.c99
+GCL = riktest3.c99
 
 all: parser scanner cfiles
 	gcc -g -o $(EXE) egclgrammar.o lex.yy.o symboltable.o tree.o expressiontree.o bigints.o codegen.o

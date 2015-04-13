@@ -46,7 +46,6 @@ void writeHeaders() {
 	WTF("#include <stdio.h>\n");
 	WTF("#include <stdlib.h>\n");
 	// Use this, to prevent errors
-	WTF("#include <stdint.h>\n");
 	WTF("#include \"bigints.h\"\n\n");
 }
 
