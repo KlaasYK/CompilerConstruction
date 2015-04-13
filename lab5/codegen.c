@@ -8,6 +8,18 @@
 #include "symboltable.h"
 #include "structarrays.h"
 
+// TODO: statements on the same line must first be evaluated to temp vars
+// before asigning them.
+// Make Printinteger return a string OR(!) print each argument on it's own line.
+// ie println a, b should return:
+// a
+// b
+
+// Make all the compare ops work (we do have in the bigints.c, just not in the
+// header I believe)
+
+//Functions, function calls and what have you. Don't mention the pointers!
+
 FILE *outputfile;
 
 int varcnt = 0;
@@ -18,6 +30,7 @@ Params paramsByRef;
 void compileStatement(Stmnt statement);
 void compileDo(Do dostatement);
 void compileIf(If ifstatement);
+void compileExpression(ExpTree exp);
 
 void WTF(char *code) {
 	fputs(code, outputfile);
@@ -140,11 +153,115 @@ void compilefuncexp(FuncCall funccall) {
 }
 
 void compilebinodeexp(Bnode bnode) {
-	varcnt++;
+	if (bnode->operator == powop) {
+		compileExpression(bnode->r);
+		int powervar = varcnt - 1;
+		compileExpression(bnode->l);
+		int basevar = varcnt - 1;
+		char num[64];
+		sprintf(num,"powInteger(&t%d,t%d);\n",basevar,powervar);
+		writeIndents();
+		WTF(num);
+	} else if (bnode->operator == plusop) {
+		compileExpression(bnode->r);
+		int right = varcnt - 1;
+		compileExpression(bnode->l);
+		int left = varcnt - 1;
+		char num[64];
+		sprintf(num,"addInteger(&t%d,t%d);\n",left,right);
+		writeIndents();
+		WTF(num);
+	} else if (bnode->operator == minop) {
+		compileExpression(bnode->r);
+		int right = varcnt - 1;
+		compileExpression(bnode->l);
+		int left = varcnt - 1;
+		char num[64];
+		sprintf(num,"subInteger(&t%d,t%d);\n",left,right);
+		writeIndents();
+		WTF(num);
+	} else if (bnode->operator == mulop) {
+		compileExpression(bnode->r);
+		int right = varcnt - 1;
+		compileExpression(bnode->l);
+		int left = varcnt - 1;
+		char num[64];
+		sprintf(num,"mulInteger(&t%d,t%d);\n",left,right);
+		writeIndents();
+		WTF(num);
+	} else if (bnode->operator == divop) {
+		compileExpression(bnode->r);
+		int right = varcnt - 1;
+		compileExpression(bnode->l);
+		int left = varcnt - 1;
+		char num[64];
+		sprintf(num,"divInteger(&t%d,t%d);\n",left,right);
+		writeIndents();
+		WTF(num);
+	} else if (bnode->operator == modop) {
+		compileExpression(bnode->r);
+		int right = varcnt - 1;
+		compileExpression(bnode->l);
+		int left = varcnt - 1;
+		char num[64];
+		sprintf(num,"modInteger(&t%d,t%d);\n",left,right);
+		writeIndents();
+		WTF(num);
+	} else if (bnode->operator == andop || bnode->operator == candop) {
+		compileExpression(bnode->r);
+		int right = varcnt - 1;
+		compileExpression(bnode->l);
+		int left = varcnt - 1;
+		char num[64];
+		sprintf(num,"t%d = t%d && t%d;\n",left, left,right);
+		writeIndents();
+		WTF(num);
+	} else if (bnode->operator == corop || bnode->operator == orop) {
+		compileExpression(bnode->r);
+		int right = varcnt - 1;
+		compileExpression(bnode->l);
+		int left = varcnt - 1;
+		char num[64];
+		sprintf(num,"t%d = t%d || t%d;\n",left, left,right);
+		writeIndents();
+		WTF(num);
+	} else {
+		varcnt++;
+		//TODO: neqop, eqop, gtop, ltop, geop, leop
+		printf("TODO: neqop, eqop, gtop, ltop, geop, leop\n");
+	}
+	
 }
 
+
+
 void compileunodeexp(Unode unode) {
-	varcnt++;
+	compileExpression(unode->e);
+	int expvar = varcnt -1;
+	if (unode->operator == notop) {
+		int newvar = varcnt++;
+		writeIndents();
+		WTF("int ");
+		writeTempVar(newvar);
+		char num[42];
+		sprintf(num, " = !t%d;\n", expvar);
+		WTF(num);
+	} else if (unode->operator == negop) {
+		int newvar = varcnt++;
+		writeIndents();
+		WTF("Integer ");
+		writeTempVar(newvar);
+		WTF(";\n");
+		writeIndents();
+		char num[64];
+		sprintf(num, "makeIntegerFromString(&t%d,\"0\")\n", newvar);
+		WTF(num);
+		writeIndents();
+		sprintf(num, "subInteger(&t%d,t%d)\n", newvar,expvar);
+		WTF(num);
+	} else {
+		printf("ERRORZZZ....\n");
+	}
 }
 
 void compileExpression(ExpTree exp) {
