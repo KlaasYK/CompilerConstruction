@@ -80,7 +80,7 @@ void writeIndents() {
 }
 
 void writeAssignment(char *varName, char *lhs, char op, char *rhs) {
-	//TODO
+	//TODO obsolete?
 }
 
 void compileIntegerExp(Int intval) {
@@ -132,7 +132,7 @@ void compileExpression(ExpTree exp) {
 			compileBoolExp(exp->node.boolval);
 			break;
 		default:
-			printf("Unkown expression kind...");
+			printf("Unkown expression kind...\n");
 			//SHOULD NOT HAPPEN
 	}
 
