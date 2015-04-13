@@ -136,6 +136,18 @@ void compileBoolExp(Bool boolval) {
 	WTF(num);
 }
 
+void funcexp(FuncCall funccall) {
+	varcnt++;
+}
+
+void binodeexp(Bnode bnode) {
+	varcnt++;
+}
+
+void unodeexp(Unode unode) {
+	varcnt++;
+}
+
 void compileExpression(ExpTree exp) {
 	switch (exp->kind) {
 		case unodeexp:
