@@ -142,7 +142,84 @@ void compilefuncexp(FuncCall funccall) {
 }
 
 void compilebinodeexp(Bnode bnode) {
-	varcnt++;
+	if (bnode->operator == powop) {
+		compileExpression(bnode->r);
+		int powervar = varcnt - 1;
+		compileExpression(bnode->l);
+		int basevar = varcnt - 1;
+		char num[64];
+		sprintf(num,"powInteger(&t%d,t%d);\n",basevar,powervar);
+		writeIndents();
+		WTF(num);
+	} else if (bnode->operator == plusop) {
+		compileExpression(bnode->r);
+		int right = varcnt - 1;
+		compileExpression(bnode->l);
+		int left = varcnt - 1;
+		char num[64];
+		sprintf(num,"addInteger(&t%d,t%d);\n",left,right);
+		writeIndents();
+		WTF(num);
+	} else if (bnode->operator == minop) {
+		compileExpression(bnode->r);
+		int right = varcnt - 1;
+		compileExpression(bnode->l);
+		int left = varcnt - 1;
+		char num[64];
+		sprintf(num,"subInteger(&t%d,t%d);\n",left,right);
+		writeIndents();
+		WTF(num);
+	} else if (bnode->operator == mulop) {
+		compileExpression(bnode->r);
+		int right = varcnt - 1;
+		compileExpression(bnode->l);
+		int left = varcnt - 1;
+		char num[64];
+		sprintf(num,"mulInteger(&t%d,t%d);\n",left,right);
+		writeIndents();
+		WTF(num);
+	} else if (bnode->operator == divop) {
+		compileExpression(bnode->r);
+		int right = varcnt - 1;
+		compileExpression(bnode->l);
+		int left = varcnt - 1;
+		char num[64];
+		sprintf(num,"divInteger(&t%d,t%d);\n",left,right);
+		writeIndents();
+		WTF(num);
+	} else if (bnode->operator == modop) {
+		compileExpression(bnode->r);
+		int right = varcnt - 1;
+		compileExpression(bnode->l);
+		int left = varcnt - 1;
+		char num[64];
+		sprintf(num,"modInteger(&t%d,t%d);\n",left,right);
+		writeIndents();
+		WTF(num);
+	} else if (bnode->operator == andop || bnode->operator == candop) {
+		compileExpression(bnode->r);
+		int right = varcnt - 1;
+		compileExpression(bnode->l);
+		int left = varcnt - 1;
+		char num[64];
+		sprintf(num,"t%d = t%d && t%d;\n",left, left,right);
+		writeIndents();
+		WTF(num);
+	} else if (bnode->operator == corop || bnode->operator == orop) {
+		compileExpression(bnode->r);
+		int right = varcnt - 1;
+		compileExpression(bnode->l);
+		int left = varcnt - 1;
+		char num[64];
+		sprintf(num,"t%d = t%d || t%d;\n",left, left,right);
+		writeIndents();
+		WTF(num);
+	} else {
+		varcnt++;
+		//TODO: neqop, eqop, gtop, ltop, geop, leop
+		printf("TODO: neqop, eqop, gtop, ltop, geop, leop\n");
+	}
+	
 }
 
 
