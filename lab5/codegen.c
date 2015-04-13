@@ -502,10 +502,11 @@ void compileParameter(Param parameter) {
 		if(paramsByRef->numParams == 1){
 			paramsByRef->params = malloc(paramsByRef->numParams * sizeof(Param));
 		}else{
-			paramsByRef->params = realloc(paramsByRef->numParams * sizeof(Param));
+			paramsByRef->params = realloc(paramsByRef->params, paramsByRef->numParams * sizeof(Param));
 		}
 		paramsByRef->params[paramsByRef->numParams - 1] = parameter;
 	}
+}
 
 void compileFunc(FuncDef function) {
 	WTF(getCTypeString(function->id->type));
@@ -513,9 +514,9 @@ void compileFunc(FuncDef function) {
 	WTF("(");
 	paramsByRef = malloc(sizeof(struct Params));
 	paramsByRef->numParams = 0;
-	for (int i = 0; i < procedure->numParams; i++) {
+	for (int i = 0; i < function->numParams; i++) {
 		if (i != 0) WTF(", ");
-		compileParameter(procedure->params[i]);
+		compileParameter(function->params[i]);
 	}
 	WTF(") {\n");
 	indentDept++;

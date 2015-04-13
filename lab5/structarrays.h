@@ -28,4 +28,9 @@ typedef struct GCmds {
 	GCommand *gCmds;
 }*GCmds;
 
+typedef struct Params {
+	int numParams;
+	Param *params;
+}*Params;
+
 #endif // STRUCTARRAYS_H
