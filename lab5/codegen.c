@@ -111,6 +111,12 @@ void compileBoolExp(Bool boolval) {
 	WTF(num);
 }
 
+void compileIDexp(ID id) {
+	if ((id->type / 10) * 10 == INTEGER_TYPE) {
+		
+	}
+}
+
 void compileExpression(ExpTree exp) {
 	switch (exp->kind) {
 		case unodeexp:
