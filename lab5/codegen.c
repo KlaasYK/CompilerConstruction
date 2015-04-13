@@ -64,11 +64,11 @@ void writeLabel(int num) {
 }
 
 void writeGoto(int num) {
-	WTF("goto ");
-	char labelstring[32];
-	sprintf(labelstring, "%d", num);
-	WTF(labelstring);
-	WTF(";\n");
+    WTF("goto lbl");
+    char labelstring[32];
+    sprintf(labelstring, "%d", num);
+    WTF(labelstring);
+    WTF(";\n");
 }
 
 void writeIndents() {
@@ -122,48 +122,115 @@ void compileDo(Do dostatement) {
 }
 
 void compileIf(If ifstatement) {
-	int truecounter = varcnt++;
-	int arrayloc = varcnt++;
+	WTF("/* START IF */\n");
+    int truecounter = varcnt++;
+    int arrayloc = varcnt++;
+    writeIndents();
 	WTF("int ");
-	writeTempVar(truecounter);
-	WTF(" = 0;\n");
-
+    writeTempVar(truecounter);
+    WTF(" = 0; //True counter\n");
+	writeIndents();
+    WTF("int ");
+    writeTempVar(arrayloc);
+    char num[40];
+    sprintf(num, "[%d] = {0}; //True array\n", ifstatement->numGCommands);
+    WTF(num);
+	
+	/* initialize random var */
+	int randomvar = varcnt++;
+	writeIndents();
 	WTF("int ");
-	writeTempVar(arrayloc);
-	char num[40];
-	sprintf(num, "[%d] = {0};\n", ifstatement->numGCommands);
-	WTF(num);
-	int startlabel = lblcnt++;
-	writeLabel(startlabel);
+	writeTempVar(randomvar);
+	WTF(" = -1; // Random Var\n");
+	
+    int startlabel = lblcnt++;
+	int endiflabel = lblcnt++;
+	writeIndents();
+    writeLabel(startlabel);
 
-	// First evaluate everything
-	for (int i = 0; i < ifstatement->numGCommands; i++) {
-
+    // First evaluate everything
+    for (int i = 0; i < ifstatement->numGCommands; i++) {
 		GCommand g = ifstatement->gCommands[i];
 		compileExpression(g->condition);
+		writeIndents();
 		WTF("if (");
 		writeTempVar(varcnt - 1);
-		WTF(" != 0) {");
+		WTF(" != 0) {\n");
+		indentDept++;
 		// If this one is true, 
+		writeIndents();
 		writeTempVar(truecounter);
 		WTF("++;\n");
+		writeIndents();
 		writeTempVar(arrayloc);
-		char num[40];
 		sprintf(num, "[%d] = 1;\n", i);
 		WTF(num);
+		writeIndents();
+		//Check if this one may execute
+		WTF("if (");
+		writeTempVar(randomvar);
+		sprintf(num, "== %d", i);
+		WTF(num);
+		WTF(") {\n");
+		indentDept++;
+		// Compile the statements
+		for (int j = 0; j < g->numStmnts; j++) {
+			compileStatement(g->stmnts[j]);
+		}
+		writeIndents();
+		writeGoto(endiflabel);
+		indentDept--;
+		writeIndents();
+		WTF("}\n");
+		indentDept--;
+		writeIndents();
 		WTF("}\n");
 	}
 	// Check if atleast one of them is true
+	writeIndents();
 	WTF("if (");
 	writeTempVar(truecounter);
 	WTF(" < 1) {\n");
+	indentDept++;
 	// Error
+	writeIndents();
 	WTF("printf(\"Runtime Error, no guard is true!\\n\");\n");
+	writeIndents();
 	WTF("exit(EXIT_FAILURE);\n");
+	indentDept--;
+	writeIndents();
 	WTF("}\n");
+	
 	// Then determine which to exucute
-
-
+	int startwhilelabel = lblcnt++;
+	writeIndents();
+	writeLabel(startwhilelabel);
+	writeIndents();
+	writeTempVar(randomvar);
+	sprintf(num, "= rand() %% %d;\n", ifstatement->numGCommands);
+	writeIndents();
+	WTF(num);
+	// Check if this one is true
+	writeIndents();
+	WTF("if (");
+	writeTempVar(arrayloc);
+	sprintf(num, "[t%d] != 1) {\n", randomvar);
+	indentDept++;
+	writeIndents();
+	WTF(num);
+	writeIndents();
+	writeGoto(startwhilelabel);
+	indentDept--;
+	writeIndents();
+	WTF("}");
+	writeIndents();
+	//Jump back to start
+	writeGoto(startlabel);
+	writeIndents();
+	writeLabel(endiflabel);
+	writeIndents();
+	WTF("/* END IF */\n");
+	// DONE
 }
 
 void compileWriteCall(WCall write) {
@@ -216,22 +283,25 @@ void compileWriteCall(WCall write) {
 }
 
 void compileStatement(Stmnt statement) {
-	switch (statement->kind) {
-		case decStmnt: compileDec(statement->dec);
-			break;
-		case assStmnt: compileAss(statement->assignment);
-			break;
-		case funcCallStmnt: break; //TODO:
-		case procCallStmnt: break; //TODO;
-		case readCallStmnt: break; //TODO;
-		case writeCallStmnt: compileWriteCall(statement->wCall);
-			break; //TODO;
-		case ifStmnt: break;
-			compileIf(statement->ifStmnt);
-
-		case doStmnt: break;
-			compileDo(statement->doStmnt);
-	}
+    switch (statement->kind) {
+	case decStmnt: compileDec(statement->dec);
+	    break;
+	case assStmnt: compileAss(statement->assignment);
+	    break;
+	case funcCallStmnt: break; //TODO:
+	case procCallStmnt: break; //TODO;
+	case readCallStmnt: break; //TODO;
+	case writeCallStmnt: compileWriteCall(statement->wCall);
+	    break; //TODO
+	case ifStmnt: 
+	    compileIf(statement->ifStmnt);
+		break;
+	case doStmnt: 
+	    compileDo(statement->doStmnt);
+		break;
+	default:
+		printf("Not Done yet...\n");
+    }
 }
 
 void compileFunc(FuncDef function) {
@@ -274,11 +344,11 @@ void compileMain(Prog program) {
 	}
 	for (int i = 0; i < program->numBodyStmnts; i++) {
 		compileStatement(program->bodyStmnts[i]);
-	}
-	writeIndents();
-	WTF("return EXIT_SUCCESS;\n");
-	indentDept--;
-	WTF("}\n");
+    }
+    writeIndents();
+    WTF("return EXIT_SUCCESS;\n");
+    indentDept--;
+    WTF("}\n");
 }
 
 void generateCode(Prog program, char *outputfilename) {
