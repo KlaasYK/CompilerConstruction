@@ -13,7 +13,7 @@ FILE *outputfile;
 int varcnt = 0;
 int lblcnt = 0;
 int indentDept = 0;
-Exps constExps;
+Params paramsByRef;
 
 void compileStatement(Stmnt statement);
 void compileDo(Do dostatement);
@@ -80,8 +80,9 @@ void writeIndents() {
 }
 
 void writeAssignment(char *varName, char *lhs, char op, char *rhs) {
-	//TODO obsolete?
+	//TODO
 }
+
 
 void compileIntegerExp(Int intval) {
 	int tempvar = varcnt++;
@@ -111,12 +112,6 @@ void compileBoolExp(Bool boolval) {
 	WTF(num);
 }
 
-void compileIDexp(ID id) {
-	if ((id->type / 10) * 10 == INTEGER_TYPE) {
-		
-	}
-}
-
 void compileExpression(ExpTree exp) {
 	switch (exp->kind) {
 		case unodeexp:
@@ -138,7 +133,7 @@ void compileExpression(ExpTree exp) {
 			compileBoolExp(exp->node.boolval);
 			break;
 		default:
-			printf("Unkown expression kind...\n");
+			printf("Unkown expression kind...");
 			//SHOULD NOT HAPPEN
 	}
 
@@ -493,28 +488,51 @@ void compileStatement(Stmnt statement) {
 	}
 }
 
+void compileParameter(Param parameter) {
+	WTF(getCTypeString(parameter->id->type));
+	WTF(parameter->id->name);
+	if (parameter->call == byRef) {
+		paramsByRef->numParams++;
+		if(paramsByRef->numParams == 1){
+			paramsByRef->params = malloc(paramsByRef->numParams * sizeof(Param));
+		}else{
+			paramsByRef->params = realloc(paramsByRef->numParams * sizeof(Param));
+		}
+		paramsByRef->params[paramsByRef->numParams - 1] = parameter;
+	}
+
 void compileFunc(FuncDef function) {
 	WTF(getCTypeString(function->id->type));
-	WTF(" ");
 	WTF(function->id->name);
 	WTF("(");
-	// TODO arguments
+	paramsByRef = malloc(sizeof(struct Params));
+	paramsByRef->numParams = 0;
+	for (int i = 0; i < procedure->numParams; i++) {
+		if (i != 0) WTF(", ");
+		compileParameter(procedure->params[i]);
+	}
 	WTF(") {\n");
 	indentDept++;
 	for (int i = 0; i < function->numStmnts; i++) {
-
 		compileStatement(function->stmnts[i]);
 	}
 	// TODO print for return statement
 	indentDept--;
 	WTF("}\n");
+	free(paramsByRef->params);
+	free(paramsByRef);
 }
 
 void compileProc(ProcDef procedure) {
 	WTF("void ");
 	WTF(procedure->name);
 	WTF("(");
-	// TODO arguments
+	paramsByRef = malloc(sizeof(struct Params));
+	paramsByRef->numParams = 0;
+	for (int i = 0; i < procedure->numParams; i++) {
+		if (i != 0) WTF(", ");
+		compileParameter(procedure->params[i]);
+	}
 	WTF(") {\n");
 	indentDept++;
 	for (int i = 0; i < procedure->numStmnts; i++) {
@@ -523,6 +541,8 @@ void compileProc(ProcDef procedure) {
 	}
 	indentDept--;
 	WTF("}\n");
+	free(paramsByRef->params);
+	free(paramsByRef);
 
 }
 
@@ -533,9 +553,14 @@ void compileMain(Prog program) {
 		writeConstantInitialization(program->constDefs[i]);
 	}
 	if (program->numConstDefs > 0) WTF("\n");
+	paramsByRef = malloc(sizeof(struct Params));
+	paramsByRef->numParams = 0;
+	// main doesnt have parameters
 	for (int i = 0; i < program->numBodyStmnts; i++) {
 		compileStatement(program->bodyStmnts[i]);
 	}
+	free(paramsByRef->params);
+	free(paramsByRef);
 	writeIndents();
 	WTF("return EXIT_SUCCESS;\n");
 	indentDept--;
