@@ -64,11 +64,11 @@ void writeLabel(int num) {
 }
 
 void writeGoto(int num) {
-    WTF("goto lbl");
-    char labelstring[32];
-    sprintf(labelstring, "%d", num);
-    WTF(labelstring);
-    WTF(";\n");
+	WTF("goto lbl");
+	char labelstring[32];
+	sprintf(labelstring, "%d", num);
+	WTF(labelstring);
+	WTF(";\n");
 }
 
 void writeIndents() {
@@ -104,12 +104,12 @@ void compileDec(Dec declaration) {
 }
 
 writeConstantInitialization(Dec declaration) {
-		//compileExpression(declaration->expTree);
-		//writeIndents();
-		//WTF(declaration->id->name);
-		//WTF(" = ");
-		//writeTempVar(varcnt-1);
-		//WTF(";\n");
+	//compileExpression(declaration->expTree);
+	//writeIndents();
+	//WTF(declaration->id->name);
+	//WTF(" = ");
+	//writeTempVar(varcnt-1);
+	//WTF(";\n");
 	int expType = getExpType(declaration->expTree);
 	if ((expType / 10)*10 == INTEGER_TYPE) {
 		writeIndents();
@@ -118,17 +118,17 @@ writeConstantInitialization(Dec declaration) {
 		WTF(", \"");
 		WTF(declaration->expTree->node.intval->value);
 		WTF("\");\n");
-	}else{
+	} else {
 		writeIndents();
 		WTF(declaration->id->name);
 		WTF(" = ");
-		if(declaration->expTree->node.boolval->value == true){
+		if (declaration->expTree->node.boolval->value == true) {
 			WTF("1");
-		}else{
+		} else {
 			WTF("0");
 		}
 		WTF(";\n");
-		
+
 	}
 }
 
@@ -138,33 +138,33 @@ void compileDo(Do dostatement) {
 
 void compileIf(If ifstatement) {
 	WTF("/* START IF */\n");
-    int truecounter = varcnt++;
-    int arrayloc = varcnt++;
-    writeIndents();
-	WTF("int ");
-    writeTempVar(truecounter);
-    WTF(" = 0; //True counter\n");
+	int truecounter = varcnt++;
+	int arrayloc = varcnt++;
 	writeIndents();
-    WTF("int ");
-    writeTempVar(arrayloc);
-    char num[40];
-    sprintf(num, "[%d] = {0}; //True array\n", ifstatement->numGCommands);
-    WTF(num);
-	
+	WTF("int ");
+	writeTempVar(truecounter);
+	WTF(" = 0; //True counter\n");
+	writeIndents();
+	WTF("int ");
+	writeTempVar(arrayloc);
+	char num[40];
+	sprintf(num, "[%d] = {0}; //True array\n", ifstatement->numGCommands);
+	WTF(num);
+
 	/* initialize random var */
 	int randomvar = varcnt++;
 	writeIndents();
 	WTF("int ");
 	writeTempVar(randomvar);
 	WTF(" = -1; // Random Var\n");
-	
-    int startlabel = lblcnt++;
+
+	int startlabel = lblcnt++;
 	int endiflabel = lblcnt++;
 	writeIndents();
-    writeLabel(startlabel);
+	writeLabel(startlabel);
 
-    // First evaluate everything
-    for (int i = 0; i < ifstatement->numGCommands; i++) {
+	// First evaluate everything
+	for (int i = 0; i < ifstatement->numGCommands; i++) {
 		GCommand g = ifstatement->gCommands[i];
 		compileExpression(g->condition);
 		writeIndents();
@@ -215,7 +215,7 @@ void compileIf(If ifstatement) {
 	indentDept--;
 	writeIndents();
 	WTF("}\n");
-	
+
 	// Then determine which to exucute
 	int startwhilelabel = lblcnt++;
 	writeIndents();
@@ -298,25 +298,25 @@ void compileWriteCall(WCall write) {
 }
 
 void compileStatement(Stmnt statement) {
-    switch (statement->kind) {
-	case decStmnt: compileDec(statement->dec);
-	    break;
-	case assStmnt: compileAss(statement->assignment);
-	    break;
-	case funcCallStmnt: break; //TODO:
-	case procCallStmnt: break; //TODO;
-	case readCallStmnt: break; //TODO;
-	case writeCallStmnt: compileWriteCall(statement->wCall);
-	    break; //TODO
-	case ifStmnt: 
-	    compileIf(statement->ifStmnt);
-		break;
-	case doStmnt: 
-	    compileDo(statement->doStmnt);
-		break;
-	default:
-		printf("Not Done yet...\n");
-    }
+	switch (statement->kind) {
+		case decStmnt: compileDec(statement->dec);
+			break;
+		case assStmnt: compileAss(statement->assignment);
+			break;
+		case funcCallStmnt: break; //TODO:
+		case procCallStmnt: break; //TODO;
+		case readCallStmnt: break; //TODO;
+		case writeCallStmnt: compileWriteCall(statement->wCall);
+			break; //TODO
+		case ifStmnt:
+			compileIf(statement->ifStmnt);
+			break;
+		case doStmnt:
+			compileDo(statement->doStmnt);
+			break;
+		default:
+			printf("Not Done yet...\n");
+	}
 }
 
 void compileFunc(FuncDef function) {
@@ -349,6 +349,7 @@ void compileProc(ProcDef procedure) {
 	}
 	indentDept--;
 	WTF("}\n");
+	
 }
 
 void compileMain(Prog program) {
@@ -357,14 +358,14 @@ void compileMain(Prog program) {
 	for (int i = 0; i < program->numConstDefs; i++) {
 		writeConstantInitialization(program->constDefs[i]);
 	}
-	if(program->numConstDefs > 0) WTF("\n");
+	if (program->numConstDefs > 0) WTF("\n");
 	for (int i = 0; i < program->numBodyStmnts; i++) {
 		compileStatement(program->bodyStmnts[i]);
-    }
-    writeIndents();
-    WTF("return EXIT_SUCCESS;\n");
-    indentDept--;
-    WTF("}\n");
+	}
+	writeIndents();
+	WTF("return EXIT_SUCCESS;\n");
+	indentDept--;
+	WTF("}\n");
 }
 
 void generateCode(Prog program, char *outputfilename) {
@@ -374,19 +375,19 @@ void generateCode(Prog program, char *outputfilename) {
 	for (int i = 0; i < program->numConstDefs; i++) {
 		compileDec(program->constDefs[i]);
 	}
-	if(program->numConstDefs > 0) WTF("\n");
+	if (program->numConstDefs > 0) WTF("\n");
 	for (int i = 0; i < program->numVarDefs; i++) {
 		compileDec(program->varDefs[i]);
 	}
-	if(program->numVarDefs > 0) WTF("\n");
+	if (program->numVarDefs > 0) WTF("\n");
 	for (int i = 0; i < program->numProcDefs; i++) {
 		compileProc(program->procDefs[i]);
+		WTF("\n");
 	}
-	if(program->numProcDefs > 0) WTF("\n");
 	for (int i = 0; i < program->numFuncDefs; i++) {
 		compileFunc(program->funcDefs[i]);
+		WTF("\n");
 	}
-	if(program->numFuncDefs > 0) WTF("\n");
 	compileMain(program);
 
 	fclose(outputfile);
