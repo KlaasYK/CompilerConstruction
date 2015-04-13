@@ -220,8 +220,7 @@ void compileDo(Do dostatement) {
 	writeLabel(startwhilelabel);
 	writeIndents();
 	writeTempVar(randomvar);
-	sprintf(num, "= rand() %% %d;\n", dostatement->numGCommands);
-	writeIndents();
+	sprintf(num, " = rand() %% %d;\n", dostatement->numGCommands);
 	WTF(num);
 	// Check if this one is true
 	writeIndents();
