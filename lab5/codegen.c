@@ -556,7 +556,9 @@ void compileFunc(FuncDef function) {
 	// TODO print for return statement
 	indentDept--;
 	WTF("}\n");
+	if(paramsByRef->numParams>0){
 	free(paramsByRef->params);
+	}
 	free(paramsByRef);
 }
 
@@ -578,7 +580,9 @@ void compileProc(ProcDef procedure) {
 	}
 	indentDept--;
 	WTF("}\n");
+	if(paramsByRef->numParams>0){
 	free(paramsByRef->params);
+	}
 	free(paramsByRef);
 }
 
@@ -595,7 +599,9 @@ void compileMain(Prog program) {
 	for (int i = 0; i < program->numBodyStmnts; i++) {
 		compileStatement(program->bodyStmnts[i]);
 	}
+	if(paramsByRef->numParams>0){
 	free(paramsByRef->params);
+	}
 	free(paramsByRef);
 	writeIndents();
 	WTF("return EXIT_SUCCESS;\n");
