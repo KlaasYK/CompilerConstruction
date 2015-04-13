@@ -145,7 +145,7 @@ void compileExpression(ExpTree exp) {
 			//TODO;
 			break;
 		case idexp:
-			compileIDExp(exp->node.id);
+			compileIDexp(exp->node.id);
 			break;
 		case funcexp:
 			//TODO;
