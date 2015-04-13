@@ -89,7 +89,12 @@ void compileExpression(ExpTree exp) {
 }
 
 void compileAss(Ass assignment) {
-	//TODO
+	compileExpression(assignment->expTree);
+	writeIndents();
+	WTF(assignment->id->name);
+	char num[40];
+	sprintf(num, " = t%d;\n", varcnt-1);
+	WTF(num);
 }
 
 void compileDec(Dec declaration) {
@@ -221,7 +226,6 @@ void compileDo(Do dostatement) {
 	writeIndents();
 	writeTempVar(randomvar);
 	sprintf(num, "= rand() %% %d;\n", dostatement->numGCommands);
-	writeIndents();
 	WTF(num);
 	// Check if this one is true
 	writeIndents();
