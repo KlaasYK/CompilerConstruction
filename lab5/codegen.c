@@ -151,16 +151,16 @@ void compileunodeexp(Unode unode) {
 void compileExpression(ExpTree exp) {
 	switch (exp->kind) {
 		case unodeexp:
-			//TODO;
+			compileunodeexp(exp->node.unode);
 			break;
 		case bnodeexp:
-			//TODO;
+			compilebinnodeexp(exp->node.bnode);
 			break;
 		case idexp:
 			compileIDexp(exp->node.id);
 			break;
 		case funcexp:
-			//TODO;
+			compilefuncexp(exp->node.funcCall);
 			break;
 		case intexp:
 			compileIntegerExp(exp->node.intval);
