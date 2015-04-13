@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "codegen.h"
+#include "expressiontree.h"
 #include "tree.h"
 #include "symboltable.h"
 #include "structarrays.h"
@@ -81,10 +83,62 @@ void writeAssignment(char *varName, char *lhs, char op, char *rhs) {
 	//TODO
 }
 
+void compileIntegerExp(Int intval) {
+	int tempvar = varcnt++;
+	writeIndents();
+	WTF("Integer ");
+	writeTempVar(tempvar);
+	WTF(";\n");
+	writeIndents();
+	char *num;
+	num = malloc((strlen(intval->value) + 42) * sizeof (char));
+	sprintf(num, "makeIntegerFromString(&t%d, \"%s\");\n", tempvar, intval->value);
+	WTF(num);
+	free(num);
+}
+
+void compileBoolExp(Bool boolval) {
+	int tempvar = varcnt++;
+	writeIndents();
+	WTF("int ");
+	writeTempVar(tempvar);
+	char num[42];
+	if (boolval->value == true) {
+		sprintf(num, " = %d;\n", 1);
+	} else {
+		sprintf(num, " = %d;\n", 0);
+	}
+	WTF(num);
+}
+
 void compileExpression(ExpTree exp) {
-	WTF("//compile the expression here\n");
-	WTF("Integer t0;\nmakeIntegerFromString(&t0, \"1\");//dummy\n");
-	varcnt++;
+	switch (exp->kind) {
+		case unodeexp:
+			//TODO;
+			break;
+		case bnodeexp:
+			//TODO;
+			break;
+		case idexp:
+			//TODO;
+			break;
+		case funcexp:
+			//TODO;
+			break;
+		case intexp:
+			compileIntegerExp(exp->node.intval);
+			break;
+		case boolexp:
+			compileBoolExp(exp->node.boolval);
+			break;
+		default:
+			printf("Unkown expression kind...");
+			//SHOULD NOT HAPPEN
+	}
+
+	//WTF("//compile the expression here\n");
+	//WTF("Integer t0;\nmakeIntegerFromString(&t0, \"1\");//dummy\n");
+	//varcnt++;
 	//TODO
 }
 
@@ -93,7 +147,7 @@ void compileAss(Ass assignment) {
 	writeIndents();
 	WTF(assignment->id->name);
 	char num[40];
-	sprintf(num, " = t%d;\n", varcnt-1);
+	sprintf(num, " = t%d;\n", varcnt - 1);
 	WTF(num);
 }
 
