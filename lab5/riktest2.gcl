@@ -1,7 +1,7 @@
 program hello;
 # The famous hello world program in GCL
 
-constant A : integer = 7453478376373655456544364564657835389772;
+constant A : integer > 7453478376373655456544364564657835389772;
 
 begin
   var x, y : integer;

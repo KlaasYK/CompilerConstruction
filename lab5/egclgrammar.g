@@ -29,6 +29,7 @@
 #define	VARIABLEASKED 266
 #define RETURNINPROC 267
 #define MISSINGRETURN 268
+#define WRONGCONSTDEFOP 269
 
 typedef struct Stmnts{
 	int numStmnts;
@@ -238,6 +239,7 @@ void printTypeError(char *identifier, int ErrorType) {
 		case VARIABLEASKED: printf("Function or procedure '%s' found in stead of variable, at column %d\n", identifier, columnnr+1);break;
 		case RETURNINPROC: printf("Trying to return a value to a procedure '%s', at column %d\n", identifier, columnnr+1);break;
 		case MISSINGRETURN: printf("Function '%s' has nothing assigned to its return variable, at column %d\n", identifier, columnnr+1);break;
+		case WRONGCONSTDEFOP: printf("Illegal character (%s) detected at column %d\n", identifier, columnnr+1);break;
 	}
 	
 	free(identifier);
@@ -1436,7 +1438,14 @@ constantdef<Dec>(int type, char *name, Dec dec)	:
 			}
 			freeTempList();
 		}
-		COMPARE_OP 
+		COMPARE_OP {
+			char* op = strdup(yytext);
+			if(strcmp(op, "=") != 0){
+				printTypeError(op, WRONGCONSTDEFOP);
+			}else{
+				free(op);
+			}
+		}
 		variable<d>(NULL, 0){
 			dec = d;
 			int tc_type = d->id->type;
