@@ -12,6 +12,7 @@
 #include "codegen.h"
 #include "symboltable.h"
 #include "tree.h"
+#include "structarrays.h"
 
 
 
@@ -30,31 +31,6 @@
 #define RETURNINPROC 267
 #define MISSINGRETURN 268
 #define WRONGCONSTDEFOP 269
-
-typedef struct Stmnts{
-	int numStmnts;
-	Stmnt *stmnts;
-}*Stmnts;
-
-typedef struct Decs{
-	int numDecs;
-	Dec *decs;
-}*Decs;
-
-typedef struct IDs{
-	int numIds;
-	ID *ids;
-}*IDs;
-
-typedef struct Exps{
-	int numExps;
-	ExpTree *exps;
-}*Exps;
-
-typedef struct GCmds {
-	int numGCmds;
-	GCommand *gCmds;
-}*GCmds;
 
 extern FILE * yyin;
 extern char * yytext;
