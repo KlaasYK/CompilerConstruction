@@ -1,8 +1,9 @@
 program dummy;
 
 begin
-	if true -> print 'Hello World';
-	[] false -> print 'I am afraid I can not do that';
-	fi;
+	do true -> print 'Hello World';
+	[] true -> print 'I am afraid I can not do that';
+	[] true -> print 'Kaas is lekker';
+	od;
 	print 'Kaas is Lekker';
 end.
