@@ -154,7 +154,7 @@ void compileExpression(ExpTree exp) {
 			compileunodeexp(exp->node.unode);
 			break;
 		case bnodeexp:
-			compilebinnodeexp(exp->node.bnode);
+			compilebinodeexp(exp->node.bnode);
 			break;
 		case idexp:
 			compileIDexp(exp->node.id);
