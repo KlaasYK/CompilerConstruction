@@ -179,11 +179,11 @@ void LLmessage(int token) {
 		printf("Expected %s, found %s (%s).\n", LLgetSymbol(token), LLgetSymbol(LLsymb), yytext);
 		break;
 	}
-	/*utilCleanUp();
+	utilCleanUp();
 	freeLines();
+	
 	freeSymbolTable();
-	exit(EXIT_FAILURE);*/
-	error = 1;
+	exit(EXIT_FAILURE);
 }
 
 
@@ -1015,7 +1015,8 @@ readcall<RCall>(IDs ids)	:
 		}
 ;
 
-call<Stmnts>(char *name) :	
+call<Stmnts>(char *name):
+	[		
 		functioncall<fc>(name, 0, NULL){
 			Stmnts ss = malloc(sizeof(struct Stmnts));
 			ss->numStmnts = 1;
@@ -1027,6 +1028,7 @@ call<Stmnts>(char *name) :
 		assignmentcall<ss>(name){
 			LLretval = ss;
 		}
+	]
 		
 ;
 

@@ -9,7 +9,7 @@ begin
     var a, b : boolean;
     x := 5;
     y := x;
-    a = true;
+    a := true;
     b = a;
     print 'Hello';
     println ' world';
