@@ -11,7 +11,7 @@ FILE *outputfile;
 int varcnt = 0;
 int lblcnt = 0;
 int indentDept = 0;
-ExpTree *constantExps;
+Exps constExps;
 
 void compileStatement(Stmnt statement);
 void compileDo(Do dostatement);
@@ -100,7 +100,21 @@ void compileDec(Dec declaration) {
 	if (declaration->idType == constant) {
 		WTF("// constant, will be init once in the main");
 	}
+	WTF("\n");
+}
 
+writeConstantInitialization(Dec declaration) {
+	int expType = getExpType(declaration->expTree);
+	if ((expType / 10)*10 == INTEGER_TYPE) {
+		//compileExpression(declaration->expTree);
+		writeIndents();
+		WTF("makeIntegerFromString(&");
+		WTF(declaration->id->name);
+		WTF(", \"");
+		WTF(declaration->expTree->node.intval->value);
+		//writeTempVar(varcnt-1);
+		WTF("\");\n");
+	}
 }
 
 void compileDo(Do dostatement) {
@@ -432,9 +446,12 @@ void compileProc(ProcDef procedure) {
 }
 
 void compileMain(Prog program) {
-    WTF("int main(int argc, char **argv){\n");
-    indentDept++;
-    for (int i = 0; i < program->numBodyStmnts; i++) {
+	WTF("int main(int argc, char **argv){\n");
+	indentDept++;
+	for (int i = 0; i < program->numConstDefs; i++) {
+		writeConstantInitialization(program->constDefs[i]);
+	}
+	for (int i = 0; i < program->numBodyStmnts; i++) {
 		compileStatement(program->bodyStmnts[i]);
     }
     writeIndents();
