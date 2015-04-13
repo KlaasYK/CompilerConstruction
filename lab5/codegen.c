@@ -8,6 +8,18 @@
 #include "symboltable.h"
 #include "structarrays.h"
 
+// TODO: statements on the same line must first be evaluated to temp vars
+// before asigning them.
+// Make Printinteger return a string OR(!) print each argument on it's own line.
+// ie println a, b should return:
+// a
+// b
+
+// Make all the compare ops work (we do have in the bigints.c, just not in the
+// header I believe)
+
+//Functions, function calls and what have you. Don't mention the pointers!
+
 FILE *outputfile;
 
 int varcnt = 0;
