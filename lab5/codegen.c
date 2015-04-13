@@ -136,15 +136,15 @@ void compileBoolExp(Bool boolval) {
 	WTF(num);
 }
 
-void funcexp(FuncCall funccall) {
+void compilefuncexp(FuncCall funccall) {
 	varcnt++;
 }
 
-void binodeexp(Bnode bnode) {
+void compilebinodeexp(Bnode bnode) {
 	varcnt++;
 }
 
-void unodeexp(Unode unode) {
+void compileunodeexp(Unode unode) {
 	varcnt++;
 }
 
