@@ -98,6 +98,12 @@ void compileIntegerExp(Int intval) {
 	free(num);
 }
 
+void compileIDexp(ID id) {
+	if ((id->type / 10) * 10 == INTEGER_TYPE) {
+		
+	}
+}
+
 void compileBoolExp(Bool boolval) {
 	int tempvar = varcnt++;
 	writeIndents();
@@ -133,7 +139,7 @@ void compileExpression(ExpTree exp) {
 			compileBoolExp(exp->node.boolval);
 			break;
 		default:
-			printf("Unkown expression kind...");
+			printf("Unkown expression kind...\n");
 			//SHOULD NOT HAPPEN
 	}
 
