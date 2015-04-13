@@ -1,5 +1,6 @@
 #ifndef BIGINTS_H
 #define BIGINTS_H
+#include <stdint.h>
 /*** stuff to implement ***/
 
 /* make integer form a string */
