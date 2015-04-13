@@ -5,7 +5,12 @@ constant A : integer = 7453478376373655456544364564657835389772;
 constant B : boolean = true;
 
 begin
-  var x, y : integer;
-  print 'Hello';
-  println ' world';
+    var x, y : integer;
+    var a, b : boolean;
+    x := 5;
+    y := x;
+    a = true;
+    b = a;
+    print 'Hello';
+    println ' world';
 end.
