@@ -69,6 +69,7 @@ void freeTempList() {
 	while (n != NULL) {
 		INode *next = n->next;
 		free(n->name);
+		n->name = NULL;
 		free(n);
 		n = next;
 	}
@@ -115,8 +116,10 @@ void freeLines() {
 	int i;
 	for (i=0; i < linesread; ++i) {
 		free(lines[i]);
+		lines[i] = NULL;
 	}
 	free(lines);
+	lines = NULL;
 	if (yyin != NULL) {
 		fclose(yyin);
 		yyin = NULL;
@@ -179,6 +182,10 @@ void LLmessage(int token) {
 		printf("Expected %s, found %s (%s).\n", LLgetSymbol(token), LLgetSymbol(LLsymb), yytext);
 		break;
 	}
+	/*utilCleanUp();
+	freeLines();
+	freeSymbolTable();
+	exit(EXIT_FAILURE);*/
 	error = 1;
 }
 
@@ -215,6 +222,7 @@ void printTypeError(char *identifier, int ErrorType) {
 	}
 	
 	free(identifier);
+	identifier = NULL;
 	
 	/*utilCleanUp();
 	
@@ -222,15 +230,6 @@ void printTypeError(char *identifier, int ErrorType) {
 	freeSymbolTable();
 	exit(EXIT_FAILURE);*/
 	error = 1;
-}
-
-void exitCompiler(){
-	printf("\nParser failed!\n");
-	printf("Stopping compiler\n\n");
-	utilCleanUp();
-	freeLines();
-	freeSymbolTable();
-	exit(EXIT_FAILURE);
 }
 
 int getType(char *name) {
@@ -243,6 +242,7 @@ int getType(char *name) {
 		printTypeError(name, WRITETOCONSTANT);
 	}else {
 		free(name);
+		name = NULL;
 	}
 	return type;
 }
@@ -256,6 +256,7 @@ int getTypeConst(char *name) {
 		printTypeError(name, UNKNOWN);
 	}else{
 		free(name);
+		name = NULL;
 	}
 	return type;
 }
@@ -300,6 +301,7 @@ int main(int argc, char** argv) {
 	
 	utilCleanUp();
 	freeProg(program);
+	program = NULL;
 	freeSymbolTable();
 	freeLines();
 	
@@ -333,6 +335,7 @@ rootexpr<Exp>(char *name, int isFunc)	:
 						LLretval = makeIDNodeExp(makeID(getTypeConst(strdup(name)), name));
 					}
 					free(name);
+					name = NULL;
 				}
 			| 
 				NUMBER{
@@ -343,6 +346,7 @@ rootexpr<Exp>(char *name, int isFunc)	:
 					char *bool = strdup(yytext);
 					LLretval = makeBoolExp(makeBool(strcmp(bool, "true")==0?true:false));
 					free(bool);
+					bool = NULL;
 				}
 			;
 
@@ -415,6 +419,7 @@ term2<Exp>(Exp left, Exp *exp, BinOp mulOp)	:
 				mulOp = modop;
 			}
 			free(mulOpText);
+			mulOpText = NULL;
 		}
 		factor<r>{
 			LLretval = makeBinNodeExp(makeBinNode(left, r, mulOp));
@@ -449,6 +454,7 @@ term<Exp>(Exp *exp) :
 				LLretval = *exp;
 			}
 			free(exp);
+			exp = NULL;
 		}
 ;
 
@@ -502,6 +508,7 @@ sumexpr<Exp>(Exp *exp) :
 				LLretval = *exp;
 			}
 			free(exp);
+			exp = NULL;
 		}
 ;
 
@@ -527,6 +534,7 @@ relexpr2<Exp>(Exp left, Exp *exp, BinOp compOp)	:
 				compOp = leop;
 			}
 			free(compOpText);
+			compOpText = NULL;
 		}
 		sumexpr<r>(NULL){
 			LLretval = makeBinNodeExp(makeBinNode(left, r, compOp));
@@ -583,6 +591,7 @@ relexpr<Exp>(Exp *exp) :
 				LLretval = *exp;
 			}
 			free(exp);
+			exp = NULL;
 		}
 ;
 
@@ -649,6 +658,7 @@ andexpr<Exp>(Exp *exp):
 				LLretval = *exp;
 			}
 			free(exp);
+			exp = NULL;
 		}
 ;
 			
@@ -702,6 +712,7 @@ expr<ExpTree>(Exp *exp) :
 				LLretval = *exp;
 			}
 			free(exp);
+			exp = NULL;
 		}
 ;
 
@@ -720,7 +731,7 @@ guardedcommand<GCommand>(ExpTree exp)	:
 		statementset<stmnts> {
 			LLretval = makeGCommand(exp, stmnts->numStmnts, stmnts->stmnts);
 			free(stmnts);
-			
+			stmnts = NULL;
 		}
 ;
 
@@ -766,7 +777,9 @@ identifierarray<IDs>(IDs idents)	:
 					idents->ids[i + oldNumIds] = ids->ids[i];
 				}
 				free(ids->ids);
+				ids->ids = NULL;
 				free(ids);
+				ids = NULL;
 			}
 		]?{
 			LLretval = idents;
@@ -774,11 +787,6 @@ identifierarray<IDs>(IDs idents)	:
 ;
 
 functioncall<FuncCall>(char *name, int type, Exps params): 
-{
-	if(error){
-		exitCompiler();
-	}
-}
 		LPARREN{
 			NodeType nt = lookupType(name);
 			if(nt != METHOD){
@@ -824,6 +832,7 @@ functioncall<FuncCall>(char *name, int type, Exps params):
 			FuncCall fc = makeFuncCall(type, name, params->numExps, params->exps);
 			LLretval = fc;
 			free(params);
+			params = NULL;
 		}
 ;
 
@@ -927,20 +936,19 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 					n = n->next;
 				}
 				freeExp(exps->exps[0]);
+				exps->exps[0] = NULL;
 			}
 			freeTempList();
 			free(exps->exps);
+			exps->exps = NULL;
 			free(exps);
+			exps = NULL;
 			LLretval = stmnts;
-			
 		}
 ;
 
 /* select assignmentcall V1 or V2 */
 assignmentcall<Stmnts>(char *name) : 
-{
-	printf("assignmentcall\n");
-}
 		assignmentcallV2<ss>(name, NULL, NULL){
 			LLretval = ss;
 		}
@@ -948,10 +956,10 @@ assignmentcall<Stmnts>(char *name) :
 
 dostatement<Stmnt>:	
 		DOBEGIN_TOK 
-		guardedcommandset<gCmds>(NULL)
-		{
+		guardedcommandset<gCmds>(NULL){
 			LLretval = makeDoStmnt(makeDo(gCmds->numGCmds, gCmds->gCmds));
 			free(gCmds);
+			gCmds = NULL;
 		}
 		DOEND_TOK
 ;
@@ -962,6 +970,7 @@ ifstatement<Stmnt>:
 		{
 			LLretval = makeIfStmnt(makeIf(gCmds->numGCmds, gCmds->gCmds));
 			free(gCmds);
+			gCmds = NULL;
 		}
 		IFEND_TOK
 ;
@@ -1002,6 +1011,7 @@ printcall<WCall>(int numitems, Printable *ps, char *printTok) :
 			wc = makeWCall(numitems, ps, true);
 		    }
 		    free(printTok);
+			printTok = NULL;
 		    LLretval = wc;
 		}
 ;
@@ -1024,21 +1034,19 @@ readcall<RCall>(IDs ids)	:
 		]*{
 			RCall rc = makeRCall(ids->numIds, ids->ids);
 			free(ids);
+			ids = NULL;
 			LLretval = rc;
 		}
 ;
 
 call<Stmnts>(char *name):
-{
-	printf("call\n");
-} 
 	[		
 		functioncall<fc>(name, 0, NULL){
 			Stmnts ss = malloc(sizeof(struct Stmnts));
 			ss->numStmnts = 1;
 			ss->stmnts = malloc(ss->numStmnts*sizeof(Stmnt));
 			ss->stmnts[0] = makeFuncCallStmnt(fc);
-		LLretval = ss;
+			LLretval = ss;
 		}
 	|	
 		assignmentcall<ss>(name){
@@ -1067,7 +1075,9 @@ declaration<Decs>(IDs idents):
 						d->decs[i] = makeExpUninitDec(idents->ids[i], variable);
 					}
 					free(idents->ids);
+					idents->ids = NULL;
 					free(idents);
+					idents = NULL;
 					LLretval = d;
 					
 					/* SYMBOL TABLE */
@@ -1087,13 +1097,9 @@ declaration<Decs>(IDs idents):
 				}
 			;
 
-statement<Stmnts>(Stmnts ss, char *name) :
-{
-	printf("statement\n");
-} 
+statement<Stmnts>(Stmnts ss, char *name) : 
 [
 		declaration<ds>(NULL){
-			/*TODO placeholder*/
 			ss = malloc(sizeof(struct Stmnts));
 			ss->numStmnts = ds->numDecs;
 			ss->stmnts = malloc(ss->numStmnts*sizeof(Stmnt));
@@ -1101,7 +1107,9 @@ statement<Stmnts>(Stmnts ss, char *name) :
 				ss->stmnts[i] = makeDecStmnt(ds->decs[i]);
 			}
 			free(ds->decs);
+			ds->decs = NULL;
 			free(ds);
+			ds = NULL;
 		}
 	| 
 		IDENTIFIER{
@@ -1110,6 +1118,7 @@ statement<Stmnts>(Stmnts ss, char *name) :
 		call<stmnts>(name){
 			ss = stmnts;
 			free(name);
+			name = NULL;
 		}
 	| 
 		printcall<wc>(0, NULL, NULL){
@@ -1154,9 +1163,12 @@ parameterset 	:
 			identifierarray<ids>(NULL){
 				for(int i=0;i<ids->numIds;i++){
 					freeID(ids->ids[i]);
+					ids->ids[i] = NULL;
 				}
 				free(ids->ids);
+				ids->ids = NULL;
 				free(ids);//not used
+				ids = NULL;
 			}
 		]?
 		TYPE_OP
@@ -1186,9 +1198,12 @@ parameterset 	:
 			identifierarray<ids>(NULL){
 				for(int i=0;i<ids->numIds;i++){
 					freeID(ids->ids[i]);
+					ids->ids[i] = NULL;
 				}
 				free(ids->ids);
+				ids->ids = NULL;
 				free(ids);//not used
+				ids = NULL;
 			}
 		]?
 		TYPE_OP
@@ -1222,6 +1237,7 @@ variable<Dec>(ExpTree exp, int type) :
 				}
 				type = CONST_BOOLEAN_TYPE;
 				free(bool);
+				bool = NULL;
 				exp = makeBoolExp(makeBool(bv));
 			}
 		| 
@@ -1267,7 +1283,9 @@ statementsetV1<Stmnts>(Stmnts stmnts) :
 				stmnts->stmnts[i + oldNumStmnts] = ss->stmnts[i];
 			}
 			free(ss->stmnts);
+			ss->stmnts = NULL;
 			free(ss);
+			ss = NULL;
 			LLretval = stmnts;
 		}
 	| 
@@ -1355,6 +1373,7 @@ function<FuncDef>(int numparams, Param *p, int numStmnts, Stmnt *stmnts)	:
 					free(lastmethodidentifier);
 					lastmethodidentifier = NULL;
 					free(ss);
+					ss = NULL;
 				}
 				SEMICOLON
 			;
@@ -1409,6 +1428,7 @@ procedure<ProcDef>(int numparams, Param *p, int numStmnts, Stmnt *stmnts)	:
 					free(lastmethodidentifier);
 					lastmethodidentifier = NULL;
 					free(ss);
+					ss = NULL;
 				}
 				SEMICOLON
 			;
@@ -1442,6 +1462,7 @@ constantdef<Dec>(int type, char *name, Dec dec)	:
 				printTypeError(op, WRONGCONSTDEFOP);
 			}else{
 				free(op);
+				op = NULL;
 			}
 		}
 		variable<d>(NULL, 0){
@@ -1490,7 +1511,9 @@ programbody<Prog>(int numConstDefs, Dec *constDefs, int numVarDefs, Dec *varDefs
 					varDefs[i + oldNumVarDefs] = vds->decs[i];
 				}
 				free(vds->decs);
+				vds->decs = NULL;
 				free(vds);
+				vds = NULL;
 			}
 		]* {
 			printf("Num of var defs: %d\n", numVarDefs);
@@ -1524,9 +1547,6 @@ programbody<Prog>(int numConstDefs, Dec *constDefs, int numVarDefs, Dec *varDefs
 			printf("Num of func defs: %d\n", numFuncDefs);
 		}
 		BEGIN_TOK {
-			if(error){
-				exitCompiler();
-			}
 			putBlock("[MAIN VARIABLES]"); /* add a new frame of reference */
 		} 
 		statementset<bss>{
@@ -1534,49 +1554,34 @@ programbody<Prog>(int numConstDefs, Dec *constDefs, int numVarDefs, Dec *varDefs
 			printf("Num of bodystmnts: %d\n", bss->numStmnts);
 			bodyStmnts = bss->stmnts;
 			free(bss);
+			bss = NULL;
 		}
 		END_TOK {
-			if(error){
-				exitCompiler();
-			}
 			popBlock();
 			Prog prog = makeProg(programname, numConstDefs, constDefs, numVarDefs, varDefs, numProcDefs, procDefs, numFuncDefs, funcDefs, numBodyStmnts, bodyStmnts);
 			LLretval = prog;
 		}
 ;
 			
-header		:
-		PROGRAM_TOK{
-			if(error){
-				exitCompiler();
-			}
-		}
+header		: 
+		PROGRAM_TOK
 		IDENTIFIER {
-			if(error){
-				exitCompiler();
-			}
 			programname = strdup(yytext); /* the token is freed in freeNode (normally) */
 		} 
-		SEMICOLON {
-			if(error){
-				exitCompiler();
-			}
-		}
+		SEMICOLON 
 ;
 
-start :
-{
-	if(error){
-		exitCompiler();
-	}
-}
+start		: 
 		header 
 		programbody<prog>(0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL){
 			program  = prog;
 		}
 		DOT{
-			if(error){
-				exitCompiler();
-			}
+			/*printf("Program name: %s\n", program->name);
+			if(strcmp(file_name, "riktest.gcl") == 0){
+				printf("Print string: %s\n", program->bodyStmnts[0]->wCall->items[0]->string);
+				printf("boolval: %s\n", (program->constDefs[0]->expTree->node.boolval->value == true)?"true":"false");
+				printf("intval: %s\n", program->constDefs[1]->expTree->node.intval->value);
+			}*/
 		}
 ; 
