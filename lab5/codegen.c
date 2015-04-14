@@ -890,7 +890,9 @@ void compileFunc(FuncDef function) {
 	for (int i = 0; i < function->numStmnts; i++) {
 		compileStatement(function->stmnts[i]);
 	}
-	// TODO print for return statement
+	WTF("return ");
+	writeVar(function->id->name);
+	WTF(";\n");
 	indentDept--;
 	WTF("}\n");
 	if (paramsByVal->numParams > 0) {
