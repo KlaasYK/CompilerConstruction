@@ -40,15 +40,15 @@ char *getCTypeString(int type) {
 		case CONST_BOOLEAN_TYPE:
 			return "const int ";
 		case REF_BOOLEAN_TYPE:
-			return "int *";
+			return "int ";
 		case INTEGER_TYPE:
 			return "Integer ";
 		case CONST_INTEGER_TYPE:
 			return "const Integer ";
 		case REF_INTEGER_TYPE:
-			return "Integer *";
+			return "Integer ";
 		default:
-			return "void";
+			return "void ";
 	}
 }
 
@@ -60,10 +60,19 @@ void writeHeaders() {
 }
 
 void writeTempVar(int num) {
-	WTF("t");
+	WTF("_t");
 	char numstring[32];
 	sprintf(numstring, "%d", num);
 	WTF(numstring);
+}
+
+void writeVar(char *name) {
+	WTF("*");
+	WTF(name);
+}
+
+void writeVarRef(char *name) {
+	WTF(name);
 }
 
 void writeLabel(int num) {
@@ -100,10 +109,11 @@ void compileIntegerExp(Int intval) {
 	WTF(";\n");
 	writeIndents();
 	char *num;
-	num = malloc((strlen(intval->value) + 42) * sizeof (char));
-	sprintf(num, "makeIntegerFromString(&t%d, \"%s\");\n", tempvar, intval->value);
-	WTF(num);
-	free(num);
+	WTF("makeIntegerFromString(&");
+	writeTempVar(tempvar);
+	WTF(", \"");
+	WTF(intval->value);
+	WTF("\");\n");
 }
 
 void compileIDexp(ID id) {
@@ -382,16 +392,16 @@ void compileExpression(ExpTree exp) {
 void compileAss(Ass assignment) {
 	compileExpression(assignment->expTree);
 	writeIndents();
-	WTF(assignment->id->name);
-	char num[40];
-	sprintf(num, " = t%d;\n", varcnt - 1);
-	WTF(num);
+	writeVar(assignment->id->name);
+	WTF(" = ");
+	writeTempVar(varcnt - 1);
+	WTF(";\n");
 }
 
 void compileDec(Dec declaration) {
 	writeIndents();
 	WTF(getCTypeString((declaration->id->type / 10)*10));
-	WTF(declaration->id->name);
+	writeVar(declaration->id->name);
 	WTF(";");
 	if (declaration->idType == constant) {
 		WTF(" // constant, will be init once in the main");
@@ -399,33 +409,20 @@ void compileDec(Dec declaration) {
 	WTF("\n");
 }
 
-void writeConstantInitialization(Dec declaration) {
-	//compileExpression(declaration->expTree);
-	//writeIndents();
-	//WTF(declaration->id->name);
-	//WTF(" = ");
-	//writeTempVar(varcnt-1);
-	//WTF(";\n");
-	int expType = getExpType(declaration->expTree);
-	if ((expType / 10)*10 == INTEGER_TYPE) {
-		writeIndents();
-		WTF("makeIntegerFromString(&");
-		WTF(declaration->id->name);
-		WTF(", \"");
-		WTF(declaration->expTree->node.intval->value);
-		WTF("\");\n");
-	} else {
-		writeIndents();
-		WTF(declaration->id->name);
-		WTF(" = ");
-		if (declaration->expTree->node.boolval->value == true) {
-			WTF("1");
-		} else {
-			WTF("0");
-		}
-		WTF(";\n");
+void writeGlobalDecMalloc(Dec declaration) {
+	writeVarRef(declaration->id->name);
+	WTF(" = malloc(sizeof(");
+	WTF(getCTypeString((declaration->id->type / 10)*10));
+	WTF("));\n");
+}
 
-	}
+void writeConstantInitialization(Dec declaration) {
+	compileExpression(declaration->expTree);
+	writeIndents();
+	writeVar(declaration->id->name);
+	WTF(" = ");
+	writeTempVar(varcnt-1);
+	WTF(";\n");
 }
 
 void compileDo(Do dostatement) {
@@ -798,6 +795,14 @@ void compileProc(ProcDef procedure) {
 void compileMain(Prog program) {
 	WTF("int main(int argc, char **argv){\n");
 	indentDept++;
+	for (int i = 0; i < program->numConstDefs; i++) {
+		writeGlobalDecMalloc(program->constDefs[i]);
+	}
+	if (program->numConstDefs > 0) WTF("\n");
+	for (int i = 0; i < program->numVarDefs; i++) {
+		writeGlobalDecMalloc(program->varDefs[i]);
+	}
+	if (program->numVarDefs > 0) WTF("\n");
 	for (int i = 0; i < program->numConstDefs; i++) {
 		writeConstantInitialization(program->constDefs[i]);
 	}
