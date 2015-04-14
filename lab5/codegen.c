@@ -76,11 +76,11 @@ void writeVarRef(char *name) {
 }
 
 void writeLabel(int num) {
-	WTF("label lbl");
+	WTF("lbl");
 	char labelstring[32];
 	sprintf(labelstring, "%d", num);
 	WTF(labelstring);
-	WTF(";\n");
+	WTF(":;\n");
 }
 
 void writeGoto(int num) {
@@ -166,7 +166,7 @@ void compilebinodeexp(Bnode bnode) {
 		compileExpression(bnode->l);
 		int basevar = varcnt - 1;
 		char num[64];
-		sprintf(num,"powInteger(&t%d,t%d);\n",basevar,powervar);
+		sprintf(num, "powInteger(&t%d,t%d);\n", basevar, powervar);
 		writeIndents();
 		WTF(num);
 	} else if (bnode->operator == plusop) {
@@ -175,7 +175,7 @@ void compilebinodeexp(Bnode bnode) {
 		compileExpression(bnode->l);
 		int left = varcnt - 1;
 		char num[64];
-		sprintf(num,"addInteger(&t%d,t%d);\n",left,right);
+		sprintf(num, "addInteger(&t%d,t%d);\n", left, right);
 		writeIndents();
 		WTF(num);
 	} else if (bnode->operator == minop) {
@@ -184,7 +184,7 @@ void compilebinodeexp(Bnode bnode) {
 		compileExpression(bnode->l);
 		int left = varcnt - 1;
 		char num[64];
-		sprintf(num,"subInteger(&t%d,t%d);\n",left,right);
+		sprintf(num, "subInteger(&t%d,t%d);\n", left, right);
 		writeIndents();
 		WTF(num);
 	} else if (bnode->operator == mulop) {
@@ -193,7 +193,7 @@ void compilebinodeexp(Bnode bnode) {
 		compileExpression(bnode->l);
 		int left = varcnt - 1;
 		char num[64];
-		sprintf(num,"mulInteger(&t%d,t%d);\n",left,right);
+		sprintf(num, "mulInteger(&t%d,t%d);\n", left, right);
 		writeIndents();
 		WTF(num);
 	} else if (bnode->operator == divop) {
@@ -202,7 +202,7 @@ void compilebinodeexp(Bnode bnode) {
 		compileExpression(bnode->l);
 		int left = varcnt - 1;
 		char num[64];
-		sprintf(num,"divInteger(&t%d,t%d);\n",left,right);
+		sprintf(num, "divInteger(&t%d,t%d);\n", left, right);
 		writeIndents();
 		WTF(num);
 	} else if (bnode->operator == modop) {
@@ -211,26 +211,59 @@ void compilebinodeexp(Bnode bnode) {
 		compileExpression(bnode->l);
 		int left = varcnt - 1;
 		char num[64];
-		sprintf(num,"modInteger(&t%d,t%d);\n",left,right);
+		sprintf(num, "modInteger(&t%d,t%d);\n", left, right);
 		writeIndents();
 		WTF(num);
 	} else if (bnode->operator == andop || bnode->operator == candop) {
-		compileExpression(bnode->r);
-		int right = varcnt - 1;
+		// CAND and AND will behave exactly the same
+		char num[64];
 		compileExpression(bnode->l);
 		int left = varcnt - 1;
-		char num[64];
-		sprintf(num,"t%d = t%d && t%d;\n",left, left,right);
+		int falselabel = lblcnt++;
+		sprintf(num, "if (t%d == 0) {\n", left);
 		writeIndents();
 		WTF(num);
-	} else if (bnode->operator == corop || bnode->operator == orop) {
+		indentDept++;
+		writeIndents();
+		writeGoto(falselabel);
+		indentDept--;
+		writeIndents();
+		WTF("}\n");
 		compileExpression(bnode->r);
 		int right = varcnt - 1;
+		sprintf(num, "t%d = t%d && t%d;\n", left, left, right);
+		writeIndents();
+		WTF(num);
+		writeIndents();
+		writeLabel(falselabel);
+		int answer = varcnt++;
+		writeIndents();
+		sprintf(num, "int t%d = t%d;\n", answer, left);
+		WTF(num);
+	} else if (bnode->operator == corop || bnode->operator == orop) {
 		compileExpression(bnode->l);
 		int left = varcnt - 1;
+		int truelabel = lblcnt++;
 		char num[64];
-		sprintf(num,"t%d = t%d || t%d;\n",left, left,right);
+		sprintf(num, "if (t%d) {\n", left);
 		writeIndents();
+		WTF(num);
+		indentDept++;
+		writeIndents();
+		writeGoto(truelabel);
+		indentDept--;
+		writeIndents();
+		WTF("}\n");
+		compileExpression(bnode->r);
+		int right = varcnt - 1;
+		sprintf(num, "t%d = t%d || t%d;\n", left, left, right);
+		writeIndents();
+		WTF(num);
+		writeIndents();
+		writeLabel(truelabel);
+		int answer = varcnt++;
+		writeIndents();
+		sprintf(num, "int t%d = t%d;\n", answer, left);
 		WTF(num);
 	} else if (bnode->operator == gtop) {
 		compileExpression(bnode->r);
@@ -240,7 +273,7 @@ void compilebinodeexp(Bnode bnode) {
 		int tempvar = varcnt++;
 		int answer = varcnt++;
 		char num[64];
-		sprintf(num,"int t%d = compareTo(t%d, t%d);\n",tempvar, left,right);
+		sprintf(num, "int t%d = compareTo(t%d, t%d);\n", tempvar, left, right);
 		writeIndents();
 		WTF(num);
 		writeIndents();
@@ -254,7 +287,7 @@ void compilebinodeexp(Bnode bnode) {
 		int tempvar = varcnt++;
 		int answer = varcnt++;
 		char num[64];
-		sprintf(num,"int t%d = compareTo(t%d, t%d);\n",tempvar, left,right);
+		sprintf(num, "int t%d = compareTo(t%d, t%d);\n", tempvar, left, right);
 		writeIndents();
 		WTF(num);
 		writeIndents();
@@ -268,7 +301,7 @@ void compilebinodeexp(Bnode bnode) {
 		int tempvar = varcnt++;
 		int answer = varcnt++;
 		char num[64];
-		sprintf(num,"int t%d = compareTo(t%d, t%d);\n",tempvar, left,right);
+		sprintf(num, "int t%d = compareTo(t%d, t%d);\n", tempvar, left, right);
 		writeIndents();
 		WTF(num);
 		sprintf(num, "int t%d = t%d >= 0;\n", answer, tempvar);
@@ -282,13 +315,13 @@ void compilebinodeexp(Bnode bnode) {
 		int tempvar = varcnt++;
 		int answer = varcnt++;
 		char num[64];
-		sprintf(num,"int t%d = compareTo(t%d, t%d);\n",tempvar, left,right);
+		sprintf(num, "int t%d = compareTo(t%d, t%d);\n", tempvar, left, right);
 		writeIndents();
 		WTF(num);
 		sprintf(num, "int t%d = t%d <= 0;\n", answer, tempvar);
 		writeIndents();
 		WTF(num);
-	} else  if ( (getExpType(bnode->l) * 10) / 10 == INTEGER_TYPE){
+	} else if ((getExpType(bnode->l) * 10) / 10 == INTEGER_TYPE) {
 		// EQ en NEQ For integers
 		compileExpression(bnode->r);
 		int right = varcnt - 1;
@@ -297,7 +330,7 @@ void compilebinodeexp(Bnode bnode) {
 		int tempvar = varcnt++;
 		int answer = varcnt++;
 		char num[64];
-		sprintf(num,"int t%d = compareTo(t%d, t%d);\n",tempvar, left,right);
+		sprintf(num, "int t%d = compareTo(t%d, t%d);\n", tempvar, left, right);
 		writeIndents();
 		WTF(num);
 		if (bnode->operator == eqop) {
@@ -327,11 +360,9 @@ void compilebinodeexp(Bnode bnode) {
 	}
 }
 
-
-
 void compileunodeexp(Unode unode) {
 	compileExpression(unode->e);
-	int expvar = varcnt -1;
+	int expvar = varcnt - 1;
 	if (unode->operator == notop) {
 		int newvar = varcnt++;
 		writeIndents();
@@ -351,7 +382,7 @@ void compileunodeexp(Unode unode) {
 		sprintf(num, "makeIntegerFromString(&t%d,\"0\")\n", newvar);
 		WTF(num);
 		writeIndents();
-		sprintf(num, "subInteger(&t%d,t%d)\n", newvar,expvar);
+		sprintf(num, "subInteger(&t%d,t%d)\n", newvar, expvar);
 		WTF(num);
 	} else {
 		printf("ERRORZZZ....\n");
@@ -762,8 +793,8 @@ void compileFunc(FuncDef function) {
 	// TODO print for return statement
 	indentDept--;
 	WTF("}\n");
-	if(paramsByRef->numParams>0){
-	free(paramsByRef->params);
+	if (paramsByRef->numParams > 0) {
+		free(paramsByRef->params);
 	}
 	free(paramsByRef);
 }
@@ -786,8 +817,8 @@ void compileProc(ProcDef procedure) {
 	}
 	indentDept--;
 	WTF("}\n");
-	if(paramsByRef->numParams>0){
-	free(paramsByRef->params);
+	if (paramsByRef->numParams > 0) {
+		free(paramsByRef->params);
 	}
 	free(paramsByRef);
 }
@@ -813,8 +844,8 @@ void compileMain(Prog program) {
 	for (int i = 0; i < program->numBodyStmnts; i++) {
 		compileStatement(program->bodyStmnts[i]);
 	}
-	if(paramsByRef->numParams>0){
-	free(paramsByRef->params);
+	if (paramsByRef->numParams > 0) {
+		free(paramsByRef->params);
 	}
 	free(paramsByRef);
 	writeIndents();
