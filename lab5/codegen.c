@@ -881,6 +881,12 @@ void compileFunc(FuncDef function) {
 	}
 	WTF(") {\n");
 	indentDept++;
+	writeIndents();
+	writeVarRef(function->id->name);
+	WTF(" = malloc(sizeof ( ");
+	WTF(getCTypeString((function->id->type / 10)*10));
+	WTF("));\n");
+	
 	for (int i = 0; i < function->numStmnts; i++) {
 		compileStatement(function->stmnts[i]);
 	}
