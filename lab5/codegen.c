@@ -553,6 +553,7 @@ void compileDo(Do dostatement) {
 }
 
 void compileIf(If ifstatement) {
+	writeIndents();
 	WTF("/* START IF */\n");
 	int truecounter = varcnt++;
 	int arrayloc = varcnt++;
