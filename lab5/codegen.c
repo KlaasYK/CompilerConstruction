@@ -390,18 +390,31 @@ void compilebinodeexp(Bnode bnode) {
 		int left = varcnt - 1;
 		int tempvar = varcnt++;
 		int answer = varcnt++;
-		char num[64];
-		sprintf(num, "int t%d = compareTo(t%d, t%d);\n", tempvar, left, right);
+		
 		writeIndents();
-		WTF(num);
+		WTF("int ");
+		writeTempVar(tempvar);
+		WTF(" = compareTo(");
+		writeTempVar(left);
+		WTF(",");
+		writeTempVar(right);
+		WTF(");\n");
 		if (bnode->operator == eqop) {
-			sprintf(num, "int t%d = t%d == 0;\n", answer, tempvar);
+			writeIndents();
+			WTF("int ");
+			writeTempVar(answer);
+			WTF(" = ");
+			writeTempVar(tempvar);
+			WTF(" == 0);\n");
 		} else {
 			// NEQ op
-			sprintf(num, "int t%d = t%d != 0;\n", answer, tempvar);
+			writeIndents();
+			WTF("int ");
+			writeTempVar(answer);
+			WTF(" = ");
+			writeTempVar(tempvar);
+			WTF(" != 0);\n");
 		}
-		writeIndents();
-		WTF(num);
 	} else {
 		// EQ en NEQ For booleans
 		compileExpression(bnode->r);
@@ -411,13 +424,25 @@ void compilebinodeexp(Bnode bnode) {
 		int answer = varcnt++;
 		char num[64];
 		if (bnode->operator == eqop) {
-			sprintf(num, "int t%d = t%d == t%d;\n", answer, left, right);
+			writeIndents();
+			WTF("int ");
+			writeTempVar(answer);
+			WTF(" = ");
+			writeTempVar(left);
+			WTF(" == ");
+			writeTempVar(right);
+			WTF(";\n");
 		} else {
 			// NEQ op
-			sprintf(num, "int t%d = t%d != t%d;\n", answer, left, right);
+						writeIndents();
+			WTF("int ");
+			writeTempVar(answer);
+			WTF(" = ");
+			writeTempVar(left);
+			WTF(" != ");
+			writeTempVar(right);
+			WTF(";\n");
 		}
-		writeIndents();
-		WTF(num);
 	}
 }
 
