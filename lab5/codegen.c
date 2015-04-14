@@ -233,7 +233,7 @@ void compilebinodeexp(Bnode bnode) {
 		int tempvar = varcnt++;
 		int answer = varcnt++;
 		char num[64];
-		sprintf(num,"int t%d = compareTo(t%d  t%d);\n",tempvar, left,right);
+		sprintf(num,"int t%d = compareTo(t%d, t%d);\n",tempvar, left,right);
 		writeIndents();
 		WTF(num);
 		writeIndents();
@@ -247,7 +247,7 @@ void compilebinodeexp(Bnode bnode) {
 		int tempvar = varcnt++;
 		int answer = varcnt++;
 		char num[64];
-		sprintf(num,"int t%d = compareTo(t%d  t%d);\n",tempvar, left,right);
+		sprintf(num,"int t%d = compareTo(t%d, t%d);\n",tempvar, left,right);
 		writeIndents();
 		WTF(num);
 		writeIndents();
@@ -261,7 +261,7 @@ void compilebinodeexp(Bnode bnode) {
 		int tempvar = varcnt++;
 		int answer = varcnt++;
 		char num[64];
-		sprintf(num,"int t%d = compareTo(t%d  t%d);\n",tempvar, left,right);
+		sprintf(num,"int t%d = compareTo(t%d, t%d);\n",tempvar, left,right);
 		writeIndents();
 		WTF(num);
 		sprintf(num, "int t%d = t%d >= 0;\n", answer, tempvar);
@@ -275,18 +275,49 @@ void compilebinodeexp(Bnode bnode) {
 		int tempvar = varcnt++;
 		int answer = varcnt++;
 		char num[64];
-		sprintf(num,"int t%d = compareTo(t%d  t%d);\n",tempvar, left,right);
+		sprintf(num,"int t%d = compareTo(t%d, t%d);\n",tempvar, left,right);
 		writeIndents();
 		WTF(num);
 		sprintf(num, "int t%d = t%d <= 0;\n", answer, tempvar);
 		writeIndents();
 		WTF(num);
+	} else  if ( (getExpType(bnode->l) * 10) / 10 == INTEGER_TYPE){
+		// EQ en NEQ For integers
+		compileExpression(bnode->r);
+		int right = varcnt - 1;
+		compileExpression(bnode->l);
+		int left = varcnt - 1;
+		int tempvar = varcnt++;
+		int answer = varcnt++;
+		char num[64];
+		sprintf(num,"int t%d = compareTo(t%d, t%d);\n",tempvar, left,right);
+		writeIndents();
+		WTF(num);
+		if (bnode->operator == eqop) {
+			sprintf(num, "int t%d = t%d == 0;\n", answer, tempvar);
+		} else {
+			// NEQ op
+			sprintf(num, "int t%d = t%d != 0;\n", answer, tempvar);
+		}
+		writeIndents();
+		WTF(num);
 	} else {
-		varcnt++;
-		//TODO: neqop, eqop, gtop, ltop, geop, leop
-		printf("TODO: neqop, eqop\n");
+		// EQ en NEQ For booleans
+		compileExpression(bnode->r);
+		int right = varcnt - 1;
+		compileExpression(bnode->l);
+		int left = varcnt - 1;
+		int answer = varcnt++;
+		char num[64];
+		if (bnode->operator == eqop) {
+			sprintf(num, "int t%d = t%d == t%d;\n", answer, left, right);
+		} else {
+			// NEQ op
+			sprintf(num, "int t%d = t%d != t%d;\n", answer, left, right);
+		}
+		writeIndents();
+		WTF(num);
 	}
-	
 }
 
 
