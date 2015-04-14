@@ -406,7 +406,7 @@ void compilebinodeexp(Bnode bnode) {
 			writeTempVar(answer);
 			WTF(" = ");
 			writeTempVar(tempvar);
-			WTF(" == 0);\n");
+			WTF(" == 0;\n");
 		} else {
 			// NEQ op
 			writeIndents();
@@ -414,7 +414,7 @@ void compilebinodeexp(Bnode bnode) {
 			writeTempVar(answer);
 			WTF(" = ");
 			writeTempVar(tempvar);
-			WTF(" != 0);\n");
+			WTF(" != 0;\n");
 		}
 	} else {
 		// EQ en NEQ For booleans
