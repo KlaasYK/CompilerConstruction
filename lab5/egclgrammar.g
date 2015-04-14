@@ -218,7 +218,7 @@ void printTypeError(char *identifier, int ErrorType) {
 		case VARIABLEASKED: printf("Function or procedure '%s' found in stead of variable, at column %d\n", identifier, columnnr+1);break;
 		case RETURNINPROC: printf("Trying to return a value to a procedure '%s', at column %d\n", identifier, columnnr+1);break;
 		case MISSINGRETURN: printf("Function '%s' has nothing assigned to its return variable, at column %d\n", identifier, columnnr+1);break;
-		case WRONGCONSTDEFOP: printf("Illegal character (%s) detected at column %d\n", identifier, columnnr+1);break;
+		case WRONGCONSTDEFOP: printf("Illegal token (%s) detected at column %d\n", identifier, columnnr+1);break;
 	}
 	
 	free(identifier);
@@ -284,25 +284,14 @@ int main(int argc, char** argv) {
 	
 	parser();
 	
-	
-	
 	if (argc == 2) {
 		fclose(yyin);
 		yyin = NULL;
 	}
-	if (error) {
-		printf("Parser failed!\n");
-		utilCleanUp();
-		freeProg(program);
-		program = NULL;
-		freeSymbolTable();
-		freeLines();
-		return EXIT_FAILURE;
-	} else {
+	
+	if(!error){
 		// TODO: replace by outputfile name (argv[2]?)
 		generateCode(program, "out.c99");
-		
-		printf("Parsing succesfull\n");
 	}
 	
 	utilCleanUp();
@@ -311,7 +300,14 @@ int main(int argc, char** argv) {
 	freeSymbolTable();
 	freeLines();
 	
-	return EXIT_SUCCESS;
+	if (error) {
+		printf("Parser failed!\n");
+		return EXIT_FAILURE;
+	} else {
+		printf("Parsing succesfull\n");
+		return EXIT_SUCCESS;
+	}
+	
 }
 
 /* EOF c FILE */
@@ -1232,12 +1228,16 @@ variable<Dec>(ExpTree exp, int type) :
 				BoolVal bv;
 				if(strcmp(bool, "true") == 0){
 					bv = true;
+					free(bool);
+					bool = NULL;
 				}else if(strcmp(bool, "false") == 0){
 					bv = false;
+					free(bool);
+					bool = NULL;
+				}else{
+					printTypeError(bool, WRONGCONSTDEFOP);
 				}
 				type = CONST_BOOLEAN_TYPE;
-				free(bool);
-				bool = NULL;
 				exp = makeBoolExp(makeBool(bv));
 			}
 		| 
@@ -1448,7 +1448,9 @@ constantdef<Dec>(int type, char *name, Dec dec)	:
 				/* check if the  identifier exists already */
 				if ( !existsInTop(n->name) ) {
 					// type+1 for constants
-					insertIdentifier(strdup(n->name), VARIABLE, type+1, NULL);
+					if(!error){
+						insertIdentifier(strdup(n->name), VARIABLE, type+1, NULL);
+					}
 				} else {
 					printTypeError(n->name, DUPLICATE);
 				}
@@ -1476,7 +1478,11 @@ constantdef<Dec>(int type, char *name, Dec dec)	:
 			}
 		}
 		SEMICOLON{
-			dec->id->name = name;
+			if(!error){
+				dec->id->name = name;
+			}else{
+				dec->id->name = strdup("error");
+			}
 			dec->idType = constant;
 			LLretval = d;
 		}

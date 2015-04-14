@@ -1,6 +1,12 @@
 program bla;
 
-constant do
+constant x:integer = 5;
+
+constant bla, bla2, bla3 :integer = 6;
+
+var bla5 : boolean;
 
 begin
+    var bla4 : boolean;
+    bla, bla2, bla3 := 6;
 end.
