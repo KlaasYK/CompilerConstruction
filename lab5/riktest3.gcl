@@ -4,8 +4,8 @@ constant x:integer = 5;
 
 var bla5, bla6, bla7 : boolean;
 
-function a(x:integer) -> integer;
-    a:=5;
+procedure a(x:integer);
+    x:=x + 5;
 end;
 
 begin
