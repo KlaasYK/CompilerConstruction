@@ -622,6 +622,7 @@ void compileDo(Do dostatement) {
 		for (int j = 0; j < g->numStmnts; j++) {
 			compileStatement(g->stmnts[j]);
 		}
+		compileStoredAss();
 		indentDept--;
 		writeIndents();
 		WTF("}\n");
@@ -744,6 +745,7 @@ void compileIf(If ifstatement) {
 		for (int j = 0; j < g->numStmnts; j++) {
 			compileStatement(g->stmnts[j]);
 		}
+		compileStoredAss();
 		writeIndents();
 		writeGoto(endiflabel);
 		indentDept--;
@@ -853,16 +855,16 @@ void compileWriteCall(WCall write) {
 
 
 void compileStatement(Stmnt statement) {
-	int sameline = 0;
+	if( statement->kind != assStmnt) {
+		compileStoredAss();
+	}
 	switch (statement->kind) {
 		case decStmnt: compileDec(statement->dec);
 			break;
 		case assStmnt:
 			if (statement->assignment->lineNr == lastline) {
 				halfCompileAss(statement->assignment);
-				sameline = 1;
 			} else {
-				sameline = 1;
 				lastline = statement->assignment->lineNr;
 				// Compile all stored assignments
 				compileStoredAss();
@@ -883,10 +885,6 @@ void compileStatement(Stmnt statement) {
 			break;
 		default:
 			printf("Not Done yet...\n");
-	}
-	if (!sameline) {
-		// Compile all stored assignments
-		compileStoredAss();
 	}
 }
 
