@@ -929,6 +929,9 @@ void compileFunc(FuncDef function) {
 	}
 	compileStoredAss();
 	// TODO print for return statement
+	WTF("return ");
+	writeVar(function->id->name);
+	WTF(";\n");
 	indentDept--;
 	WTF("}\n");
 	if (paramsByVal->numParams > 0) {
