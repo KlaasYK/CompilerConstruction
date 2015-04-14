@@ -103,10 +103,6 @@ void writeIndents() {
 	}
 }
 
-void writeAssignment(char *varName, char *lhs, char op, char *rhs) {
-	//TODO
-}
-
 void compileIntegerExp(Int intval) {
 	int tempvar = varcnt++;
 	writeIndents();
@@ -529,15 +525,17 @@ void compileStoredAss() {
 	numstatements = 0;
 }
 
-void compileAss(Ass assignment) {
+/* not needed anymore, just kept as reference*/
+/*void compileAss(Ass assignment) {
 	compileExpression(assignment->expTree);
 	writeIndents();
 	writeVar(assignment->id->name);
 	WTF(" = ");
 	writeTempVar(varcnt - 1);
 	WTF(";\n");
-}
+}*/
 
+/* Rick, zijn deze mallocs echt nodig? */
 void compileDec(Dec declaration) {
 	writeIndents();
 	WTF(getCTypeString((declaration->id->type / 10)*10));
@@ -579,7 +577,7 @@ void compileDo(Do dostatement) {
 	writeIndents();
 	WTF("int ");
 	writeTempVar(arrayloc);
-	char num[40];
+	char num[42];
 	sprintf(num, "[%d] = {0}; //True array\n", dostatement->numGCommands);
 	WTF(num);
 
@@ -670,8 +668,9 @@ void compileDo(Do dostatement) {
 	writeIndents();
 	WTF("if (");
 	writeTempVar(arrayloc);
-	sprintf(num, "[t%d] != 1) {\n", randomvar);
-	WTF(num);
+	WTF("[");
+	writeTempVar(randomvar);
+	WTF("] != 1) {\n");
 	indentDept++;
 	writeIndents();
 	writeGoto(startwhilelabel);
@@ -700,7 +699,7 @@ void compileIf(If ifstatement) {
 	writeIndents();
 	WTF("int ");
 	writeTempVar(arrayloc);
-	char num[40];
+	char num[42];
 	sprintf(num, "[%d] = {0}; //True array\n", ifstatement->numGCommands);
 	WTF(num);
 
@@ -782,10 +781,10 @@ void compileIf(If ifstatement) {
 	writeIndents();
 	WTF("if (");
 	writeTempVar(arrayloc);
-	sprintf(num, "[t%d] != 1) {\n", randomvar);
+	WTF("[");
+	writeTempVar(randomvar);
+	WTF("] != 1) {\n");
 	indentDept++;
-	writeIndents();
-	WTF(num);
 	writeIndents();
 	writeGoto(startwhilelabel);
 	indentDept--;
