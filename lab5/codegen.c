@@ -14,11 +14,8 @@
 // ie println a, b should return:
 // a
 // b
-
-// Make all the compare ops work (we do have in the bigints.c, just not in the
-// header I believe)
-
-//Functions, function calls and what have you. Don't mention the pointers!
+// Functions, function calls and what have you. Don't mention the pointers!
+// Make CAND, AND, COR and COR all conditional (everything is evalled now)
 
 FILE *outputfile;
 

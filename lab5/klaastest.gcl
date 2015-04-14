@@ -1,9 +1,10 @@
 program dummy;
 
 begin
-	do true -> print 'Hello World';
-	[] true -> print 'I am afraid I can not do that';
-	[] true -> print 'Kaas is lekker';
-	od;
-	print 'Kaas is Lekker';
+	var kaasislekker : boolean;
+	var k : integer;
+	k := 42;
+	kaasislekker := true;
+	kaasislekker := not kaasislekker;
+	k := -k;
 end.

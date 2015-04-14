@@ -2,6 +2,8 @@
 #define BIGINTS_H
 /*** stuff to implement ***/
 
+#include <stdint.h>
+
 /* use only base of 10^x (otherwise makeIntegerFromString and printInteger will break) */
 #define BASE 65536 /* must become 65535 = 2 ^16 - 1*/ 
 #define LOGBASE 6 /* must become 6 */
@@ -38,5 +40,7 @@ void modInteger(Integer *a, Integer b);
 
 /* a := a^b */
 void powInteger(Integer *a, Integer b);
+
+int compareTo(Integer a, Integer b);
 
 #endif //BIGINTS_H
