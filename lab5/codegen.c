@@ -225,10 +225,66 @@ void compilebinodeexp(Bnode bnode) {
 		sprintf(num,"t%d = t%d || t%d;\n",left, left,right);
 		writeIndents();
 		WTF(num);
+	} else if (bnode->operator == gtop) {
+		compileExpression(bnode->r);
+		int right = varcnt - 1;
+		compileExpression(bnode->l);
+		int left = varcnt - 1;
+		int tempvar = varcnt++;
+		int answer = varcnt++;
+		char num[64];
+		sprintf(num,"int t%d = compareTo(t%d  t%d);\n",tempvar, left,right);
+		writeIndents();
+		WTF(num);
+		writeIndents();
+		sprintf(num, "int t%d = t%d == 1;\n", answer, tempvar);
+		WTF(num);
+	} else if (bnode->operator == ltop) {
+		compileExpression(bnode->r);
+		int right = varcnt - 1;
+		compileExpression(bnode->l);
+		int left = varcnt - 1;
+		int tempvar = varcnt++;
+		int answer = varcnt++;
+		char num[64];
+		sprintf(num,"int t%d = compareTo(t%d  t%d);\n",tempvar, left,right);
+		writeIndents();
+		WTF(num);
+		writeIndents();
+		sprintf(num, "int t%d = t%d == -1;\n", answer, tempvar);
+		WTF(num);
+	} else if (bnode->operator == geop) {
+		compileExpression(bnode->r);
+		int right = varcnt - 1;
+		compileExpression(bnode->l);
+		int left = varcnt - 1;
+		int tempvar = varcnt++;
+		int answer = varcnt++;
+		char num[64];
+		sprintf(num,"int t%d = compareTo(t%d  t%d);\n",tempvar, left,right);
+		writeIndents();
+		WTF(num);
+		sprintf(num, "int t%d = t%d >= 0;\n", answer, tempvar);
+		writeIndents();
+		WTF(num);
+	} else if (bnode->operator == leop) {
+		compileExpression(bnode->r);
+		int right = varcnt - 1;
+		compileExpression(bnode->l);
+		int left = varcnt - 1;
+		int tempvar = varcnt++;
+		int answer = varcnt++;
+		char num[64];
+		sprintf(num,"int t%d = compareTo(t%d  t%d);\n",tempvar, left,right);
+		writeIndents();
+		WTF(num);
+		sprintf(num, "int t%d = t%d <= 0;\n", answer, tempvar);
+		writeIndents();
+		WTF(num);
 	} else {
 		varcnt++;
 		//TODO: neqop, eqop, gtop, ltop, geop, leop
-		printf("TODO: neqop, eqop, gtop, ltop, geop, leop\n");
+		printf("TODO: neqop, eqop\n");
 	}
 	
 }
