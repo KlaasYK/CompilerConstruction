@@ -2,7 +2,7 @@ program bla;
 
 constant x:integer = 5;
 
-var bla5 : boolean;
+var bla5, bla6, bla7 : boolean;
 
 begin
     var bla4 : boolean;

@@ -433,16 +433,18 @@ void compileDec(Dec declaration) {
 	writeIndents();
 	WTF(getCTypeString((declaration->id->type / 10)*10));
 	writeVar(declaration->id->name);
-	WTF(";");
-	if (declaration->idType == constant) {
-		WTF(" // constant, will be init once in the main");
+	if (indentDept > 0) {
+		WTF(" = malloc(sizeof ( ");
+		WTF(getCTypeString((declaration->id->type / 10)*10));
+		WTF("))");
 	}
-	WTF("\n");
+	WTF(";\n");
 }
 
 void writeGlobalDecMalloc(Dec declaration) {
+	writeIndents();
 	writeVarRef(declaration->id->name);
-	WTF(" = malloc(sizeof(");
+	WTF(" = malloc(sizeof ( ");
 	WTF(getCTypeString((declaration->id->type / 10)*10));
 	WTF("));\n");
 }
@@ -452,7 +454,7 @@ void writeConstantInitialization(Dec declaration) {
 	writeIndents();
 	writeVar(declaration->id->name);
 	WTF(" = ");
-	writeTempVar(varcnt-1);
+	writeTempVar(varcnt - 1);
 	WTF(";\n");
 }
 
@@ -826,18 +828,22 @@ void compileProc(ProcDef procedure) {
 void compileMain(Prog program) {
 	WTF("int main(int argc, char **argv){\n");
 	indentDept++;
+	if (program->numConstDefs > 0) WTF("// constant mallocs, will be init below\n");
 	for (int i = 0; i < program->numConstDefs; i++) {
 		writeGlobalDecMalloc(program->constDefs[i]);
 	}
 	if (program->numConstDefs > 0) WTF("\n");
+	if (program->numVarDefs > 0) WTF("// varable mallocs\n");
 	for (int i = 0; i < program->numVarDefs; i++) {
 		writeGlobalDecMalloc(program->varDefs[i]);
 	}
 	if (program->numVarDefs > 0) WTF("\n");
+	if (program->numConstDefs > 0) WTF("// constant initializations\n");
 	for (int i = 0; i < program->numConstDefs; i++) {
 		writeConstantInitialization(program->constDefs[i]);
 	}
 	if (program->numConstDefs > 0) WTF("\n");
+	if (program->numBodyStmnts > 0) WTF("// main body\n");
 	paramsByRef = malloc(sizeof (struct Params));
 	paramsByRef->numParams = 0;
 	// main doesnt have parameters
@@ -858,18 +864,22 @@ void generateCode(Prog program, char *outputfilename) {
 	outputfile = fopen(outputfilename, "w");
 	writeHeaders();
 
+	if (program->numConstDefs > 0) WTF("// global constant definitions, will be malloced and init once in the main\n");
 	for (int i = 0; i < program->numConstDefs; i++) {
 		compileDec(program->constDefs[i]);
 	}
 	if (program->numConstDefs > 0) WTF("\n");
+	if (program->numVarDefs > 0) WTF("// global variable definitions, will be malloced in the main\n");
 	for (int i = 0; i < program->numVarDefs; i++) {
 		compileDec(program->varDefs[i]);
 	}
 	if (program->numVarDefs > 0) WTF("\n");
+	if (program->numProcDefs > 0) WTF("// procedure definitions\n");
 	for (int i = 0; i < program->numProcDefs; i++) {
 		compileProc(program->procDefs[i]);
 		WTF("\n");
 	}
+	if (program->numFuncDefs > 0) WTF("// function definitions\n");
 	for (int i = 0; i < program->numFuncDefs; i++) {
 		compileFunc(program->funcDefs[i]);
 		WTF("\n");
