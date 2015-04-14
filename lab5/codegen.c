@@ -117,28 +117,18 @@ void compileIntegerExp(Int intval) {
 }
 
 void compileIDexp(ID id) {
+	writeIndents();
+	int tempvar = varcnt++;
 	if ((id->type / 10) * 10 == INTEGER_TYPE) {
-		writeIndents();
-		int tempvar = varcnt++;
 		WTF("Integer ");
-		writeTempVar(tempvar);
-		char *num;
-		num = malloc((strlen(id->name) + 42) * sizeof (char));
-		sprintf(num, " = %s;\n", id->name);
-		WTF(num);
-		free(num);
 	} else {
 		// Boolean type
-		writeIndents();
-		int tempvar = varcnt++;
 		WTF("int ");
-		writeTempVar(tempvar);
-		char *num;
-		num = malloc((strlen(id->name) + 42) * sizeof (char));
-		sprintf(num, " = %s;\n", id->name);
-		WTF(num);
-		free(num);
 	}
+	writeTempVar(tempvar);
+	WTF(" = ");
+	writeVar(id->name);
+	WTF(";\n");
 }
 
 void compileBoolExp(Bool boolval) {
@@ -299,7 +289,7 @@ void compilebinodeexp(Bnode bnode) {
 		int left = varcnt - 1;
 		int tempvar = varcnt++;
 		int answer = varcnt++;
-		
+
 		writeIndents();
 		WTF("int ");
 		writeTempVar(tempvar);
@@ -321,7 +311,7 @@ void compilebinodeexp(Bnode bnode) {
 		int left = varcnt - 1;
 		int tempvar = varcnt++;
 		int answer = varcnt++;
-		
+
 		writeIndents();
 		WTF("int ");
 		writeTempVar(tempvar);
@@ -336,7 +326,7 @@ void compilebinodeexp(Bnode bnode) {
 		WTF(" = ");
 		writeTempVar(tempvar);
 		WTF(" == -1;\n");
-		
+
 	} else if (bnode->operator == geop) {
 		compileExpression(bnode->r);
 		int right = varcnt - 1;
@@ -344,7 +334,7 @@ void compilebinodeexp(Bnode bnode) {
 		int left = varcnt - 1;
 		int tempvar = varcnt++;
 		int answer = varcnt++;
-		
+
 		writeIndents();
 		WTF("int ");
 		writeTempVar(tempvar);
@@ -359,7 +349,7 @@ void compilebinodeexp(Bnode bnode) {
 		WTF(" = ");
 		writeTempVar(tempvar);
 		WTF(" >= 0;\n");
-		
+
 	} else if (bnode->operator == leop) {
 		compileExpression(bnode->r);
 		int right = varcnt - 1;
@@ -367,7 +357,7 @@ void compilebinodeexp(Bnode bnode) {
 		int left = varcnt - 1;
 		int tempvar = varcnt++;
 		int answer = varcnt++;
-		
+
 		writeIndents();
 		WTF("int ");
 		writeTempVar(tempvar);
@@ -382,7 +372,7 @@ void compilebinodeexp(Bnode bnode) {
 		WTF(" = ");
 		writeTempVar(tempvar);
 		WTF(" <= 0;\n");
-		
+
 	} else if ((getExpType(bnode->l) * 10) / 10 == INTEGER_TYPE) {
 		// EQ en NEQ For integers
 		compileExpression(bnode->r);
@@ -391,7 +381,7 @@ void compilebinodeexp(Bnode bnode) {
 		int left = varcnt - 1;
 		int tempvar = varcnt++;
 		int answer = varcnt++;
-		
+
 		writeIndents();
 		WTF("int ");
 		writeTempVar(tempvar);
@@ -435,7 +425,7 @@ void compilebinodeexp(Bnode bnode) {
 			WTF(";\n");
 		} else {
 			// NEQ op
-						writeIndents();
+			writeIndents();
 			WTF("int ");
 			writeTempVar(answer);
 			WTF(" = ");
@@ -857,7 +847,7 @@ void compileParameter(Param parameter) {
 	WTF(getCTypeString(parameter->id->type));
 	if (parameter->call == byRef) {
 		writeVar(parameter->id->name);
-	}else{
+	} else {
 		writeVarRef(parameter->id->name);
 		paramsByVal->numParams++;
 		if (paramsByVal->numParams == 1) {
