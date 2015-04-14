@@ -232,7 +232,8 @@ void compilebinodeexp(Bnode bnode) {
 		compileExpression(bnode->l);
 		int left = varcnt - 1;
 		int falselabel = lblcnt++;
-		writeIndents("if (");
+		writeIndents();
+		WTF("if (");
 		writeTempVar(left);
 		WTF(" == 0) {\n");
 		indentDept++;
@@ -454,9 +455,9 @@ void compileunodeexp(Unode unode) {
 		writeIndents();
 		WTF("int ");
 		writeTempVar(newvar);
-		char num[42];
-		sprintf(num, " = !t%d;\n", expvar);
-		WTF(num);
+		WTF(" = !");
+		writeTempVar(expvar);
+		WTF(";\n");
 	} else if (unode->operator == negop) {
 		int newvar = varcnt++;
 		writeIndents();
@@ -464,12 +465,15 @@ void compileunodeexp(Unode unode) {
 		writeTempVar(newvar);
 		WTF(";\n");
 		writeIndents();
-		char num[64];
-		sprintf(num, "makeIntegerFromString(&t%d,\"0\")\n", newvar);
-		WTF(num);
+		WTF("makeIntegerFromString(&");
+		writeTempVar(newvar);
+		WTF(",\"0\");\n");
 		writeIndents();
-		sprintf(num, "subInteger(&t%d,t%d)\n", newvar, expvar);
-		WTF(num);
+		WTF("subInteger(&");
+		writeTempVar(newvar);
+		WTF(", ");
+		writeTempVar(expvar);
+		WTF(");\n");
 	} else {
 		printf("ERRORZZZ....\n");
 	}
