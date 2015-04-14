@@ -292,6 +292,12 @@ int main(int argc, char** argv) {
 	}
 	if (error) {
 		printf("Parser failed!\n");
+		utilCleanUp();
+		freeProg(program);
+		program = NULL;
+		freeSymbolTable();
+		freeLines();
+		return EXIT_FAILURE;
 	} else {
 		// TODO: replace by outputfile name (argv[2]?)
 		generateCode(program, "out.c99");
@@ -300,7 +306,7 @@ int main(int argc, char** argv) {
 	}
 	
 	utilCleanUp();
-	freeProg(program);
+	//freeProg(program);
 	program = NULL;
 	freeSymbolTable();
 	freeLines();
@@ -817,17 +823,18 @@ functioncall<FuncCall>(char *name, int type, Exps params):
 			int expectedNumParams = getNumNodes(expectedParams);
 			if(params->numExps != expectedNumParams){
 				printTypeError(strdup(name), PARAMMISMATCH1);
-			}
-			for(int i = params->numExps-1;i>=0;i--){
-				int type = getExpType(params->exps[i]);
-				int expectedType = expectedParams->evaltype;
-				if((type/10)*10 != (expectedType/10)*10){
-					printTypeError(strdup(name), PARAMMISMATCH2);
+			}else{
+				for(int i = params->numExps-1;i>=0;i--){
+					int type = getExpType(params->exps[i]);
+					int expectedType = expectedParams->evaltype;
+					if((type/10)*10 != (expectedType/10)*10){
+						printTypeError(strdup(name), PARAMMISMATCH2);
+					}
+					if(type%10 == 1 && expectedType%10 == 2){
+						printTypeError(strdup(name), REFERENCETOCONSTANT);					
+					}
+					expectedParams = expectedParams->next;
 				}
-				if(type%10 == 1 && expectedType%10 == 2){
-					printTypeError(strdup(name), REFERENCETOCONSTANT);					
-				}
-				expectedParams = expectedParams->next;
 			}
 			FuncCall fc = makeFuncCall(type, name, params->numExps, params->exps);
 			LLretval = fc;
@@ -893,50 +900,51 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 				/* if not equal, and not one to many... */
 				freeTempList();
 				printTypeError(NULL, ASSMISMATCH);
-			}
-			if ( exps->numExps != 1) {
-				INode *n = tempidentifierlist;
-				for(int i=exps->numExps-1;i+1>0;i--){
-					/* type checking */
-					int lhs = getType(strdup(n->name));
-					int rhs = getExpType(exps->exps[i]);
-					stmnts->stmnts[i]->assignment->expTree = exps->exps[i];
-					if (lhs == VOID_TYPE) {
-						//Trying to assign something to the proc
-						printTypeError(strdup(n->name),RETURNINPROC);
-					} else if (lookupType(n->name) == METHOD && lhs != VOID_TYPE) {
-						// check if we are in the function
-						if(!updateFunc(n->name)){
-							printTypeError(strdup(n->name),VARIABLEASKED);
-						}
-					} else if ((lhs/10)*10 != (rhs/10)*10 ) {
-						/* the list is freeëd in error */
-						printTypeError(strdup(n->name),WRONGTYPE);
-					}
-					n = n->next;
-				}
 			} else {
-				/* one to all statements */
-				int rhs = getExpType(exps->exps[0]);
-				INode *n = tempidentifierlist;
-				for(int i=stmnts->numStmnts-1;i+1 > 0;i--){
-					/* type checking */
-					int lhs = getType(strdup(n->name));
-					stmnts->stmnts[i]->assignment->expTree = deepCopyExp(exps->exps[0]);
-					if (lhs == VOID_TYPE) {
-						//Trying to assign something to the proc
-						printTypeError(strdup(n->name),RETURNINPROC);
-					} else if (lookupType(n->name) == METHOD && lhs != VOID_TYPE) {
-						if(!updateFunc(n->name)){
-							printTypeError(strdup(n->name),VARIABLEASKED);
+				if ( exps->numExps != 1) {
+					INode *n = tempidentifierlist;
+					for(int i=exps->numExps-1;i+1>0;i--){
+						/* type checking */
+						int lhs = getType(strdup(n->name));
+						int rhs = getExpType(exps->exps[i]);
+						stmnts->stmnts[i]->assignment->expTree = exps->exps[i];
+						if (lhs == VOID_TYPE) {
+							//Trying to assign something to the proc
+							printTypeError(strdup(n->name),RETURNINPROC);
+						} else if (lookupType(n->name) == METHOD && lhs != VOID_TYPE) {
+							// check if we are in the function
+							if(!updateFunc(n->name)){
+								printTypeError(strdup(n->name),VARIABLEASKED);
+							}
+						} else if ((lhs/10)*10 != (rhs/10)*10 ) {
+							/* the list is freeëd in error */
+							printTypeError(strdup(n->name),WRONGTYPE);
 						}
-					} else if ((lhs/10)*10 != (rhs/10)*10 ) {
-						printTypeError(strdup(n->name),WRONGTYPE);
+						n = n->next;
 					}
-					n = n->next;
+				} else {
+					/* one to all statements */
+					int rhs = getExpType(exps->exps[0]);
+					INode *n = tempidentifierlist;
+					for(int i=stmnts->numStmnts-1;i+1 > 0;i--){
+						/* type checking */
+						int lhs = getType(strdup(n->name));
+						stmnts->stmnts[i]->assignment->expTree = deepCopyExp(exps->exps[0]);
+						if (lhs == VOID_TYPE) {
+							//Trying to assign something to the proc
+							printTypeError(strdup(n->name),RETURNINPROC);
+						} else if (lookupType(n->name) == METHOD && lhs != VOID_TYPE) {
+							if(!updateFunc(n->name)){
+								printTypeError(strdup(n->name),VARIABLEASKED);
+							}
+						} else if ((lhs/10)*10 != (rhs/10)*10 ) {
+							printTypeError(strdup(n->name),WRONGTYPE);
+						}
+						n = n->next;
+					}
+					freeExp(exps->exps[0]);
+					exps->exps[0] = NULL;
 				}
-				freeExp(exps->exps[0]);
-				exps->exps[0] = NULL;
 			}
 			freeTempList();
 			free(exps->exps);
@@ -1057,48 +1065,48 @@ call<Stmnts>(char *name):
 ;
 
 declaration<Decs>(IDs idents): 
-				VAR_TOK 
-				identifierarray<ids>(NULL){
-					idents = ids;
+		VAR_TOK 
+		identifierarray<ids>(NULL){
+			idents = ids;
+		}
+		TYPE_OP 
+		TYPE {
+			int type = stringToEvalType(yytext);
+			/* TREE */
+			for(int i = 0; i < idents->numIds; i++){
+				idents->ids[i]->type = type;
+			}
+			Decs d  = malloc(idents->numIds*sizeof(struct Decs));
+			d->numDecs = idents->numIds;
+			d->decs = malloc(d->numDecs*sizeof(Dec));
+			for(int i=0; i < d->numDecs; i++){
+				d->decs[i] = makeExpUninitDec(idents->ids[i], variable);
+			}
+			free(idents->ids);
+			idents->ids = NULL;
+			free(idents);
+			idents = NULL;
+			LLretval = d;
+
+			/* SYMBOL TABLE */
+			INode *n = tempidentifierlist;
+			while (n != NULL) {
+				/* check if the  identifier exists already */
+				if ( !existsInTop(n->name) && !isMethod(n->name) ) {
+					insertIdentifier(strdup(n->name), VARIABLE, stringToEvalType(yytext), NULL);
+				} else if(isMethod(n->name)){
+					printTypeError(n->name, VARIABLEASKED);
+				} else {
+					printTypeError(n->name, DUPLICATE);
 				}
-				TYPE_OP 
-				TYPE {
-					int type = stringToEvalType(yytext);
-					/* TREE */
-					for(int i = 0; i < idents->numIds; i++){
-						idents->ids[i]->type = type;
-					}
-					Decs d  = malloc(idents->numIds*sizeof(struct Decs));
-					d->numDecs = idents->numIds;
-					d->decs = malloc(d->numDecs*sizeof(Dec));
-					for(int i=0; i < d->numDecs; i++){
-						d->decs[i] = makeExpUninitDec(idents->ids[i], variable);
-					}
-					free(idents->ids);
-					idents->ids = NULL;
-					free(idents);
-					idents = NULL;
-					LLretval = d;
-					
-					/* SYMBOL TABLE */
-					INode *n = tempidentifierlist;
-					while (n != NULL) {
-						/* check if the  identifier exists already */
-						if ( !existsInTop(n->name) && !isMethod(n->name) ) {
-							insertIdentifier(strdup(n->name), VARIABLE, stringToEvalType(yytext), NULL);
-						} else if(isMethod(n->name)){
-							printTypeError(n->name, VARIABLEASKED);
-						} else {
-							printTypeError(n->name, DUPLICATE);
-						}
-						n = n->next;
-					}
-					freeTempList();
-				}
-			;
+				n = n->next;
+			}
+			freeTempList();
+		}
+;
 
 statement<Stmnts>(Stmnts ss, char *name) : 
-[
+	[
 		declaration<ds>(NULL){
 			ss = malloc(sizeof(struct Stmnts));
 			ss->numStmnts = ds->numDecs;
