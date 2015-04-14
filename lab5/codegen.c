@@ -493,6 +493,15 @@ void compileDo(Do dostatement) {
 		WTF("}\n");
 		indentDept--;
 		writeIndents();
+		WTF("} else {\n");
+		indentDept++;
+		// Set this one in the truth table to false;
+		writeIndents();
+		writeTempVar(arrayloc);
+		sprintf(num, "[%d] = 0;\n", i);
+		WTF(num);
+		indentDept--;
+		writeIndents();
 		WTF("}\n");
 	}
 	// Check if atleast one of them is true
@@ -526,9 +535,8 @@ void compileDo(Do dostatement) {
 	WTF("if (");
 	writeTempVar(arrayloc);
 	sprintf(num, "[t%d] != 1) {\n", randomvar);
-	indentDept++;
-	writeIndents();
 	WTF(num);
+	indentDept++;
 	writeIndents();
 	writeGoto(startwhilelabel);
 	indentDept--;
