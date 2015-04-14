@@ -306,7 +306,7 @@ int main(int argc, char** argv) {
 	}
 	
 	utilCleanUp();
-	//freeProg(program);
+	freeProg(program);
 	program = NULL;
 	freeSymbolTable();
 	freeLines();
@@ -726,7 +726,6 @@ guardedcommand<GCommand>(ExpTree exp)	:
 		expr<e>(NULL)  {
 			if (e != NULL) {
 				if (getExpType(e)/10*10 != BOOLEAN_TYPE) {
-					/* TODO: print expression */
 					printTypeError(strdup(yytext), WRONGTYPE);
 				} else {
 					exp = e;
@@ -756,7 +755,6 @@ guardedcommandset<GCmds>(GCmds gcmds)	:
 								gcmds->numGCmds++;
 								gcmds->gCmds = realloc(gcmds->gCmds,gcmds->numGCmds*sizeof(GCommand));
 								gcmds->gCmds[gcmds->numGCmds-1] = retgcmd;
-								// TODO: free?? if needed...
 							}
 						]* 
 						{
@@ -857,9 +855,7 @@ assignmentcallV1<Stmnts>(char *name):
 
 /* newer version of assignmentcall that doesn't make sure yet that the amount of identifiers equals the amount of expressions (semantically easier to evaluate) */
 assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	: 
-		{
-			//TODO typecheck name (watch out for return type of functions!)
-			addTempList(strdup(name));
+		{	addTempList(strdup(name));
 			
 			stmnts = malloc(sizeof(struct Stmnts));
 			stmnts->numStmnts = 1;
@@ -871,8 +867,6 @@ assignmentcallV2<Stmnts>(char *name, Stmnts stmnts, Exps exps)	:
 			COMMA 
 			IDENTIFIER{
 				addTempList(strdup(yytext));
-				
-				//TODO typecheck IDENTIFIER (watch out for return type of functions!)
 				stmnts->numStmnts++;
 				stmnts->stmnts = realloc(stmnts->stmnts, stmnts->numStmnts*sizeof(Stmnt));
 				int type = getType(strdup(yytext));
@@ -1072,7 +1066,6 @@ declaration<Decs>(IDs idents):
 		TYPE_OP 
 		TYPE {
 			int type = stringToEvalType(yytext);
-			/* TREE */
 			for(int i = 0; i < idents->numIds; i++){
 				idents->ids[i]->type = type;
 			}
@@ -1088,7 +1081,6 @@ declaration<Decs>(IDs idents):
 			idents = NULL;
 			LLretval = d;
 
-			/* SYMBOL TABLE */
 			INode *n = tempidentifierlist;
 			while (n != NULL) {
 				/* check if the  identifier exists already */
@@ -1584,12 +1576,5 @@ start		:
 		programbody<prog>(0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL){
 			program  = prog;
 		}
-		DOT{
-			/*printf("Program name: %s\n", program->name);
-			if(strcmp(file_name, "riktest.gcl") == 0){
-				printf("Print string: %s\n", program->bodyStmnts[0]->wCall->items[0]->string);
-				printf("boolval: %s\n", (program->constDefs[0]->expTree->node.boolval->value == true)?"true":"false");
-				printf("intval: %s\n", program->constDefs[1]->expTree->node.intval->value);
-			}*/
-		}
+		DOT
 ; 
