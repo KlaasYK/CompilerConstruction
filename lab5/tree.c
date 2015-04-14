@@ -27,35 +27,46 @@ Prog makeProg(char *name, int numConstDefs, Dec* constDefs, int numVarDefs, Dec*
 void freeProg(Prog p) {
 	if (p != NULL) {
 		free(p->name);
+		p->name = NULL;
 		for (int i = 0; i < p->numConstDefs; i++) {
 			freeDec(p->constDefs[i]);
+			p->constDefs[i] = NULL;
 		}
 		if (p->numConstDefs > 0) {
 			free(p->constDefs);
+			p->constDefs = NULL;
 		}
 		for (int i = 0; i < p->numVarDefs; i++) {
 			freeDec(p->varDefs[i]);
+			p->varDefs[i] = NULL;
 		}
 		if (p->numVarDefs > 0) {
 			free(p->varDefs);
+			p->varDefs = NULL;
 		}
 		for (int i = 0; i < p->numProcDefs; i++) {
 			freeProcDef(p->procDefs[i]);
+			p->procDefs[i] = NULL;
 		}
 		if (p->numProcDefs > 0) {
 			free(p->procDefs);
+			p->procDefs = NULL;
 		}
 		for (int i = 0; i < p->numFuncDefs; i++) {
 			freeFuncDef(p->funcDefs[i]);
+			p->funcDefs[i] = NULL;
 		}
 		if (p->numFuncDefs > 0) {
 			free(p->funcDefs);
+			p->funcDefs = NULL;
 		}
 		for (int i = 0; i < p->numBodyStmnts; i++) {
 			freeStmnt(p->bodyStmnts[i]);
+			p->bodyStmnts[i] = NULL;
 		}
 		if (p->numBodyStmnts > 0) {
 			free(p->bodyStmnts);
+			p->bodyStmnts = NULL;
 		}
 		free(p);
 	}
@@ -74,17 +85,22 @@ FuncDef makeFuncDef(ID id, int numParams, Param *params, int numStmnts, Stmnt *s
 void freeFuncDef(FuncDef fd) {
 	if (fd != NULL) {
 		freeID(fd->id);
+		fd->id = NULL;
 		for (int i = 0; i < fd->numParams; i++) {
 			freeParam(fd->params[i]);
+			fd->params[i] = NULL;
 		}
 		if (fd->numParams > 0) {
 			free(fd->params);
+			fd->params = NULL;
 		}
 		for (int i = 0; i < fd->numStmnts; i++) {
 			freeStmnt(fd->stmnts[i]);
+			fd->stmnts[i] = NULL;
 		}
 		if (fd->numStmnts > 0) {
 			free(fd->stmnts);
+			fd->stmnts = NULL;
 		}
 		free(fd);
 	}
@@ -109,17 +125,22 @@ ProcDef makeProcDef(char *name, int numParams, Param *params, int numStmnts, Stm
 void freeProcDef(ProcDef pd) {
 	if (pd != NULL) {
 		free(pd->name);
+		pd->name = NULL;
 		for (int i = 0; i < pd->numParams; i++) {
 			freeParam(pd->params[i]);
+			pd->params[i] = NULL;
 		}
 		if (pd->numParams > 0) {
 			free(pd->params);
+			pd->params = NULL;
 		}
 		for (int i = 0; i < pd->numStmnts; i++) {
 			freeStmnt(pd->stmnts[i]);
+			pd->stmnts[i] = NULL;
 		}
 		if (pd->numStmnts > 0) {
 			free(pd->stmnts);
+			pd->stmnts = NULL;
 		}
 		free(pd);
 	}
@@ -135,6 +156,7 @@ Param makeParam(ID id, Call call) {
 void freeParam(Param p) {
 	if (p != NULL) {
 		freeID(p->id);
+		p->id = NULL;
 		free(p);
 	}
 }
@@ -193,24 +215,31 @@ void freeStmnt(Stmnt s) {
 		switch (s->kind) {
 			case decStmnt:
 				freeDec(s->dec);
+				s->dec = NULL;
 				break;
 			case assStmnt:
 				freeAss(s->assignment);
+				s->assignment = NULL;
 				break;
 			case funcCallStmnt:
 				freeFuncCall(s->funcCall);
+				s->funcCall = NULL;
 				break;
 			case readCallStmnt:
 				freeRCall(s->rCall);
+				s->rCall = NULL;
 				break;
 			case writeCallStmnt:
 				freeWCall(s->wCall);
+				s->wCall = NULL;
 				break;
 			case ifStmnt:
 				freeIf(s->ifStmnt);
+				s->ifStmnt = NULL;
 				break;
 			case doStmnt:
 				freeDo(s->doStmnt);
+				s->doStmnt = NULL;
 				break;
 			default:
 				fprintf(stderr, "Undefined kind of statement!");
@@ -258,13 +287,16 @@ Dec makeStringDec(ID id, IDType idType, char *str) {
 void freeDec(Dec d) {
 	if (d != NULL) {
 		freeID(d->id);
+		d->id = NULL;
 		if (d->isInitialized == true) {
 			switch (d->decType) {
 				case expKind:
 					freeExp(d->expTree);
+					d->expTree = NULL;
 					break;
 				case stringKind:
 					free(d->str);
+					d->str = NULL;
 					break;
 				default:
 					fprintf(stderr, "Undefined kind of statement!");
@@ -286,7 +318,9 @@ Ass makeAss(ID id, ExpTree expTree, int lineNr) {
 void freeAss(Ass a) {
 	if (a != NULL) {
 		freeID(a->id);
-		freeExp(a->expTree);
+		a->id = NULL;
+		freeExp(a->expTree);;
+		a->expTree = NULL;
 		free(a);
 	}
 }
@@ -302,9 +336,11 @@ void freeRCall(RCall rc) {
 	if (rc != NULL) {
 		for (int i = 0; i < rc->numids; i++) {
 			freeID(rc->ids[i]);
+			rc->ids[i] = NULL;
 		}
 		if (rc->numids > 0) {
 			free(rc->ids);
+			rc->ids = NULL;
 		}
 		free(rc);
 	}
@@ -322,9 +358,11 @@ void freeWCall(WCall wc) {
 	if (wc != NULL) {
 		for (int i = 0; i < wc->numitems; i++) {
 			freePrintable(wc->items[i]);
+			wc->items[i] = NULL;
 		}
 		if (wc->numitems > 0) {
 			free(wc->items);
+			wc->items = NULL;
 		}
 		free(wc);
 	}
@@ -355,9 +393,11 @@ void freePrintable(Printable p) {
 		switch (p->kind) {
 			case stringKind:
 				free(p->string);
+				p->string = NULL;
 				break;
 			case expKind:
 				freeExp(p->exp);
+				p->exp = NULL;
 				break;
 			default:
 				fprintf(stderr, "Undefined kind of printable!");
@@ -378,9 +418,11 @@ void freeIf(If i) {
 	if (i != NULL) {
 		for (int j = 0; j < i->numGCommands; j++) {
 			freeGCommand(i->gCommands[j]);
+			i->gCommands[j] = NULL;
 		}
 		if (i->numGCommands > 0) {
 			free(i->gCommands);
+			i->gCommands = NULL;
 		}
 		free(i);
 	}
@@ -397,9 +439,11 @@ void freeDo(Do d) {
 	if (d != NULL) {
 		for (int i = 0; i < d->numGCommands; i++) {
 			freeGCommand(d->gCommands[i]);
+			d->gCommands[i] = NULL;
 		}
 		if (d->numGCommands > 0) {
 			free(d->gCommands);
+			d->gCommands = NULL;
 		}
 		free(d);
 	}
@@ -416,11 +460,14 @@ GCommand makeGCommand(Exp condition, int numStmnts, Stmnt *stmnts) {
 void freeGCommand(GCommand gc) {
 	if (gc != NULL) {
 		freeExp(gc->condition);
+		gc->condition = NULL;
 		for (int i = 0; i < gc->numStmnts; i++) {
 			freeStmnt(gc->stmnts[i]);
+			gc->stmnts[i] = NULL;
 		}
 		if (gc->numStmnts > 0) {
 			free(gc->stmnts);
+			gc->stmnts = NULL;
 		}
 		free(gc);
 	}

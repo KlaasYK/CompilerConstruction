@@ -18,6 +18,7 @@ ID makeID(int type, char* name) {
 void freeID(ID id) {
 	if (id != NULL) {
 		free(id->name);
+		id->name = NULL;
 		free(id);
 	}
 }
@@ -33,11 +34,14 @@ FuncCall makeFuncCall(int type, char* name, int numParams, Exp *params) {
 void freeFuncCall(FuncCall fc) {
 	if (fc != NULL) {
 		freeID(fc->id);
+		fc->id = NULL;
 		for (int i = 0; i < fc->numParams; i++) {
 			freeExp(fc->params[i]);
+			fc->params[i] = NULL;
 		}
 		if (fc->numParams > 0) {
 			free(fc->params);
+			fc->params = NULL;
 		}
 		free(fc);
 	}
@@ -58,6 +62,7 @@ Int makeInt(char *value) {
 void freeInt(Int i) {
 	if (i != NULL) {
 		free(i->value);
+		i->value = NULL;
 		free(i);
 	}
 }
@@ -121,21 +126,27 @@ void freeExp(Exp exp) {
 		switch (exp->kind) {
 			case unodeexp:
 				freeUnNode(exp->node.unode);
+				exp->node.unode = NULL;
 				break;
 			case bnodeexp:
 				freeBinNode(exp->node.bnode);
+				exp->node.bnode = NULL;
 				break;
 			case idexp:
 				freeID(exp->node.id);
+				exp->node.id = NULL;
 				break;
 			case funcexp:
 				freeFuncCall(exp->node.funcCall);
+				exp->node.funcCall = NULL;
 				break;
 			case intexp:
 				freeInt(exp->node.intval);
+				exp->node.intval = NULL;
 				break;
 			case boolexp:
 				freeBool(exp->node.boolval);
+				exp->node.boolval = NULL;
 				break;
 			default:
 				fprintf(stderr, "Undefined kind of expression!");
@@ -295,6 +306,7 @@ Unode makeUnNode(Exp e, UnOp op) {
 void freeUnNode(Unode un) {
 	if (un != NULL) {
 		freeExp(un->e);
+		un->e = NULL;
 		free(un);
 	}
 }
@@ -310,7 +322,9 @@ Bnode makeBinNode(Exp l, Exp r, BinOp op) {
 void freeBinNode(Bnode bin) {
 	if (bin != NULL) {
 		freeExp(bin->l);
+		bin->l = NULL;
 		freeExp(bin->r);
+		bin->r = NULL;
 		free(bin);
 	}
 }
