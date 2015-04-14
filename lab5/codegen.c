@@ -24,6 +24,12 @@ int lblcnt = 0;
 int indentDept = 0;
 Params paramsByVal;
 
+int lastline;
+int numstatements;
+int maxstatements;
+int *tempvars;
+Ass *stored;
+
 void compileStatement(Stmnt statement);
 void compileDo(Do dostatement);
 void compileIf(If ifstatement);
@@ -500,6 +506,29 @@ void compileExpression(ExpTree exp) {
 	//TODO
 }
 
+void halfCompileAss(Ass assignment) {
+	compileExpression(assignment->expTree);
+	stored[numstatements] = assignment;
+	tempvars[numstatements] = varcnt - 1;
+	numstatements++;
+	
+	//TODO check if numstatements >= maxstatements
+}
+
+void compileStoredAss() {
+	for (int i = 0; i < numstatements; i++) {
+		Ass s = stored[i];
+		writeIndents();
+		writeVar(s->id->name);
+		WTF(" = ");
+		writeTempVar(tempvars[i]);
+		WTF(";\n");
+		stored[i] = NULL;
+		tempvars[i] = -1;
+	}
+	numstatements = 0;
+}
+
 void compileAss(Ass assignment) {
 	compileExpression(assignment->expTree);
 	writeIndents();
@@ -821,11 +850,26 @@ void compileWriteCall(WCall write) {
 	free(kinds);
 }
 
+
+
+
 void compileStatement(Stmnt statement) {
+	int sameline = 0;
 	switch (statement->kind) {
 		case decStmnt: compileDec(statement->dec);
 			break;
-		case assStmnt: compileAss(statement->assignment);
+		case assStmnt:
+			if (statement->assignment->lineNr == lastline) {
+				halfCompileAss(statement->assignment);
+				sameline = 1;
+			} else {
+				sameline = 1;
+				lastline = statement->assignment->lineNr;
+				// Compile all stored assignments
+				compileStoredAss();
+				halfCompileAss(statement->assignment);
+			}
+			//compileAss(statement->assignment);
 			break;
 		case funcCallStmnt: break; //TODO:
 		case procCallStmnt: break; //TODO;
@@ -840,6 +884,10 @@ void compileStatement(Stmnt statement) {
 			break;
 		default:
 			printf("Not Done yet...\n");
+	}
+	if (!sameline) {
+		// Compile all stored assignments
+		compileStoredAss();
 	}
 }
 
@@ -876,10 +924,11 @@ void compileFunc(FuncDef function) {
 	WTF(" = malloc(sizeof ( ");
 	WTF(getCTypeString((function->id->type / 10)*10));
 	WTF("));\n");
-	
+
 	for (int i = 0; i < function->numStmnts; i++) {
 		compileStatement(function->stmnts[i]);
 	}
+	compileStoredAss();
 	// TODO print for return statement
 	indentDept--;
 	WTF("}\n");
@@ -905,6 +954,8 @@ void compileProc(ProcDef procedure) {
 
 		compileStatement(procedure->stmnts[i]);
 	}
+	compileStoredAss();
+	
 	indentDept--;
 	WTF("}\n");
 	if (paramsByVal->numParams > 0) {
@@ -938,6 +989,8 @@ void compileMain(Prog program) {
 	for (int i = 0; i < program->numBodyStmnts; i++) {
 		compileStatement(program->bodyStmnts[i]);
 	}
+	compileStoredAss();
+	
 	if (paramsByVal->numParams > 0) {
 		free(paramsByVal->params);
 	}
@@ -950,6 +1003,12 @@ void compileMain(Prog program) {
 
 void generateCode(Prog program, char *outputfilename) {
 	outputfile = fopen(outputfilename, "w");
+	lastline = -1;
+	numstatements = 0;
+	maxstatements = 42;
+	stored = malloc(maxstatements * sizeof (Ass));
+	tempvars = malloc(maxstatements *sizeof(int));
+
 	writeHeaders();
 
 	if (program->numConstDefs > 0) WTF("// global constant definitions, will be malloced and init once in the main\n");
@@ -974,5 +1033,8 @@ void generateCode(Prog program, char *outputfilename) {
 	}
 	compileMain(program);
 
+	free(stored);
+	free(tempvars);
+	
 	fclose(outputfile);
 }
