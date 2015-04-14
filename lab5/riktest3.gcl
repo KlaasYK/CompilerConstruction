@@ -4,6 +4,9 @@ constant x:integer = 5;
 
 var bla5, bla6, bla7 : boolean;
 
+procedure a(x:integer);
+end;
+
 begin
     var bla4 : boolean;
     bla4, bla5 := true;
