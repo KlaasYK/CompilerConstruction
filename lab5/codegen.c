@@ -1077,7 +1077,7 @@ void compileParameter(Param parameter) {
 	if (parameter->call == byRef) {
 		writeVar(parameter->id->name);
 	} else {
-		WTF("_");
+		WTF("*_");
 		writeVarRef(parameter->id->name);
 		paramsByVal->numParams++;
 		if (paramsByVal->numParams == 1) {
@@ -1100,7 +1100,7 @@ void compileCallByValueInit() {
 		WTF("));\n");
 		writeIndents();
 		writeVar(paramsByVal->params[i]->id->name);
-		WTF(" = _");
+		WTF(" = *_");
 		writeVarRef(paramsByVal->params[i]->id->name);
 		WTF(";\n");
 	}
