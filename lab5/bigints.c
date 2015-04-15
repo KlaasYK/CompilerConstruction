@@ -46,7 +46,7 @@ void deepCopyInteger(Integer a, Integer *aCopy) {
 	}
 	copy->length = a.length;
 	copy->sign = a.sign;
-	shallowCopy(*copy, aCopy);
+	shallowCopyInteger(*copy, aCopy);
 	free(copy);
 }
 
