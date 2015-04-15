@@ -151,7 +151,7 @@ void compilefuncexp(FuncCall funccall) {
 	int *vars;
 	if (funccall->numParams > 0) {
 		vars = malloc(funccall->numParams * sizeof (int));
-		for (int i; i < funccall->numParams; i++) {
+		for (int i = 0; i < funccall->numParams; i++) {
 			if (funccall->params[i]->kind != idexp) {
 				compileExpression(funccall->params[i]);
 				vars[i] = varcnt - 1;
@@ -1089,7 +1089,7 @@ void compileParameter(Param parameter) {
 	if (parameter->call == byRef) {
 		writeVar(parameter->id->name);
 	} else {
-		WTF("_");
+		WTF("*_");
 		writeVarRef(parameter->id->name);
 		paramsByVal->numParams++;
 		if (paramsByVal->numParams == 1) {
@@ -1112,7 +1112,7 @@ void compileCallByValueInit() {
 		WTF("));\n");
 		writeIndents();
 		writeVar(paramsByVal->params[i]->id->name);
-		WTF(" = _");
+		WTF(" = *_");
 		writeVarRef(paramsByVal->params[i]->id->name);
 		WTF(";\n");
 	}
