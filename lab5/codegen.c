@@ -62,6 +62,7 @@ void writeHeaders() {
 	WTF("#include <stdio.h>\n");
 	WTF("#include <stdlib.h>\n");
 	WTF("#include <sys/time.h>\n");
+	WTF("#include <string.h>\n");
 	WTF("#include \"bigints.h\"\n\n");
 }
 
@@ -892,7 +893,7 @@ void compileReadCall(RCall read) {
 		WTF("size_t ");
 		writeTempVar(nbytes);
 		// NOTE: maximum number length is 1024 character (ie 10^1024)
-		WTF(" = 1024;\n");
+		WTF(" = 42;\n");
 		writeIndents();
 		WTF("char *");
 		writeTempVar(chararray);
@@ -918,6 +919,13 @@ void compileReadCall(RCall read) {
 		WTF("if (");
 		writeTempVar(bytes_read);
 		WTF(" <= 0) { printf(\"INPUTERROR\\n\");}\n");
+		
+		// KILL THE \n ON THE END
+		writeIndents();
+		writeTempVar(chararray);
+		WTF("[strlen(");
+		writeTempVar(chararray);
+		WTF(")-1] = \'\\0\'; //Kill the eol \n");
 		
 		if (read->ids[i]->type /10 == INTEGER_TYPE /10) {
 			writeIndents();
