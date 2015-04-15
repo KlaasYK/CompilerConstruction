@@ -515,9 +515,17 @@ void compileStoredAss() {
 	for (int i = 0; i < numstatements; i++) {
 		Ass s = stored[i];
 		writeIndents();
-		writeVar(s->id->name);
-		WTF(" = ");
-		writeTempVar(tempvars[i]);
+		if((s->id->type/10) * 10 == INTEGER_TYPE){
+			WTF("setInteger(");
+			writeVarRef(s->id->name);
+			WTF(", ");
+			writeTempVar(tempvars[i]);
+			WTF(")");
+		}else{
+			writeVar(s->id->name);
+			WTF(" = ");
+			writeTempVar(tempvars[i]);
+		}
 		WTF(";\n");
 		stored[i] = NULL;
 		tempvars[i] = -1;
@@ -991,8 +999,6 @@ void compileProc(ProcDef procedure) {
 		WTF(getCTypeString(paramsByVal->params[i]->id->type / 10 * 10));
 		WTF("));\n");
 		writeIndents();
-		writeVar(paramsByVal->params[i]->id->name);
-		WTF(" = NULL;\n");
 		WTF("setInteger(");
 		writeVarRef(paramsByVal->params[i]->id->name);
 		WTF(", _");
