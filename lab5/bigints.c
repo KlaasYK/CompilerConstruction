@@ -91,7 +91,7 @@ void addValueInBase(uint32_t *digits, unsigned long length, uint32_t value, int 
 		temp = digits[i] * srcBase + carry;
 		digits[i] = temp % dstBase;
 		carry = temp / dstBase;
-	} 
+	}
 }
 
 void makeIntegerFromString(Integer *a, const char *digits) {
@@ -140,7 +140,7 @@ char *makeStringFromInteger(Integer a) {
 	unsigned long i;
 	char *rstring;
 	int negative = 0;
-	
+
 	uint32_t val;
 	if (a.sign == -1) {
 		//printf("-");
@@ -160,18 +160,18 @@ char *makeStringFromInteger(Integer a) {
 
 	/* print 0 */
 	if (i + 1 == 0) {
-		rstring = malloc(2*sizeof(char));
-		sprintf(rstring,"0");
+		rstring = malloc(2 * sizeof (char));
+		sprintf(rstring, "0");
 
 	} else {
 		unsigned long lenght = i;
-		rstring = malloc((i+negative+1) * sizof(char));
+		rstring = malloc((i + negative + 1) * sizof(char));
 		if (negative) {
-			sprintf(rstring+i,"-");
+			sprintf(rstring + i, "-");
 		}
-		
+
 		for (i; i + 1 >= 1; --i) {
-			sprintf(restring+negative + (length - i), "%u", printdigits[i]);
+			sprintf(restring + negative + (length - i), "%u", printdigits[i]);
 		}
 	}
 
@@ -180,34 +180,9 @@ char *makeStringFromInteger(Integer a) {
 }
 
 void printInteger(Integer a) {
-	unsigned long i;
-	uint32_t val;
-	if (a.sign == -1) {
-		printf("-");
-	}
-	uint32_t *printdigits = safeCalloc(LOGBASE * a.length);
-	for (i = a.length - 1; i + 1 >= 1; --i) {
-		addValueInBase(printdigits, LOGBASE * a.length, a.digits[i], BASE, 10);
-	}
-
-	/* remove the zeros form the end */
-	for (i = LOGBASE * a.length - 1; i + 1 >= 1; --i) {
-		if (printdigits[i] > 0) {
-			break;
-		}
-	}
-
-	/* print 0 */
-	if (i + 1 == 0) {
-		printf("0");
-
-	} else {
-		for (i; i + 1 >= 1; --i) {
-			printf("%u", printdigits[i]);
-		}
-	}
-
-	free(printdigits);
+	char *str = makeStringFromInteger(a);
+	printf("%s", str);
+	free(str);
 }
 
 /* a := a + b */
@@ -391,10 +366,10 @@ void splitAt(Integer *high, Integer *low, Integer largeInteger, unsigned long sp
 		high->sign = 1;
 	} else {
 		high->length = largeInteger.length - split;
-		
+
 		if (high->length == 0) {
 			/* multiply small with very large numer */
-			makeIntegerFromString(high,"0");
+			makeIntegerFromString(high, "0");
 		} else {
 			high->digits = safeMalloc(high->length);
 			for (i = 0; i < high->length; ++i) {
@@ -650,7 +625,7 @@ void powInteger(Integer *base, Integer exponent) {
 					mulInteger(&result, *base);
 					/* implicit exponent - 1 */
 				}
-				
+
 				divInteger(&expCopy, two);
 				mulInteger(base, *base);
 			}

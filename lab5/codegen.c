@@ -853,6 +853,15 @@ void compileWriteCall(WCall write) {
 			}
 	}
 	WTF(");\n");
+	for (int i = 0; i < j; i++) {
+
+		WTF(",");
+			if (kinds[k] / 10 == INTEGER_TYPE / 10) {
+				WTF("free(");
+				writeTempVar(vars[i]);
+				WTF(");");
+			}
+	}
 	free(vars);
 	free(kinds);
 }
