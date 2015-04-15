@@ -988,18 +988,7 @@ void compileParameter(Param parameter) {
 	}
 }
 
-void compileFunc(FuncDef function) {
-	WTF(getCTypeString((function->id->type / 10) *10));
-	writeVar(function->id->name);
-	WTF("(");
-	paramsByVal = malloc(sizeof (struct Params));
-	paramsByVal->numParams = 0;
-	for (int i = 0; i < function->numParams; i++) {
-		if (i != 0) WTF(", ");
-		compileParameter(function->params[i]);
-	}
-	WTF(") {\n");
-	indentDept++;
+void compileCallByValueInit(){
 	// make copy variables that are called by value
 	for (int i = 0; i < paramsByVal->numParams; i++) {
 		writeIndents();
@@ -1014,6 +1003,37 @@ void compileFunc(FuncDef function) {
 		writeVarRef(paramsByVal->params[i]->id->name);
 		WTF(";\n");
 	}
+}
+
+void compileCallByValueFree(){
+	for (int i = 0; i < paramsByVal->numParams; i++) {
+		writeIndents();
+		WTF("freeInteger(");
+		writeVarRef(paramsByVal->params[i]->id->name);
+		WTF(");\n");
+		writeIndents();
+		WTF("free(");
+		writeVarRef(paramsByVal->params[i]->id->name);
+		WTF(");\n");
+	}
+	
+}
+
+void compileFunc(FuncDef function) {
+	WTF(getCTypeString((function->id->type / 10) *10));
+	writeVar(function->id->name);
+	WTF("(");
+	paramsByVal = malloc(sizeof (struct Params));
+	paramsByVal->numParams = 0;
+	for (int i = 0; i < function->numParams; i++) {
+		if (i != 0) WTF(", ");
+		compileParameter(function->params[i]);
+	}
+	WTF(") {\n");
+	indentDept++;
+	compileCallByValueInit();
+	
+	//func body
 	writeIndents();
 	WTF(getCTypeString((function->id->type / 10) *10));
 	writeVar(function->id->name);
@@ -1025,6 +1045,7 @@ void compileFunc(FuncDef function) {
 		compileStatement(function->stmnts[i]);
 	}
 	compileStoredAss();
+	compileCallByValueFree();
 	writeIndents();
 	WTF("return ");
 	writeVarRef(function->id->name);
@@ -1049,27 +1070,14 @@ void compileProc(ProcDef procedure) {
 	}
 	WTF(") {\n");
 	indentDept++;
-	// make copy variables that are called by value
-	for (int i = 0; i < paramsByVal->numParams; i++) {
-		writeIndents();
-		WTF(getCTypeString(paramsByVal->params[i]->id->type / 10 * 10));
-		writeVar(paramsByVal->params[i]->id->name);
-		WTF(" = malloc(sizeof ( ");
-		WTF(getCTypeString(paramsByVal->params[i]->id->type / 10 * 10));
-		WTF("));\n");
-		writeIndents();
-		WTF("setInteger(");
-		writeVarRef(paramsByVal->params[i]->id->name);
-		WTF(", _");
-		writeVarRef(paramsByVal->params[i]->id->name);
-		WTF(");\n");
-	}
+	compileCallByValueInit();
 
 	// procedure body
 	for (int i = 0; i < procedure->numStmnts; i++) {
 		compileStatement(procedure->stmnts[i]);
 	}
 	compileStoredAss();
+	compileCallByValueFree();
 
 	indentDept--;
 	WTF("}\n");
