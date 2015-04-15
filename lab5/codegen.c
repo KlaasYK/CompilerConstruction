@@ -930,6 +930,7 @@ void compileWriteCall(WCall write) {
 
 void compileReadCall(RCall read) {
 	int *stringPtr = malloc(read->numids * sizeof (int));
+	WTF("\n");
 	for (int i = 0; i < read->numids; i++) {
 		stringPtr[i] = varcnt++;
 
@@ -938,6 +939,7 @@ void compileReadCall(RCall read) {
 		writeTempVar(stringPtr[i]);
 		WTF(";\n");
 	}
+	WTF("\n");
 	int scancheck = varcnt++;
 	writeIndents();
 	WTF("int ");
@@ -951,10 +953,11 @@ void compileReadCall(RCall read) {
 	}
 	WTF("\"");
 	for (int i = 0; i < read->numids; i++) {
-		WTF(", ");
+		WTF(", &");
 		writeTempVar(stringPtr[i]);
 	}
 	WTF(");\n");
+	WTF("\n");
 	int scancheck2 = varcnt++;
 	writeIndents();
 	WTF("int ");
@@ -969,10 +972,12 @@ void compileReadCall(RCall read) {
 	writeTempVar(scancheck2);
 	WTF(" == 0) ");
 	writeGoto(trueLabel);
+	WTF("\n");
 	writeIndents();
 	writeGoto(falseLabel);
 	writeIndents();
 	writeLabel(trueLabel);
+	indentDept++;
 	for (int i = 0; i < read->numids; i++) {
 		if (read->ids[i]->type / 10 == INTEGER_TYPE / 10) {
 			writeIndents();
@@ -993,8 +998,11 @@ void compileReadCall(RCall read) {
 		writeTempVar(stringPtr[i]);
 		WTF(");\n");
 	}
+	indentDept--;
+	WTF("\n");
 	writeIndents();
 	writeLabel(falseLabel);
+	WTF("\n");
 }
 
 void compileProcCall(FuncCall func) {\
