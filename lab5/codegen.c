@@ -134,7 +134,7 @@ void compileIDexp(ID id) {
 		writeTempVar(tempvar);
 		WTF(" = ");
 		writeVar(id->name);
-		WTF(");\n");
+		WTF(";\n");
 	}
 }
 
