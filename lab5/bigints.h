@@ -20,6 +20,8 @@ typedef struct EGCLint Integer;
 /* make integer form a string */
 void makeIntegerFromString(Integer *a, const char digits[]);
 
+char *makeStringFromInteger(Integer a);
+
 /* prints integer to stdout */
 void printInteger(Integer a);
 
