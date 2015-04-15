@@ -25,6 +25,9 @@ char *makeStringFromInteger(Integer a);
 /* prints integer to stdout */
 void printInteger(Integer a);
 
+/* a := b */
+void setInteger(Integer *a, Integer b);
+
 /* a := a + b */
 void addInteger(Integer *a, Integer b);
 

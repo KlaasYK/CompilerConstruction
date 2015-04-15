@@ -931,6 +931,20 @@ void compileFunc(FuncDef function) {
 	}
 	WTF(") {\n");
 	indentDept++;
+	// make copy variables that are called by value
+	for (int i = 0; i < paramsByVal->numParams; i++) {
+		writeIndents();
+		WTF(getCTypeString(paramsByVal->params[i]->id->type / 10 * 10));
+		writeVar(paramsByVal->params[i]->id->name);
+		WTF(" = malloc(sizeof ( ");
+		WTF(getCTypeString(paramsByVal->params[i]->id->type / 10 * 10));
+		WTF("));\n");
+		writeIndents();
+		writeVar(paramsByVal->params[i]->id->name);
+		WTF(" = _");
+		writeVarRef(paramsByVal->params[i]->id->name);
+		WTF(";\n");
+	}
 	writeIndents();
 	WTF(getCTypeString((function->id->type / 10) *10));
 	writeVar(function->id->name);

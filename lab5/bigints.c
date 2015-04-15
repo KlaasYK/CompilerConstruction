@@ -181,6 +181,11 @@ void printInteger(Integer a) {
 	free(str);
 }
 
+/* a := b */
+void setInteger(Integer *a, Integer b){
+	deepCopyInteger(b, a);
+}
+
 /* a := a + b */
 void addInteger(Integer *a, Integer b) {
 	unsigned long alen = a->length;
