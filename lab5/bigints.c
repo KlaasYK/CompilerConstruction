@@ -162,10 +162,9 @@ char *makeStringFromInteger(Integer a) {
 	if (i + 1 == 0) {
 		rstring = malloc(2 * sizeof (char));
 		sprintf(rstring, "0");
-
 	} else {
 		unsigned long length = i;
-		rstring = malloc((i + negative + 1) * sizeof(char));
+		rstring = malloc((i + negative + 2) * sizeof(char));
 		if (negative) {
 			sprintf(rstring, "-");
 		}

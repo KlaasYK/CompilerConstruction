@@ -1,8 +1,5 @@
 program dummy;
 
 begin
-	var k : integer;
-	print 'k = ';
-	read k;
-	println k;
+	println 42;
 end.

@@ -3,5 +3,9 @@ program bla;
 constant y:integer = 42;
 
 begin
-    print 42;
+	var k : integer;
+	println 42;
+	print 'test = ';
+	read k;
+    println k;
 end.
