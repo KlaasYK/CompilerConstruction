@@ -1119,7 +1119,7 @@ void compileCallByValueInit() {
 			WTF("->digits = NULL;\n");
 			writeIndents();
 			WTF("setInteger(");
-			writeVar(paramsByVal->params[i]->id->name);
+			writeVarRef(paramsByVal->params[i]->id->name);
 			WTF(", *_");
 			writeVarRef(paramsByVal->params[i]->id->name);
 			WTF(");\n");
