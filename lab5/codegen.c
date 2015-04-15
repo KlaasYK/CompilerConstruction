@@ -1113,11 +1113,23 @@ void compileCallByValueInit() {
 		WTF(" = malloc(sizeof ( ");
 		WTF(getCTypeString(paramsByVal->params[i]->id->type / 10 * 10));
 		WTF("));\n");
-		writeIndents();
-		writeVar(paramsByVal->params[i]->id->name);
-		WTF(" = *_");
-		writeVarRef(paramsByVal->params[i]->id->name);
-		WTF(";\n");
+		if (paramsByVal->params[i]->id->type / 10 * 10 == INTEGER_TYPE) {
+			writeIndents();
+			writeVarRef(paramsByVal->params[i]->id->name);
+			WTF("->digits = NULL;\n");
+			writeIndents();
+			WTF("setInteger(");
+			writeVar(paramsByVal->params[i]->id->name);
+			WTF(", *_");
+			writeVarRef(paramsByVal->params[i]->id->name);
+			WTF(");\n");
+		} else {
+			writeIndents();
+			writeVar(paramsByVal->params[i]->id->name);
+			WTF(" = *_");
+			writeVarRef(paramsByVal->params[i]->id->name);
+			WTF(";\n");
+		}
 	}
 }
 
