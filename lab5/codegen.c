@@ -151,7 +151,7 @@ void compilefuncexp(FuncCall funccall) {
 	int *vars;
 	if (funccall->numParams > 0) {
 		vars = malloc(funccall->numParams * sizeof (int));
-		for (int i; i < funccall->numParams; i++) {
+		for (int i = 0; i < funccall->numParams; i++) {
 			if (funccall->params[i]->kind != idexp) {
 				compileExpression(funccall->params[i]);
 				vars[i] = varcnt - 1;
