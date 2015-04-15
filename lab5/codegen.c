@@ -61,7 +61,7 @@ char *getCTypeString(int type) {
 void writeHeaders() {
 	WTF("#include <stdio.h>\n");
 	WTF("#include <stdlib.h>\n");
-	// Use this, to prevent errors
+	WTF("#include <time.h>\n");
 	WTF("#include \"bigints.h\"\n\n");
 }
 
@@ -1014,6 +1014,21 @@ void compileProc(ProcDef procedure) {
 void compileMain(Prog program) {
 	WTF("int main(int argc, char **argv){\n");
 	indentDept++;
+	
+	/* seed the random generator */
+	WTF("struct timeval ");
+	int timeval = varcnt++;
+	writeTempVar(timeval);
+	WTF(";\n");
+	writeIndents();
+	WTF("gettimeofday(&");
+	writeTempVar(timeval);
+	WTF(", NULL);\n");
+	WTF("srand(");
+	writeTempVar(timeval);
+	WTF(".tv_usec);\n");
+	
+	
 	if (program->numConstDefs > 0) WTF("// global constant mallocs, will be init below\n");
 	for (int i = 0; i < program->numConstDefs; i++) {
 		writeGlobalDecMalloc(program->constDefs[i]);

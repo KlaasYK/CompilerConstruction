@@ -1,0 +1,11 @@
+boolean.gcl: works
+euclid.gcl: works
+euclid2.gcl: no c compile (undeclared variable) (func call)
+extended.gcl: error on line 11 (unknown identifier q) (expected)
+hello.gcl: works
+lexerror.gcl: works (shows error as expected)
+mult.gcl: READCALL
+random.gcl: works like a charm
+realsyntaxerror.gcl: works (shows error as expexted)
+sqrt.gcl: no c compile (undeclared variable) (func call)
+syntaxerror.gcl: works (show no error, due to changed grammar)
