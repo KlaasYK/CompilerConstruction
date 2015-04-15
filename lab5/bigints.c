@@ -163,7 +163,7 @@ char *makeStringFromInteger(Integer a) {
 		unsigned long length = i;
 		rstring = malloc((i + negative + 1) * sizeof(char));
 		if (negative) {
-			sprintf(rstring + i, "-");
+			sprintf(rstring, "-");
 		}
 
 		for (i; i + 1 >= 1; --i) {
