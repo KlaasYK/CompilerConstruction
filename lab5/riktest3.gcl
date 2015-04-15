@@ -7,5 +7,6 @@ begin
     k := 5;
     read k;
     println k;
+    k := -k;
     println k;
 end.

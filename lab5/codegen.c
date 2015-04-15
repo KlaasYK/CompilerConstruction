@@ -56,7 +56,7 @@ void writeHeaders() {
 	WTF("#include <stdlib.h>\n");
 	WTF("#include <sys/time.h>\n");
 	WTF("#include <string.h>\n");
-	WTF("#include \"bigints.h\"\n\n");
+	WTF("#include \"bigints.h\"\n");
 }
 
 void writeTempVar(int num) {
@@ -929,68 +929,72 @@ void compileWriteCall(WCall write) {
 }
 
 void compileReadCall(RCall read) {
+	int *stringPtr = malloc(read->numids * sizeof (int));
 	for (int i = 0; i < read->numids; i++) {
-		int bytes_read = varcnt++;
-		int nbytes = varcnt++;
-		int chararray = varcnt++;
+		stringPtr[i] = varcnt++;
 
-		writeIndents();
-		WTF("int ");
-		writeTempVar(bytes_read);
-		WTF(";\n");
-		writeIndents();
-		WTF("size_t ");
-		writeTempVar(nbytes);
-		// NOTE: maximum number length is 1024 character (ie 10^1024)
-		WTF(" = 42;\n");
 		writeIndents();
 		WTF("char *");
-		writeTempVar(chararray);
+		writeTempVar(stringPtr[i]);
 		WTF(";\n");
-
-		writeIndents();
-		writeTempVar(chararray);
-		WTF(" = malloc( (");
-		writeTempVar(nbytes);
-		WTF(" + 1) * sizeof(char) );\n");
-		// TODO perform check?
-
-		writeIndents();
-		writeTempVar(bytes_read);
-		WTF(" = getline(&");
-		writeTempVar(chararray);
-		WTF(", &");
-		writeTempVar(nbytes);
-		WTF(", stdin);\n");
-
-		//Perform a check
-		writeIndents();
-		WTF("if (");
-		writeTempVar(bytes_read);
-		WTF(" <= 0) { printf(\"INPUTERROR\\n\");}\n");
-
-		// KILL THE \n ON THE END
-		writeIndents();
-		writeTempVar(chararray);
-		WTF("[strlen(");
-		writeTempVar(chararray);
-		WTF(")-1] = \'\\0\'; //Kill the eol \n");
-
+	}
+	int scancheck = varcnt++;
+	writeIndents();
+	WTF("int ");
+	writeTempVar(scancheck);
+	WTF(" = scanf(\"");
+	for (int i = 0; i < read->numids; i++) {
+		if (i != 0) {
+			WTF(" ");
+		}
+		WTF("%ms");
+	}
+	WTF("\"");
+	for (int i = 0; i < read->numids; i++) {
+		WTF(", ");
+		writeTempVar(stringPtr[i]);
+	}
+	WTF(");\n");
+	int scancheck2 = varcnt++;
+	writeIndents();
+	WTF("int ");
+	writeTempVar(scancheck2);
+	WTF(" = ");
+	writeTempVar(scancheck);
+	WTF(" - 1;\n");
+	int trueLabel = lblcnt++;
+	int falseLabel = lblcnt++;
+	writeIndents();
+	WTF("if(");
+	writeTempVar(scancheck2);
+	WTF(" == 0) ");
+	writeGoto(trueLabel);
+	writeIndents();
+	writeGoto(falseLabel);
+	writeIndents();
+	writeLabel(trueLabel);
+	for (int i = 0; i < read->numids; i++) {
 		if (read->ids[i]->type / 10 == INTEGER_TYPE / 10) {
+			writeIndents();
+			WTF("printf(\"The number is: %s.\", ");
+			writeTempVar(stringPtr[i]);
+			WTF(");\n");
 			writeIndents();
 			WTF("makeIntegerFromString(");
 			writeVarRef(read->ids[i]->name);
 			WTF(", ");
-			writeTempVar(chararray);
+			writeTempVar(stringPtr[i]);
 			WTF(");\n");
 		} else {
 			//TODO boolean. Not asked for in the exercise
 		}
 		writeIndents();
 		WTF("free(");
-		writeTempVar(chararray);
+		writeTempVar(stringPtr[i]);
 		WTF(");\n");
 	}
+	writeIndents();
+	writeLabel(falseLabel);
 }
 
 void compileProcCall(FuncCall func) {\
