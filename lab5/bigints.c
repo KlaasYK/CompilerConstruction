@@ -132,6 +132,53 @@ void makeIntegerFromString(Integer *a, const char *digits) {
 	a->digits = newdigits;
 }
 
+char *makeStringFromInteger(Integer a) {
+	if (a == NULL) {
+		printf("Integer not initialised.");
+		exit(EXIT_FAILURE);
+	}
+	unsigned long i;
+	char *rstring;
+	int negative = 0;
+	
+	uint32_t val;
+	if (a.sign == -1) {
+		//printf("-");
+		negative = 1;
+	}
+	uint32_t *printdigits = safeCalloc(LOGBASE * a.length);
+	for (i = a.length - 1; i + 1 >= 1; --i) {
+		addValueInBase(printdigits, LOGBASE * a.length, a.digits[i], BASE, 10);
+	}
+
+	/* remove the zeros form the end */
+	for (i = LOGBASE * a.length - 1; i + 1 >= 1; --i) {
+		if (printdigits[i] > 0) {
+			break;
+		}
+	}
+
+	/* print 0 */
+	if (i + 1 == 0) {
+		rstring = malloc(2*sizeof(char));
+		sprintf(rstring,"0");
+
+	} else {
+		unsigned long lenght = i;
+		rstring = malloc((i+negative+1) * sizof(char));
+		if (negative) {
+			sprintf(rstring+i,"-");
+		}
+		
+		for (i; i + 1 >= 1; --i) {
+			sprintf(restring+negative + (length - i), "%u", printdigits[i]);
+		}
+	}
+
+	free(printdigits);
+	return rstring;
+}
+
 void printInteger(Integer a) {
 	unsigned long i;
 	uint32_t val;
