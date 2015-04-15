@@ -61,7 +61,7 @@ char *getCTypeString(int type) {
 void writeHeaders() {
 	WTF("#include <stdio.h>\n");
 	WTF("#include <stdlib.h>\n");
-	WTF("#include <time.h>\n");
+	WTF("#include <sys/time.h>\n");
 	WTF("#include \"bigints.h\"\n\n");
 }
 
