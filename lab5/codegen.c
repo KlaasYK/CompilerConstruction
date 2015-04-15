@@ -1169,6 +1169,9 @@ void compileFunc(FuncDef function) {
 	WTF(" = malloc(sizeof ( ");
 	WTF(getCTypeString((function->id->type / 10)*10));
 	WTF("));\n");
+	writeIndents();
+	writeVarRef(function->id->name);
+	WTF("->digits = NULL;\n");
 
 	for (int i = 0; i < function->numStmnts; i++) {
 		compileStatement(function->stmnts[i]);
