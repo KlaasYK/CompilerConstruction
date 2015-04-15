@@ -188,6 +188,7 @@ void printInteger(Integer a) {
 
 /* a := b */
 void setInteger(Integer *a, Integer b){
+	freeInteger(a);
 	deepCopyInteger(b, a);
 }
 
