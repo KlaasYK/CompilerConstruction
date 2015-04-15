@@ -20,6 +20,7 @@ function sqrt2(var x : integer) -> integer;
   var l : integer;
   sqrt2 := 42;
   n:= 2;
+  var a, s, d, f, g
 end;
 
 begin
