@@ -33,17 +33,23 @@ uint32_t *safeCalloc(unsigned long size) {
 /* utility function to free the memory */
 void freeInteger(Integer *a) {
 	free(a->digits);
+	a->digits = NULL;
 }
 
 /* utility function to deep copy Integers*/
 void deepCopyInteger(Integer a, Integer *aCopy) {
 	unsigned long i;
-	aCopy->digits = safeMalloc(a.length);
+	Integer *copy = malloc(sizeof(Integer));
+	copy->digits = safeMalloc(a.length);
 	for (i = 0; i < a.length; i++) {
-		aCopy->digits[i] = a.digits[i];
+		copy->digits[i] = a.digits[i];
 	}
-	aCopy->length = a.length;
-	aCopy->sign = a.sign;
+	copy->length = a.length;
+	copy->sign = a.sign;
+	if(aCopy != NULL){
+		free(aCopy);
+	}
+	aCopy = copy;
 }
 
 /* utility function to shallow copy Integers */

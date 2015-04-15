@@ -544,6 +544,8 @@ void compileDec(Dec declaration) {
 		WTF(" = malloc(sizeof ( ");
 		WTF(getCTypeString((declaration->id->type / 10)*10));
 		WTF("))");
+	}else{
+		WTF(" = NULL");
 	}
 	WTF(";\n");
 }
