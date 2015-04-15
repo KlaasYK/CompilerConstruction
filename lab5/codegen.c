@@ -460,7 +460,7 @@ void compileunodeexp(Unode unode) {
 		writeIndents();
 		WTF("Integer ");
 		writeTempVar(newvar);
-		WTF(";\n");
+		WTF(" = {NULL, 0, 1};\n");
 		writeIndents();
 		WTF("makeIntegerFromString(&");
 		writeTempVar(newvar);
@@ -520,13 +520,13 @@ void compileStoredAss() {
 	for (int i = 0; i < numstatements; i++) {
 		Ass s = stored[i];
 		writeIndents();
-		if((s->id->type/10) * 10 == INTEGER_TYPE){
+		if ((s->id->type / 10) * 10 == INTEGER_TYPE) {
 			WTF("setInteger(");
 			writeVarRef(s->id->name);
 			WTF(", ");
 			writeTempVar(tempvars[i]);
 			WTF(")");
-		}else{
+		} else {
 			writeVar(s->id->name);
 			WTF(" = ");
 			writeTempVar(tempvars[i]);
@@ -556,9 +556,14 @@ void compileDec(Dec declaration) {
 	if (indentDept > 0) {
 		WTF(" = malloc(sizeof ( ");
 		WTF(getCTypeString((declaration->id->type / 10)*10));
-		WTF("))");
-	}else{
-		WTF(" = NULL");
+		WTF("));\n");
+		if ((declaration->id->type / 10)*10 == INTEGER_TYPE) {
+			writeIndents();
+			writeVarRef(declaration->id->name);
+			WTF("->digits = NULL;\n");
+		}
+	} else {
+		WTF(" = NULL;");
 	}
 	WTF(";\n");
 }
@@ -569,6 +574,11 @@ void writeGlobalDecMalloc(Dec declaration) {
 	WTF(" = malloc(sizeof ( ");
 	WTF(getCTypeString((declaration->id->type / 10)*10));
 	WTF("));\n");
+	if ((declaration->id->type / 10)*10 == INTEGER_TYPE) {
+		writeIndents();
+		writeVarRef(declaration->id->name);
+		WTF("->digits = NULL;\n");
+	}
 }
 
 void writeConstantInitialization(Dec declaration) {
@@ -889,7 +899,7 @@ void compileReadCall(RCall read) {
 		int bytes_read = varcnt++;
 		int nbytes = varcnt++;
 		int chararray = varcnt++;
-		
+
 		writeIndents();
 		WTF("int ");
 		writeTempVar(bytes_read);
@@ -903,14 +913,14 @@ void compileReadCall(RCall read) {
 		WTF("char *");
 		writeTempVar(chararray);
 		WTF(";\n");
-		
+
 		writeIndents();
 		writeTempVar(chararray);
 		WTF(" = malloc( (");
 		writeTempVar(nbytes);
 		WTF(" + 1) * sizeof(char) );\n");
 		// TODO perform check?
-		
+
 		writeIndents();
 		writeTempVar(bytes_read);
 		WTF(" = getline(&");
@@ -918,21 +928,21 @@ void compileReadCall(RCall read) {
 		WTF(", &");
 		writeTempVar(nbytes);
 		WTF(", stdin);\n");
-		
+
 		//Perform a check
 		writeIndents();
 		WTF("if (");
 		writeTempVar(bytes_read);
 		WTF(" <= 0) { printf(\"INPUTERROR\\n\");}\n");
-		
+
 		// KILL THE \n ON THE END
 		writeIndents();
 		writeTempVar(chararray);
 		WTF("[strlen(");
 		writeTempVar(chararray);
 		WTF(")-1] = \'\\0\'; //Kill the eol \n");
-		
-		if (read->ids[i]->type /10 == INTEGER_TYPE /10) {
+
+		if (read->ids[i]->type / 10 == INTEGER_TYPE / 10) {
 			writeIndents();
 			WTF("makeIntegerFromString(");
 			writeVarRef(read->ids[i]->name);
@@ -1001,8 +1011,8 @@ void compileParameter(Param parameter) {
 	}
 }
 
-void compileCallByValueInit(){
-	if(paramsByVal->numParams > 0) WTF("// make copy variables that are called by value\n");
+void compileCallByValueInit() {
+	if (paramsByVal->numParams > 0) WTF("// make copy variables that are called by value\n");
 	for (int i = 0; i < paramsByVal->numParams; i++) {
 		writeIndents();
 		WTF(getCTypeString(paramsByVal->params[i]->id->type / 10 * 10));
@@ -1018,8 +1028,8 @@ void compileCallByValueInit(){
 	}
 }
 
-void compileCallByValueFree(){
-	if(paramsByVal->numParams > 0) WTF("// free the copy variables that are called by value\n");
+void compileCallByValueFree() {
+	if (paramsByVal->numParams > 0) WTF("// free the copy variables that are called by value\n");
 	for (int i = 0; i < paramsByVal->numParams; i++) {
 		writeIndents();
 		WTF("freeInteger(");
@@ -1030,7 +1040,7 @@ void compileCallByValueFree(){
 		writeVarRef(paramsByVal->params[i]->id->name);
 		WTF(");\n");
 	}
-	
+
 }
 
 void compileFunc(FuncDef function) {
@@ -1046,7 +1056,7 @@ void compileFunc(FuncDef function) {
 	WTF(") {\n");
 	indentDept++;
 	compileCallByValueInit();
-	
+
 	//func body
 	writeIndents();
 	WTF(getCTypeString((function->id->type / 10) *10));
