@@ -1006,6 +1006,7 @@ void compileReadCall(RCall read) {
 	writeIndents();
 	writeLabel(falseLabel);
 	WTF("\n");
+	free(stringPtr);
 }
 
 void compileProcCall(FuncCall func) {\
