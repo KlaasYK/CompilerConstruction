@@ -1,10 +1,8 @@
 program dummy;
 
 begin
-	var kaasislekker : boolean;
 	var k : integer;
-	k := 42;
-	kaasislekker := true;
-	kaasislekker := not kaasislekker;
-	k := -k;
+	print 'k = ';
+	read k;
+	println k;
 end.
