@@ -1,14 +1,12 @@
 program bla;
 
-constant x:integer = 5;
-
-var bla5, bla6, bla7 : boolean;
+constant y:integer = 5;
 
 procedure a(x:integer);
     x:=x + 5;
+    println x;
 end;
 
 begin
-    var bla4 : boolean;
-    bla4, bla5 := true;
+    a(y);
 end.
