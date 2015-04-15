@@ -48,4 +48,6 @@ void powInteger(Integer *a, Integer b);
 
 int compareTo(Integer a, Integer b);
 
+void freeInteger(Integer *a);
+
 #endif //BIGINTS_H
