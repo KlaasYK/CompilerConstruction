@@ -981,10 +981,6 @@ void compileReadCall(RCall read) {
 	for (int i = 0; i < read->numids; i++) {
 		if (read->ids[i]->type / 10 == INTEGER_TYPE / 10) {
 			writeIndents();
-			WTF("printf(\"The number is: %s.\", ");
-			writeTempVar(stringPtr[i]);
-			WTF(");\n");
-			writeIndents();
 			WTF("makeIntegerFromString(");
 			writeVarRef(read->ids[i]->name);
 			WTF(", ");
