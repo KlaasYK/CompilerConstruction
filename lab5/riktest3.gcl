@@ -1,12 +1,7 @@
 program bla;
 
-constant y:integer = 5;
-
-procedure a(x:integer);
-    x:=x + 5;
-    println x;
-end;
+constant y:integer = 42;
 
 begin
-    a(y);
+    print 42;
 end.

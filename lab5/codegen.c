@@ -989,7 +989,7 @@ void compileParameter(Param parameter) {
 }
 
 void compileCallByValueInit(){
-	// make copy variables that are called by value
+	if(paramsByVal->numParams > 0) WTF("// make copy variables that are called by value\n");
 	for (int i = 0; i < paramsByVal->numParams; i++) {
 		writeIndents();
 		WTF(getCTypeString(paramsByVal->params[i]->id->type / 10 * 10));
@@ -1006,6 +1006,7 @@ void compileCallByValueInit(){
 }
 
 void compileCallByValueFree(){
+	if(paramsByVal->numParams > 0) WTF("// free the copy variables that are called by value\n");
 	for (int i = 0; i < paramsByVal->numParams; i++) {
 		writeIndents();
 		WTF("freeInteger(");
