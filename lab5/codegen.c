@@ -868,6 +868,64 @@ void compileWriteCall(WCall write) {
 	free(kinds);
 }
 
+void compileReadCall(RCall read) {
+	for (int i = 0; i < read->numids; i++) {
+		int bytes_read = varcnt++;
+		int nbytes = varcnt++;
+		int chararray = varcnt++;
+		
+		writeIndents();
+		WTF("int ");
+		writeTempVar(bytes_read);
+		WTF(";\n");
+		writeIndents();
+		WTF("size_t ");
+		writeTempVar(nbytes);
+		// NOTE: maximum number length is 1024 character (ie 10^1024)
+		WTF(" = 1024;\n");
+		writeIndents();
+		WTF("char *");
+		writeTempVar(chararray);
+		WTF(";\n");
+		
+		writeIndents();
+		writeTempVar(chararray);
+		WTF(" = malloc( (");
+		writeTempVar(nbytes);
+		WTF(" + 1) * sizeof(char) );\n");
+		// TODO perform check?
+		
+		writeIndents();
+		writeTempVar(bytes_read);
+		WTF(" = getline(&");
+		writeTempVar(chararray);
+		WTF(", &");
+		writeTempVar(nbytes);
+		WTF(", stdin);\n");
+		
+		//Perform a check
+		writeIndents();
+		WTF("if (");
+		writeTempVar(bytes_read);
+		WTF(" <= 0) { printf(\"INPUTERROR\\n\");}\n");
+		
+		if (read->ids[i]->type /10 == INTEGER_TYPE /10) {
+			writeIndents();
+			WTF("makeIntegerFromString(");
+			writeVarRef(read->ids[i]->name);
+			WTF(", ");
+			writeTempVar(chararray);
+			WTF(");\n");
+		} else {
+			//TODO boolean. Not asked for in the exercise
+		}
+		writeIndents();
+		WTF("free(");
+		writeTempVar(chararray);
+		WTF(");\n");
+	}
+}
+
 void compileStatement(Stmnt statement) {
 	if (statement->kind != assStmnt) {
 		compileStoredAss();
@@ -888,9 +946,10 @@ void compileStatement(Stmnt statement) {
 			break;
 		case funcCallStmnt: break; //TODO:
 		case procCallStmnt: break; //TODO;
-		case readCallStmnt: break; //TODO;
+		case readCallStmnt: compileReadCall(statement->rCall);
+			break;
 		case writeCallStmnt: compileWriteCall(statement->wCall);
-			break; //TODO
+			break;
 		case ifStmnt:
 			compileIf(statement->ifStmnt);
 			break;
@@ -1012,7 +1071,7 @@ void compileProc(ProcDef procedure) {
 void compileMain(Prog program) {
 	WTF("int main(int argc, char **argv){\n");
 	indentDept++;
-	
+
 	/* seed the random generator */
 	WTF("struct timeval ");
 	int timeval = varcnt++;
@@ -1025,8 +1084,8 @@ void compileMain(Prog program) {
 	WTF("srand(");
 	writeTempVar(timeval);
 	WTF(".tv_usec);\n");
-	
-	
+
+
 	if (program->numConstDefs > 0) WTF("// global constant mallocs, will be init below\n");
 	for (int i = 0; i < program->numConstDefs; i++) {
 		writeGlobalDecMalloc(program->constDefs[i]);
