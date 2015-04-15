@@ -1,6 +1,5 @@
 #ifndef BIGINTS_H
 #define BIGINTS_H
-/*** stuff to implement ***/
 
 #include <stdint.h>
 
@@ -16,6 +15,7 @@ struct EGCLint {
 	int sign; /* wheter it is positive, of negative */
 };
 typedef struct EGCLint Integer;
+
 
 /* make integer form a string */
 void makeIntegerFromString(Integer *a, const char digits[]);

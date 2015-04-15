@@ -109,7 +109,7 @@ void compileIntegerExp(Int intval) {
 	writeIndents();
 	WTF("Integer ");
 	writeTempVar(tempvar);
-	WTF(";\n");
+	WTF(" = {NULL, 0, 1};\n");
 	writeIndents();
 	char *num;
 	WTF("makeIntegerFromString(&");
@@ -129,7 +129,7 @@ void compileIDexp(ID id) {
 		WTF("int ");
 	}
 	writeTempVar(tempvar);
-	WTF(";\n");
+	WTF(" = {NULL, 0, 1};\n");
 	writeIndents();
 	WTF("setInteger(&");
 	writeTempVar(tempvar);

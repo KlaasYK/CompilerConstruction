@@ -32,8 +32,10 @@ uint32_t *safeCalloc(unsigned long size) {
 
 /* utility function to free the memory */
 void freeInteger(Integer *a) {
-	free(a->digits);
-	a->digits = NULL;
+	if (a->digits != NULL) {
+		free(a->digits);
+		a->digits = NULL;
+	}
 }
 
 /* utility function to shallow copy Integers */
@@ -46,7 +48,7 @@ void shallowCopyInteger(Integer a, Integer *aCopy) {
 /* utility function to deep copy Integers*/
 void deepCopyInteger(Integer a, Integer *aCopy) {
 	unsigned long i;
-	Integer *copy = malloc(sizeof(Integer));
+	Integer *copy = malloc(sizeof (Integer));
 	copy->digits = safeMalloc(a.length);
 	for (i = 0; i < a.length; i++) {
 		copy->digits[i] = a.digits[i];
@@ -164,7 +166,7 @@ char *makeStringFromInteger(Integer a) {
 		sprintf(rstring, "0");
 	} else {
 		unsigned long length = i;
-		rstring = malloc((i + negative + 2) * sizeof(char));
+		rstring = malloc((i + negative + 2) * sizeof (char));
 		if (negative) {
 			sprintf(rstring, "-");
 		}
@@ -186,7 +188,7 @@ void printInteger(Integer a) {
 }
 
 /* a := b */
-void setInteger(Integer *a, Integer b){
+void setInteger(Integer *a, Integer b) {
 	freeInteger(a);
 	deepCopyInteger(b, a);
 }
