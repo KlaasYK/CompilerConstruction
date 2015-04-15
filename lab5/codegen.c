@@ -117,12 +117,14 @@ void compileIDexp(ID id) {
 	int tempvar = varcnt++;
 	if ((id->type / 10) * 10 == INTEGER_TYPE) {
 		WTF("Integer ");
+	writeTempVar(tempvar);
+	WTF(" = {NULL, 0, 1};\n");
 	} else {
 		// Boolean type
 		WTF("int ");
-	}
 	writeTempVar(tempvar);
-	WTF(" = {NULL, 0, 1};\n");
+	WTF(";\n");
+	}
 	writeIndents();
 	WTF("setInteger(&");
 	writeTempVar(tempvar);
