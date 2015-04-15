@@ -1127,7 +1127,7 @@ void compileCallByValueFree() {
 
 void compileFunc(FuncDef function) {
 	WTF(getCTypeString((function->id->type / 10) *10));
-	writeVar(function->id->name);
+	WTF(function->id->name);
 	WTF("(");
 	paramsByVal = malloc(sizeof (struct Params));
 	paramsByVal->numParams = 0;
@@ -1154,7 +1154,7 @@ void compileFunc(FuncDef function) {
 	compileCallByValueFree();
 	writeIndents();
 	WTF("return ");
-	writeVarRef(function->id->name);
+	writeVar(function->id->name);
 	WTF(";\n");
 	indentDept--;
 	WTF("}\n");

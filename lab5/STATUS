@@ -1,6 +1,6 @@
 boolean.gcl: works
 euclid.gcl: works
-euclid2.gcl: no c compile (undeclared variable) (func call)
+euclid2.gcl: works
 extended.gcl: error on line 11 (unknown identifier q) (expected)
 hello.gcl: works
 lexerror.gcl: works (shows error as expected)
