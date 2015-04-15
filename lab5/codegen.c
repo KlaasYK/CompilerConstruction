@@ -814,7 +814,13 @@ void compileWriteCall(WCall write) {
 	for (int i = 0; i < j; i++) {
 
 		WTF(",");
+			if (kinds[k] / 10 == INTEGER_TYPE / 10) {
+				WTF("makeStringFromInteger(");
+				writeTempVar(vars[i]);
+				WTF(")");
+			} else {
 		writeTempVar(vars[i]);
+			}
 	}
 	WTF(");\n");
 	free(vars);
