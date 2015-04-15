@@ -133,10 +133,6 @@ void makeIntegerFromString(Integer *a, const char *digits) {
 }
 
 char *makeStringFromInteger(Integer a) {
-	if (a == NULL) {
-		printf("Integer not initialised.");
-		exit(EXIT_FAILURE);
-	}
 	unsigned long i;
 	char *rstring;
 	int negative = 0;
@@ -164,14 +160,14 @@ char *makeStringFromInteger(Integer a) {
 		sprintf(rstring, "0");
 
 	} else {
-		unsigned long lenght = i;
-		rstring = malloc((i + negative + 1) * sizof(char));
+		unsigned long length = i;
+		rstring = malloc((i + negative + 1) * sizeof(char));
 		if (negative) {
 			sprintf(rstring + i, "-");
 		}
 
 		for (i; i + 1 >= 1; --i) {
-			sprintf(restring + negative + (length - i), "%u", printdigits[i]);
+			sprintf(rstring + negative + (length - i), "%u", printdigits[i]);
 		}
 	}
 
