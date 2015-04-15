@@ -128,9 +128,13 @@ void compileIDexp(ID id) {
 		WTF("int ");
 	}
 	writeTempVar(tempvar);
-	WTF(" = ");
-	writeVar(id->name);
 	WTF(";\n");
+	writeIndents();
+	WTF("setInteger(&");
+	writeTempVar(tempvar);
+	WTF(", ");
+	writeVar(id->name);
+	WTF(");\n");
 }
 
 void compileBoolExp(Bool boolval) {
@@ -569,10 +573,11 @@ void writeGlobalDecMalloc(Dec declaration) {
 void writeConstantInitialization(Dec declaration) {
 	compileExpression(declaration->expTree);
 	writeIndents();
-	writeVar(declaration->id->name);
-	WTF(" = ");
+	WTF("setInteger(");
+	writeVarRef(declaration->id->name);
+	WTF(", ");
 	writeTempVar(varcnt - 1);
-	WTF(";\n");
+	WTF(");\n");
 }
 
 void compileDo(Do dostatement) {

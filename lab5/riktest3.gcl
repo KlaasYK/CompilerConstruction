@@ -3,9 +3,7 @@ program bla;
 constant y:integer = 42;
 
 begin
-	var k : integer;
-	println 42;
-	print 'test = ';
-	read k;
+    var k : integer;
+    read k;
     println k;
 end.
