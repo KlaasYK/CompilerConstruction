@@ -843,12 +843,18 @@ void compileWriteCall(WCall write) {
     // Are there any expressions to be printed?
     for (int i = 0; i < j; i++) {
 
-	WTF(",");
-	writeTempVar(vars[i]);
-    }
-    WTF(");\n");
-    free(vars);
-    free(kinds);
+		WTF(",");
+			if (kinds[k] / 10 == INTEGER_TYPE / 10) {
+				WTF("makeStringFromInteger(");
+				writeTempVar(vars[i]);
+				WTF(")");
+			} else {
+		writeTempVar(vars[i]);
+			}
+	}
+	WTF(");\n");
+	free(vars);
+	free(kinds);
 }
 
 void compileStatement(Stmnt statement) {
