@@ -36,6 +36,13 @@ void freeInteger(Integer *a) {
 	a->digits = NULL;
 }
 
+/* utility function to shallow copy Integers */
+void shallowCopyInteger(Integer a, Integer *aCopy) {
+	aCopy->digits = a.digits;
+	aCopy->length = a.length;
+	aCopy->sign = a.sign;
+}
+
 /* utility function to deep copy Integers*/
 void deepCopyInteger(Integer a, Integer *aCopy) {
 	unsigned long i;
@@ -48,13 +55,6 @@ void deepCopyInteger(Integer a, Integer *aCopy) {
 	copy->sign = a.sign;
 	shallowCopyInteger(*copy, aCopy);
 	free(copy);
-}
-
-/* utility function to shallow copy Integers */
-void shallowCopyInteger(Integer a, Integer *aCopy) {
-	aCopy->digits = a.digits;
-	aCopy->length = a.length;
-	aCopy->sign = a.sign;
 }
 
 /* utility function to compare numbers */
