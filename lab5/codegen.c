@@ -8,14 +8,7 @@
 #include "symboltable.h"
 #include "structarrays.h"
 
-// TODO: statements on the same line must first be evaluated to temp vars
-// before asigning them.
-// Make Printinteger return a string OR(!) print each argument on it's own line.
-// ie println a, b should return:
-// a
-// b
-// Functions, function calls and what have you. Don't mention the pointers!
-// Make CAND, AND, COR and COR all conditional (everything is evalled now)
+// TODO: Functions, function calls and what have you. Don't mention the pointers!
 
 FILE *outputfile;
 
