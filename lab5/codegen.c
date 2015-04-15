@@ -117,20 +117,25 @@ void compileIDexp(ID id) {
 	int tempvar = varcnt++;
 	if ((id->type / 10) * 10 == INTEGER_TYPE) {
 		WTF("Integer ");
-	writeTempVar(tempvar);
-	WTF(" = {NULL, 0, 1};\n");
+		writeTempVar(tempvar);
+		WTF(" = {NULL, 0, 1};\n");
+		writeIndents();
+		WTF("setInteger(&");
+		writeTempVar(tempvar);
+		WTF(", ");
+		writeVar(id->name);
+		WTF(");\n");
 	} else {
 		// Boolean type
 		WTF("int ");
-	writeTempVar(tempvar);
-	WTF(";\n");
+		writeTempVar(tempvar);
+		WTF(";\n");
+		writeIndents();
+		writeTempVar(tempvar);
+		WTF(" = ");
+		writeVar(id->name);
+		WTF(");\n");
 	}
-	writeIndents();
-	WTF("setInteger(&");
-	writeTempVar(tempvar);
-	WTF(", ");
-	writeVar(id->name);
-	WTF(");\n");
 }
 
 void compileBoolExp(Bool boolval) {
