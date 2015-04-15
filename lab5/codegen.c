@@ -146,7 +146,48 @@ void compileBoolExp(Bool boolval) {
 }
 
 void compilefuncexp(FuncCall funccall) {
-	varcnt++;
+	int result = varcnt++;
+	int first = 1;
+	int *vars;
+	if (funccall->numParams > 0) {
+		vars = malloc(funccall->numParams * sizeof (int));
+		for (int i; i < funccall->numParams; i++) {
+			if (funccall->params[i]->kind != idexp) {
+				compileExpression(funccall->params[i]);
+				vars[i] = varcnt - 1;
+			} else {
+				// place variables directly, nog compile expression.
+				vars[i] = -1;
+			}
+		}
+	}
+	writeIndents();
+	WTF(getCTypeString(funccall->id->type));
+	WTF(" ");
+	writeTempVar(result);
+	WTF(" = ");
+	WTF(funccall->id->name);
+	WTF("(");
+	if (funccall->numParams > 0) {
+		for (int i = 0; i < funccall->numParams; i++) {
+			if (first) {
+				first = 0;
+			} else {
+				WTF(", ");
+			}
+			if (vars[i] == -1) {
+				// place variables directly, nog compile expression.
+				writeVarRef(funccall->params[i]->node.id->name);
+			} else {
+				WTF("&");
+				writeTempVar(vars[i]);
+			}
+		}
+	}
+	WTF(");\n");
+	if (funccall->numParams > 0) {
+		free(vars);
+	}
 }
 
 void compilebinodeexp(Bnode bnode) {
@@ -952,6 +993,47 @@ void compileReadCall(RCall read) {
 	}
 }
 
+void compileProcCall(FuncCall func) {\
+	printf("trace\n");
+	int first = 1;
+	int *vars;
+	if (func->numParams > 0) {
+		vars = malloc(func->numParams * sizeof (int));
+		for (int i = 0; i < func->numParams; i++) {
+			if (func->params[i]->kind != idexp) {
+				compileExpression(func->params[i]);
+				vars[i] = varcnt - 1;
+			} else {
+				// place variables directly, nog compile expression.
+				vars[i] = -1;
+			}
+		}
+	}
+	writeIndents();
+	WTF(func->id->name);
+	WTF("(");
+	if (func->numParams > 0) {
+		for (int i = 0; i < func->numParams; i++) {
+			if (first) {
+				first = 0;
+			} else {
+				WTF(", ");
+			}
+			if (vars[i] == -1) {
+				// place variables directly, nog compile expression.
+				writeVarRef(func->params[i]->node.id->name);
+			} else {
+				WTF("&");
+				writeTempVar(vars[i]);
+			}
+		}
+	}
+	WTF(");\n");
+	if (func->numParams > 0) {
+		free(vars);
+	}
+}
+
 void compileStatement(Stmnt statement) {
 	if (statement->kind != assStmnt) {
 		compileStoredAss();
@@ -970,8 +1052,11 @@ void compileStatement(Stmnt statement) {
 			}
 			//compileAss(statement->assignment);
 			break;
-		case funcCallStmnt: break; //TODO:
-		case procCallStmnt: break; //TODO;
+			//Nothing is done with the result, just might be procedure
+		case funcCallStmnt: compileProcCall(statement->funcCall);
+			break;
+		case procCallStmnt: compileProcCall(statement->funcCall);
+			break;
 		case readCallStmnt: compileReadCall(statement->rCall);
 			break;
 		case writeCallStmnt: compileWriteCall(statement->wCall);
