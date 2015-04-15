@@ -992,9 +992,12 @@ void compileProc(ProcDef procedure) {
 		WTF("));\n");
 		writeIndents();
 		writeVar(paramsByVal->params[i]->id->name);
-		WTF(" = _");
+		WTF(" = NULL;\n");
+		WTF("setInteger(");
 		writeVarRef(paramsByVal->params[i]->id->name);
-		WTF(";\n");
+		WTF(", _");
+		writeVarRef(paramsByVal->params[i]->id->name);
+		WTF(");\n");
 	}
 
 	// procedure body

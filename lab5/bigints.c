@@ -46,10 +46,8 @@ void deepCopyInteger(Integer a, Integer *aCopy) {
 	}
 	copy->length = a.length;
 	copy->sign = a.sign;
-	if(aCopy != NULL){
-		free(aCopy);
-	}
-	aCopy = copy;
+	shallowCopy(*copy, aCopy);
+	free(copy);
 }
 
 /* utility function to shallow copy Integers */
@@ -185,6 +183,7 @@ void printInteger(Integer a) {
 	char *str = makeStringFromInteger(a);
 	printf("%s", str);
 	free(str);
+	str = NULL;
 }
 
 /* a := b */
