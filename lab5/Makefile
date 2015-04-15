@@ -19,7 +19,7 @@ cfiles: egclgrammar.c lex.yy.c symboltable.c bigints.c
 
 
 run: $(GCL)
-	gcc -c -g -std=gnu99 -D_GNU_SOURCE -x c out.c99 bigints.c
+	gcc -c -g -std=gnu99 -x c out.c99 bigints.c
 	gcc -g -o a.out out.o bigints.o
 	
 %.c99: %.gcl $(EXE)
