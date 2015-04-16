@@ -589,7 +589,6 @@ void compileStoredAss() {
 	WTF(";\n");
 }*/
 
-/* Rick, zijn deze mallocs echt nodig? */
 void compileDec(Dec declaration) {
 	writeIndents();
 	WTF(getCTypeString((declaration->id->type / 10)*10));
