@@ -16,6 +16,7 @@ int varcnt = 0;
 int lblcnt = 0;
 int indentDept = 0;
 Params paramsByVal;
+Decs mallocedVars;
 
 int lastline;
 int numstatements;
@@ -580,6 +581,7 @@ void compileStoredAss() {
 }
 
 /* not needed anymore, just kept as reference*/
+
 /*void compileAss(Ass assignment) {
 	compileExpression(assignment->expTree);
 	writeIndents();
@@ -601,7 +603,15 @@ void compileDec(Dec declaration) {
 			writeIndents();
 			writeVarRef(declaration->id->name);
 			WTF("->digits = NULL;\n");
+
 		}
+		mallocedVars->numDecs++;
+		if (mallocedVars->numDecs == 1) {
+			mallocedVars->decs = malloc(mallocedVars->numDecs * sizeof (Dec));
+		} else {
+			mallocedVars->decs = realloc(mallocedVars->decs, mallocedVars->numDecs * sizeof (Dec));
+		}
+		mallocedVars->decs[mallocedVars->numDecs - 1] = declaration;
 	} else {
 		WTF(" = NULL;");
 	}
@@ -619,6 +629,26 @@ void writeGlobalDecMalloc(Dec declaration) {
 		writeVarRef(declaration->id->name);
 		WTF("->digits = NULL;\n");
 	}
+	mallocedVars->numDecs++;
+	if (mallocedVars->numDecs == 1) {
+		mallocedVars->decs = malloc(mallocedVars->numDecs * sizeof (Dec));
+	} else {
+		mallocedVars->decs = realloc(mallocedVars->decs, mallocedVars->numDecs * sizeof (Dec));
+	}
+	mallocedVars->decs[mallocedVars->numDecs - 1] = declaration;
+}
+
+void writeMallocedVarFree(Dec declaration){
+		if ((declaration->id->type / 10) * 10) {
+			writeIndents();
+			WTF("freeInteger(");
+			writeVarRef(declaration->id->name);
+			WTF(");\n");
+		}
+		writeIndents();
+		WTF("free(");
+		writeVarRef(declaration->id->name);
+		WTF(");\n");
 }
 
 void writeConstantInitialization(Dec declaration) {
@@ -1236,6 +1266,8 @@ void compileMain(Prog program) {
 	writeTempVar(timeval);
 	WTF(".tv_usec);\n");
 
+	mallocedVars = malloc(sizeof (struct Decs));
+	mallocedVars->numDecs = 0;
 
 	if (program->numConstDefs > 0) WTF("// global constant mallocs, will be init below\n");
 	for (int i = 0; i < program->numConstDefs; i++) {
@@ -1265,6 +1297,15 @@ void compileMain(Prog program) {
 		free(paramsByVal->params);
 	}
 	free(paramsByVal);
+
+	for (int i = 0; i < mallocedVars->numDecs; i++) {
+		writeMallocedVarFree(mallocedVars->decs[i]);
+	}
+
+	if (mallocedVars->numDecs > 0) {
+		free(mallocedVars->decs);
+	}
+	free(mallocedVars);
 	writeIndents();
 	WTF("return EXIT_SUCCESS;\n");
 	indentDept--;
