@@ -652,11 +652,6 @@ void compileExpression(ExpTree exp) {
 			printf("Unkown expression kind...\n");
 			//SHOULD NOT HAPPEN
 	}
-
-	//WTF("//compile the expression here\n");
-	//WTF("Integer t0;\nmakeIntegerFromString(&t0, \"1\");//dummy\n");
-	//varcnt++;
-	//TODO
 }
 
 void halfCompileAss(Ass assignment) {
@@ -772,6 +767,10 @@ void writeConstantInitialization(Dec declaration) {
 	WTF("setInteger(");
 	writeVarRef(declaration->id->name);
 	WTF(", ");
+	writeTempVar(varcnt - 1);
+	WTF(");\n");
+	writeIndents();
+	WTF("freeInteger(&");
 	writeTempVar(varcnt - 1);
 	WTF(");\n");
 }
