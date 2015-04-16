@@ -770,7 +770,7 @@ void writeGlobalDecMalloc(Dec declaration) {
 }
 
 void writeMallocedVarFree(Dec declaration) {
-	if ((declaration->id->type / 10) * 10) {
+	if ((declaration->id->type / 10) * 10 == INTEGER_TYPE) {
 		writeIndents();
 		WTF("freeInteger(");
 		writeVarRef(declaration->id->name);
