@@ -678,7 +678,7 @@ void compileStoredAss() {
 			writeVarRef(s->id->name);
 			WTF(", ");
 			writeTempVar(tempvars[i]);
-			WTF(")");
+			WTF(");\n");
 			//FREE
 			writeIndents();
 			WTF("freeInteger(&");
@@ -688,8 +688,8 @@ void compileStoredAss() {
 			writeVar(s->id->name);
 			WTF(" = ");
 			writeTempVar(tempvars[i]);
+			WTF(");\n");
 		}
-		WTF(";\n");
 		stored[i] = NULL;
 		tempvars[i] = -1;
 	}
