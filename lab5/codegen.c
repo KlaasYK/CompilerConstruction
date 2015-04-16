@@ -1361,9 +1361,26 @@ void compileFunc(FuncDef function) {
 		free(mallocedVars->decs);
 	}
 	free(mallocedVars);
+	
+	// copy the variable to another temp
+	// free the original var
+	int returnvar = varcnt++;
+	
+	writeIndents();
+	WTF(getCTypeString((function->id->type / 10) *10));
+	writeTempVar(returnvar);
+	WTF(" = ");
+	writeVar(function->id->name);
+	WTF(";\n");
+	
+	writeIndents();
+	WTF("free(");
+	writeVarRef(function->id->name);
+	WTF(");\n");
+	
 	writeIndents();
 	WTF("return ");
-	writeVar(function->id->name);
+	writeTempVar(returnvar);
 	WTF(";\n");
 	indentDept--;
 	WTF("}\n");
