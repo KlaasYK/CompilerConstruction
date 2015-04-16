@@ -206,10 +206,31 @@ void compilefuncexp(FuncCall funccall) {
 						case modop:
 						case powop:
 							/* free integer*/
+							writeIndents();
+							WTF("freeInteger(&");
+							writeTempVar(vars[i]);
+							WTF(";\n");
 							break;
 					}
-				} else {
-
+				} else if (funccall->params[i]->kind == unodeexp) {
+					if (funccall->params[i]->node.bnode->operator == negop) {
+						writeIndents();
+						WTF("freeInteger(&");
+						writeTempVar(vars[i]);
+						WTF(";\n");
+					}
+				} else if (funccall->params[i]->kind == funcexp) {
+					if (funccall->params[i]->node.funcCall->id->type / 10 == INTEGER_TYPE / 10) {
+						writeIndents();
+						WTF("freeInteger(&");
+						writeTempVar(vars[i]);
+						WTF(";\n");
+					}
+				} else if (funccall->params[i]->kind == intexp) {
+					writeIndents();
+					WTF("freeInteger(&");
+					writeTempVar(vars[i]);
+					WTF(";\n");
 				}
 			}
 		}
@@ -753,17 +774,17 @@ void writeGlobalDecMalloc(Dec declaration) {
 	mallocedVars->decs[mallocedVars->numDecs - 1] = declaration;
 }
 
-void writeMallocedVarFree(Dec declaration){
-		if ((declaration->id->type / 10) * 10) {
-			writeIndents();
-			WTF("freeInteger(");
-			writeVarRef(declaration->id->name);
-			WTF(");\n");
-		}
+void writeMallocedVarFree(Dec declaration) {
+	if ((declaration->id->type / 10) * 10) {
 		writeIndents();
-		WTF("free(");
+		WTF("freeInteger(");
 		writeVarRef(declaration->id->name);
 		WTF(");\n");
+	}
+	writeIndents();
+	WTF("free(");
+	writeVarRef(declaration->id->name);
+	WTF(");\n");
 }
 
 void writeConstantInitialization(Dec declaration) {
