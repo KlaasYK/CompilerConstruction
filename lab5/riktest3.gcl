@@ -4,6 +4,7 @@ constant y:integer = 42;
 
 begin
     var k  : integer;
+    var j  : integer;
     k := 5;
     read k;
     println k;
