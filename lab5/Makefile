@@ -41,5 +41,5 @@ clean:
 	rm -f codegen.o
 	rm -f out.c99
 	rm -f out.o
-	rm -f out
-	rm -f out.exe
+	rm -f a.out
+	rm -f a.out.exe
