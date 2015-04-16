@@ -1179,7 +1179,6 @@ void compileReadCall(RCall read) {
 }
 
 void compileProcCall(FuncCall func) {\
-	printf("trace\n");
 	int first = 1;
 	int *vars;
 	if (func->numParams > 0) {
