@@ -704,9 +704,8 @@ void compileDec(Dec declaration) {
 		}
 		mallocedVars->decs[mallocedVars->numDecs - 1] = declaration;
 	} else {
-		WTF(" = NULL;");
+		WTF(" = NULL;\n");
 	}
-	WTF(";\n");
 }
 
 void writeGlobalDecMalloc(Dec declaration) {
