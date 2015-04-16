@@ -688,7 +688,7 @@ void compileStoredAss() {
 			writeVar(s->id->name);
 			WTF(" = ");
 			writeTempVar(tempvars[i]);
-			WTF(");\n");
+			WTF(";\n");
 		}
 		stored[i] = NULL;
 		tempvars[i] = -1;
