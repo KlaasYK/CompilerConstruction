@@ -1393,7 +1393,7 @@ void compileMain(Prog program) {
 	indentDept++;
 
 	/* seed the random generator */
-	WTF("// seed the random generator");
+	WTF("// seed the random generator\n");
 	writeIndents();
 	WTF("struct timeval ");
 	int timeval = varcnt++;
