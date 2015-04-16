@@ -209,6 +209,11 @@ void compilebinodeexp(Bnode bnode) {
 		WTF(",");
 		writeTempVar(powervar);
 		WTF(");\n");
+		//FREE
+		writeIndents();
+		WTF("freeInteger(&");
+		writeTempVar(powervar);
+		WTF(");\n");
 	} else if (bnode->operator == plusop) {
 		compileExpression(bnode->r);
 		int right = varcnt - 1;
@@ -218,6 +223,11 @@ void compilebinodeexp(Bnode bnode) {
 		WTF("addInteger(&");
 		writeTempVar(left);
 		WTF(",");
+		writeTempVar(right);
+		WTF(");\n");
+		//FREE
+		writeIndents();
+		WTF("freeInteger(&");
 		writeTempVar(right);
 		WTF(");\n");
 	} else if (bnode->operator == minop) {
@@ -231,6 +241,11 @@ void compilebinodeexp(Bnode bnode) {
 		WTF(",");
 		writeTempVar(right);
 		WTF(");\n");
+		//FREE
+		writeIndents();
+		WTF("freeInteger(&");
+		writeTempVar(right);
+		WTF(");\n");
 	} else if (bnode->operator == mulop) {
 		compileExpression(bnode->r);
 		int right = varcnt - 1;
@@ -240,6 +255,11 @@ void compilebinodeexp(Bnode bnode) {
 		WTF("mulInteger(&");
 		writeTempVar(left);
 		WTF(",");
+		writeTempVar(right);
+		WTF(");\n");
+		//FREE
+		writeIndents();
+		WTF("freeInteger(&");
 		writeTempVar(right);
 		WTF(");\n");
 	} else if (bnode->operator == divop) {
@@ -253,6 +273,11 @@ void compilebinodeexp(Bnode bnode) {
 		WTF(",");
 		writeTempVar(right);
 		WTF(");\n");
+		//FREE
+		writeIndents();
+		WTF("freeInteger(&");
+		writeTempVar(right);
+		WTF(");\n");
 	} else if (bnode->operator == modop) {
 		compileExpression(bnode->r);
 		int right = varcnt - 1;
@@ -262,6 +287,11 @@ void compilebinodeexp(Bnode bnode) {
 		WTF("modInteger(&");
 		writeTempVar(left);
 		WTF(",");
+		writeTempVar(right);
+		WTF(");\n");
+		//FREE
+		writeIndents();
+		WTF("freeInteger(&");
 		writeTempVar(right);
 		WTF(");\n");
 	} else if (bnode->operator == andop || bnode->operator == candop) {
@@ -352,6 +382,17 @@ void compilebinodeexp(Bnode bnode) {
 		WTF(" = ");
 		writeTempVar(tempvar);
 		WTF(" == 1;\n");
+
+		//FREE
+		writeIndents();
+		WTF("freeInteger(&");
+		writeTempVar(left);
+		WTF(");\n");
+		//FREE
+		writeIndents();
+		WTF("freeInteger(&");
+		writeTempVar(right);
+		WTF(");\n");
 	} else if (bnode->operator == ltop) {
 		compileExpression(bnode->r);
 		int right = varcnt - 1;
@@ -374,6 +415,17 @@ void compilebinodeexp(Bnode bnode) {
 		WTF(" = ");
 		writeTempVar(tempvar);
 		WTF(" == -1;\n");
+
+		//FREE
+		writeIndents();
+		WTF("freeInteger(&");
+		writeTempVar(left);
+		WTF(");\n");
+		//FREE
+		writeIndents();
+		WTF("freeInteger(&");
+		writeTempVar(right);
+		WTF(");\n");
 
 	} else if (bnode->operator == geop) {
 		compileExpression(bnode->r);
@@ -398,6 +450,17 @@ void compilebinodeexp(Bnode bnode) {
 		writeTempVar(tempvar);
 		WTF(" >= 0;\n");
 
+		//FREE
+		writeIndents();
+		WTF("freeInteger(&");
+		writeTempVar(left);
+		WTF(");\n");
+		//FREE
+		writeIndents();
+		WTF("freeInteger(&");
+		writeTempVar(right);
+		WTF(");\n");
+
 	} else if (bnode->operator == leop) {
 		compileExpression(bnode->r);
 		int right = varcnt - 1;
@@ -420,6 +483,17 @@ void compilebinodeexp(Bnode bnode) {
 		WTF(" = ");
 		writeTempVar(tempvar);
 		WTF(" <= 0;\n");
+
+		//FREE
+		writeIndents();
+		WTF("freeInteger(&");
+		writeTempVar(left);
+		WTF(");\n");
+		//FREE
+		writeIndents();
+		WTF("freeInteger(&");
+		writeTempVar(right);
+		WTF(");\n");
 
 	} else if ((getExpType(bnode->l) * 10) / 10 == INTEGER_TYPE) {
 		// EQ en NEQ For integers
@@ -454,6 +528,18 @@ void compilebinodeexp(Bnode bnode) {
 			writeTempVar(tempvar);
 			WTF(" != 0;\n");
 		}
+
+		//FREE
+		writeIndents();
+		WTF("freeInteger(&");
+		writeTempVar(left);
+		WTF(");\n");
+		//FREE
+		writeIndents();
+		WTF("freeInteger(&");
+		writeTempVar(right);
+		WTF(");\n");
+
 	} else {
 		// EQ en NEQ For booleans
 		compileExpression(bnode->r);
