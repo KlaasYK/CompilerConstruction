@@ -598,6 +598,11 @@ void compileunodeexp(Unode unode) {
 		WTF(", ");
 		writeTempVar(expvar);
 		WTF(");\n");
+		//FREE
+		writeIndents();
+		WTF("freeInteger(&");
+		writeTempVar(expvar);
+		WTF(");\n");
 	} else {
 		printf("ERRORZZZ....\n");
 	}
@@ -666,6 +671,7 @@ void compileStoredAss() {
 }
 
 /* not needed anymore, just kept as reference*/
+
 /*void compileAss(Ass assignment) {
 	compileExpression(assignment->expTree);
 	writeIndents();
