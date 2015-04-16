@@ -1052,6 +1052,11 @@ void compileWriteCall(WCall write) {
 				WTF(" = makeStringFromInteger(");
 				writeTempVar(expvar);
 				WTF(");\n");
+				//Free the original integer
+				writeIndents();
+				WTF("freeInteger(&");
+				writeTempVar(expvar);
+				WTF(");\n");
 			}
 			vars[j] = varcnt - 1;
 			j++;
