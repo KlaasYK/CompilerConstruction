@@ -641,6 +641,7 @@ void compileExpression(ExpTree exp) {
 
 void halfCompileAss(Ass assignment) {
 	compileExpression(assignment->expTree);
+	// The expressions are freeëd in compileStoredAss()
 	stored[numstatements] = assignment;
 	tempvars[numstatements] = varcnt - 1;
 	numstatements++;
@@ -658,6 +659,11 @@ void compileStoredAss() {
 			WTF(", ");
 			writeTempVar(tempvars[i]);
 			WTF(")");
+			//FREE
+			writeIndents();
+			WTF("freeInteger(&");
+			writeTempVar(tempvars[i]);
+			WTF(");\n");
 		} else {
 			writeVar(s->id->name);
 			WTF(" = ");
