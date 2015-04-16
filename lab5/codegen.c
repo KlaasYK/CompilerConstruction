@@ -1157,6 +1157,10 @@ void compileReadCall(RCall read) {
 	for (int i = 0; i < read->numids; i++) {
 		if (read->ids[i]->type / 10 == INTEGER_TYPE / 10) {
 			writeIndents();
+			WTF("freeInteger(");
+			writeVarRef(read->ids[i]->name);
+			WTF(");\n");
+			writeIndents();
 			WTF("makeIntegerFromString(");
 			writeVarRef(read->ids[i]->name);
 			WTF(", ");
