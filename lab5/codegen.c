@@ -1393,6 +1393,8 @@ void compileMain(Prog program) {
 	indentDept++;
 
 	/* seed the random generator */
+	WTF("// seed the random generator");
+	writeIndents();
 	WTF("struct timeval ");
 	int timeval = varcnt++;
 	writeTempVar(timeval);
@@ -1401,6 +1403,7 @@ void compileMain(Prog program) {
 	WTF("gettimeofday(&");
 	writeTempVar(timeval);
 	WTF(", NULL);\n");
+	writeIndents();
 	WTF("srand(");
 	writeTempVar(timeval);
 	WTF(".tv_usec);\n");
