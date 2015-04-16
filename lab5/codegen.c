@@ -1322,6 +1322,8 @@ void compileCallByValueFree() {
 }
 
 void compileFunc(FuncDef function) {
+	mallocedVars = malloc(sizeof (struct Decs));
+	mallocedVars->numDecs = 0;
 	WTF(getCTypeString((function->id->type / 10) *10));
 	WTF(function->id->name);
 	WTF("(");
@@ -1351,6 +1353,14 @@ void compileFunc(FuncDef function) {
 	}
 	compileStoredAss();
 	compileCallByValueFree();
+	for (int i = 0; i < mallocedVars->numDecs; i++) {
+		writeMallocedVarFree(mallocedVars->decs[i]);
+	}
+
+	if (mallocedVars->numDecs > 0) {
+		free(mallocedVars->decs);
+	}
+	free(mallocedVars);
 	writeIndents();
 	WTF("return ");
 	writeVar(function->id->name);
@@ -1364,6 +1374,8 @@ void compileFunc(FuncDef function) {
 }
 
 void compileProc(ProcDef procedure) {
+	mallocedVars = malloc(sizeof (struct Decs));
+	mallocedVars->numDecs = 0;
 	WTF("void ");
 	WTF(procedure->name);
 	WTF("(");
@@ -1384,6 +1396,14 @@ void compileProc(ProcDef procedure) {
 	compileStoredAss();
 	compileCallByValueFree();
 
+	for (int i = 0; i < mallocedVars->numDecs; i++) {
+		writeMallocedVarFree(mallocedVars->decs[i]);
+	}
+
+	if (mallocedVars->numDecs > 0) {
+		free(mallocedVars->decs);
+	}
+	free(mallocedVars);
 	indentDept--;
 	WTF("}\n");
 	if (paramsByVal->numParams > 0) {
