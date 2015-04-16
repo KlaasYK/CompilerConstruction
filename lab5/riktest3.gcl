@@ -7,7 +7,7 @@ procedure x(a:integer);
 end;
 
 function z(a:integer) -> integer
-    z := x+5;
+    z := a+5;
 end;
 
 
