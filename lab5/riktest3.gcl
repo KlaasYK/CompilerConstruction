@@ -9,4 +9,6 @@ begin
     println k;
     k := -k;
     println k;
+    k := -k;
+    println k;
 end.
