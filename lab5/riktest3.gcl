@@ -2,6 +2,15 @@ program bla;
 
 constant y:integer = 42;
 
+procedure x(a:integer);
+    println z(a);
+end;
+
+function z(a:integer) -> integer
+    z := x+5;
+end;
+
+
 begin
     var k  : integer;
     var j  : integer;
