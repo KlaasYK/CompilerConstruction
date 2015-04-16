@@ -194,6 +194,25 @@ void compilefuncexp(FuncCall funccall) {
 	}
 	WTF(");\n");
 	if (funccall->numParams > 0) {
+		for (int i = 0; i < funccall->numParams; i++) {
+			if (vars[i] != -1) {
+				//Free the expression if needed
+				if (funccall->params[i]->kind == bnodeexp) {
+					switch (funccall->params[i]->node.bnode->operator) {
+						case plusop:
+						case minop:
+						case mulop:
+						case divop:
+						case modop:
+						case powop:
+							/* free integer*/
+							break;
+					}
+				} else {
+
+				}
+			}
+		}
 		free(vars);
 	}
 }
@@ -642,6 +661,7 @@ void compileExpression(ExpTree exp) {
 
 void halfCompileAss(Ass assignment) {
 	compileExpression(assignment->expTree);
+	// The expressions are freeëd in compileStoredAss()
 	stored[numstatements] = assignment;
 	tempvars[numstatements] = varcnt - 1;
 	numstatements++;
@@ -658,13 +678,18 @@ void compileStoredAss() {
 			writeVarRef(s->id->name);
 			WTF(", ");
 			writeTempVar(tempvars[i]);
-			WTF(")");
+			WTF(");\n");
+			//FREE
+			writeIndents();
+			WTF("freeInteger(&");
+			writeTempVar(tempvars[i]);
+			WTF(");\n");
 		} else {
 			writeVar(s->id->name);
 			WTF(" = ");
 			writeTempVar(tempvars[i]);
+			WTF(";\n");
 		}
-		WTF(";\n");
 		stored[i] = NULL;
 		tempvars[i] = -1;
 	}
