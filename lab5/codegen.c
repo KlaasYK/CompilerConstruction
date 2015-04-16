@@ -193,6 +193,25 @@ void compilefuncexp(FuncCall funccall) {
 	}
 	WTF(");\n");
 	if (funccall->numParams > 0) {
+		for (int i = 0; i < funccall->numParams; i++) {
+			if (vars[i] != -1) {
+				//Free the expression if needed
+				if (funccall->params[i]->kind == bnodeexp) {
+					switch (funccall->params[i]->node.bnode->operator) {
+						case plusop:
+						case minop:
+						case mulop:
+						case divop:
+						case modop:
+						case powop:
+							/* free integer*/
+							break;
+					}
+				} else {
+
+				}
+			}
+		}
 		free(vars);
 	}
 }
